@@ -39,6 +39,22 @@ export default [
     external: ['react', 'react-dom', 'react-router-dom', 'lucide-react'],
   },
   {
+    input: 'src/styles/index.css',
+    output: {
+      file: 'dist/styles.css',
+    },
+    plugins: [
+      postcss({
+        extensions: ['.css'],
+        minimize: false,
+        extract: true,
+        config: {
+          path: './postcss.config.cjs'
+        }
+      }),
+    ],
+  },
+  {
     input: 'dist/components/index.d.ts',
     output: [{ file: 'dist/index.d.ts', format: 'esm' }],
     plugins: [dts()],

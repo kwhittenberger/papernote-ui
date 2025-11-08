@@ -25,6 +25,9 @@ export interface TableProps<T> {
   renderExpandedRow?: (row: T) => React.ReactNode;
   emptyState?: React.ReactNode;
   className?: string;
+  onSort?: (columnKey: string, direction: SortDirection) => void;
+  sortColumn?: string | null;
+  sortDirection?: SortDirection;
 }
 
 export default function Table<T>({
@@ -37,23 +40,42 @@ export default function Table<T>({
   renderExpandedRow,
   emptyState,
   className = '',
+  onSort,
+  sortColumn: externalSortColumn,
+  sortDirection: externalSortDirection,
 }: TableProps<T>) {
-  const [sortColumn, setSortColumn] = useState<string | null>(null);
-  const [sortDirection, setSortDirection] = useState<SortDirection>(null);
+  const [internalSortColumn, setInternalSortColumn] = useState<string | null>(null);
+  const [internalSortDirection, setInternalSortDirection] = useState<SortDirection>(null);
+
+  // Use external sort state if provided, otherwise use internal state
+  const sortColumn = externalSortColumn !== undefined ? externalSortColumn : internalSortColumn;
+  const sortDirection = externalSortDirection !== undefined ? externalSortDirection : internalSortDirection;
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
   // Handle sorting
   const handleSort = (columnKey: string) => {
+    let newDirection: SortDirection;
+
     if (sortColumn === columnKey) {
-      if (sortDirection === 'asc') setSortDirection('desc');
-      else if (sortDirection === 'desc') {
-        setSortColumn(null);
-        setSortDirection(null);
+      if (sortDirection === 'asc') {
+        newDirection = 'desc';
+      } else if (sortDirection === 'desc') {
+        newDirection = null;
+      } else {
+        newDirection = 'asc';
       }
     } else {
-      setSortColumn(columnKey);
-      setSortDirection('asc');
+      newDirection = 'asc';
+    }
+
+    // If using external sort control, call the callback
+    if (onSort) {
+      onSort(columnKey, newDirection);
+    } else {
+      // Otherwise update internal state
+      setInternalSortColumn(newDirection === null ? null : columnKey);
+      setInternalSortDirection(newDirection);
     }
   };
 

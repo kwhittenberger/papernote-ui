@@ -18,7 +18,8 @@
       "require": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
-    "./styles": "./src/styles/index.css",
+    "./styles": "./dist/styles.css",
+    "./styles.css": "./dist/styles.css",
     "./tailwind-config": "./tailwind.config.js"
   },
   "scripts": {

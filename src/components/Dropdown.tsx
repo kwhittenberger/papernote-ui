@@ -11,6 +11,7 @@ export interface DropdownItem {
   onClick?: () => void;
   disabled?: boolean;
   divider?: boolean;
+  variant?: 'default' | 'danger';
 }
 
 export interface DropdownProps {
@@ -70,6 +71,8 @@ export default function Dropdown({ trigger, items, align = 'right' }: DropdownPr
                   className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
                     item.disabled
                       ? 'text-ink-400 cursor-not-allowed'
+                      : item.variant === 'danger'
+                      ? 'text-error-600 hover:bg-error-50 hover:text-error-700'
                       : 'text-ink-700 hover:bg-paper-50 hover:text-ink-900'
                   }`}
                 >

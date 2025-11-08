@@ -2,6 +2,7 @@
 // This file is part of the Commissions Management System (CMMS).
 // Proprietary and confidential. Unauthorized copying or distribution is prohibited.
 import React from 'react';
+import Button from './Button';
 
 export interface EmptyStateProps {
   icon?: React.ReactNode;
@@ -43,20 +44,20 @@ export default function EmptyState({
       {(action || secondaryAction) && (
         <div className="flex items-center gap-3">
           {action && (
-            <button
+            <Button
+              variant="primary"
               onClick={action.onClick}
-              className="btn btn-primary"
             >
               {action.label}
-            </button>
+            </Button>
           )}
           {secondaryAction && (
-            <button
+            <Button
+              variant="secondary"
               onClick={secondaryAction.onClick}
-              className="btn btn-secondary"
             >
               {secondaryAction.label}
-            </button>
+            </Button>
           )}
         </div>
       )}

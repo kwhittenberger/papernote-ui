@@ -6,7 +6,6 @@ import React from 'react';
 export interface CardProps {
   children: React.ReactNode;
   variant?: 'default' | 'compact' | 'flat';
-  width?: 'sm' | 'md' | 'lg' | 'xl' | 'auto' | 'full';
   className?: string;
   onClick?: () => void;
   hoverable?: boolean;
@@ -15,7 +14,6 @@ export interface CardProps {
 export default function Card({
   children,
   variant = 'default',
-  width = 'auto',
   className = '',
   onClick,
   hoverable = false,
@@ -28,20 +26,11 @@ export default function Card({
     flat: 'rounded-lg p-5',
   };
 
-  const widthStyles = {
-    sm: 'w-64 max-w-full',
-    md: 'w-80 max-w-full',
-    lg: 'w-96 max-w-full',
-    xl: 'w-[32rem] max-w-full',
-    auto: 'w-auto',
-    full: 'w-full',
-  };
-
   const interactiveStyles = onClick || hoverable ? 'cursor-pointer hover:shadow-md' : '';
 
   return (
     <div
-      className={`${baseStyles} ${variantStyles[variant]} ${widthStyles[width]} ${interactiveStyles} ${className}`}
+      className={`${baseStyles} ${variantStyles[variant]} ${interactiveStyles} ${className}`}
       onClick={onClick}
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
