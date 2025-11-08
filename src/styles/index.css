@@ -175,7 +175,7 @@
     max-width: 1400px;
     margin-top: 1rem;
     margin-bottom: 1rem;
-    margin-left: 1rem; /* Minimal gutter for page nav */
+    margin-left: 2.5rem; /* Narrower gutter for page nav */
     margin-right: 2rem;
     padding: 3rem 4rem 3rem 5rem; /* Extra left padding for binding margin */
     min-height: calc(100vh - 12rem);
@@ -230,8 +230,8 @@
   /* Page Navigation / TOC - Sits in gutter between sidebar and page */
   .page-nav {
     @apply fixed top-32 bottom-8;
-    left: 16.25rem; /* Sidebar (16rem) + minimal offset */
-    width: 1.5rem;
+    left: 16.5rem; /* Sidebar (16rem) + gutter offset */
+    width: 2rem;
     z-index: 5;
     pointer-events: none;
   }
@@ -266,7 +266,12 @@
   }
 
   .page-nav-dot {
-    @apply w-2 h-2 rounded-full bg-paper-300 hover:bg-accent-400 transition-all duration-200 cursor-pointer pointer-events-auto;
+    @apply w-2 h-2 rounded-full bg-paper-300 transition-all duration-200 cursor-pointer pointer-events-auto;
+  }
+
+  .page-nav-dot:hover {
+    @apply bg-accent-400;
+    transform: scale(1.2);
   }
 
   .page-nav-dot.active {
