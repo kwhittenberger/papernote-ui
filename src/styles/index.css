@@ -175,7 +175,7 @@
     max-width: 1400px;
     margin-top: 1rem;
     margin-bottom: 1rem;
-    margin-left: 2.5rem; /* Narrower gutter for page nav */
+    margin-left: 1rem; /* Small margin from gutter */
     margin-right: 2rem;
     padding: 3rem 4rem 3rem 5rem; /* Extra left padding for binding margin */
     min-height: calc(100vh - 12rem);

@@ -71,7 +71,7 @@ export default function UserProfileButton({
   const trigger = (
     <button
       className={`
-        w-full flex items-center gap-3 p-3 rounded-lg
+        w-full flex items-center gap-2 p-2.5 rounded-lg
         bg-white bg-subtle-grain border border-paper-300
         hover:bg-paper-50 transition-colors duration-200 group
         ${className}
@@ -79,26 +79,26 @@ export default function UserProfileButton({
       aria-haspopup="true"
     >
       {/* Avatar with Status */}
-      <div className="relative">
-        <div className="h-10 w-10 bg-gradient-to-br from-accent-400 to-accent-600 rounded-xl flex items-center justify-center shadow-lg">
-          <span className="text-white text-sm font-bold">{initials}</span>
+      <div className="relative flex-shrink-0">
+        <div className="h-9 w-9 bg-gradient-to-br from-accent-400 to-accent-600 rounded-xl flex items-center justify-center shadow-lg">
+          <span className="text-white text-xs font-bold">{initials}</span>
         </div>
         {/* Online Status Indicator */}
         <div
-          className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-white ${
+          className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white ${
             isOnline ? 'bg-success-500' : 'bg-ink-400'
           }`}
         />
       </div>
 
       {/* User Info */}
-      <div className="flex-1 text-left min-w-0">
-        <p className="text-sm font-semibold text-ink-900 truncate">{userName}</p>
-        <p className="text-xs text-ink-500 truncate">{userTitle || userEmail || ''}</p>
+      <div className="flex-1 text-left min-w-0 overflow-hidden">
+        <p className="text-xs font-semibold text-ink-900 truncate leading-tight">{userName}</p>
+        <p className="text-[10px] text-ink-500 truncate leading-tight mt-0.5">{userTitle || userEmail || ''}</p>
       </div>
 
       {/* Chevron */}
-      <ChevronDown className="h-4 w-4 text-ink-400 group-hover:text-ink-600 transition-all duration-200 flex-shrink-0" />
+      <ChevronDown className="h-3.5 w-3.5 text-ink-400 group-hover:text-ink-600 transition-all duration-200 flex-shrink-0" />
     </button>
   );
 
