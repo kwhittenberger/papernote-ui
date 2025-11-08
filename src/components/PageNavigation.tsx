@@ -45,15 +45,28 @@ export const PageNavigation: React.FC<PageNavigationProps> = ({ className = '' }
   }, []);
 
   useEffect(() => {
-    // Scroll spy
+    // Scroll spy - listen to the correct scroll container
+    const findScrollContainer = () => {
+      const container = document.querySelector('.flex-1.overflow-auto');
+      return (container as HTMLElement) || null;
+    };
+
     const handleScroll = () => {
-      const scrollPosition = window.scrollY + 200;
+      const scrollContainer = findScrollContainer();
+      if (!scrollContainer) return;
+
+      const scrollTop = scrollContainer.scrollTop;
+      const containerTop = scrollContainer.getBoundingClientRect().top;
 
       for (const section of sections) {
         const element = document.getElementById(section.id) || document.querySelector(`[data-section="${section.id}"]`);
         if (element) {
-          const { offsetTop, offsetHeight } = element as HTMLElement;
-          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
+          const rect = element.getBoundingClientRect();
+          const elementTop = rect.top - containerTop;
+          const elementBottom = elementTop + rect.height;
+
+          // Check if section is in view (with some offset for better UX)
+          if (elementTop <= 200 && elementBottom > 200) {
             setActiveSection(section.id);
             break;
           }
@@ -61,14 +74,29 @@ export const PageNavigation: React.FC<PageNavigationProps> = ({ className = '' }
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const scrollContainer = findScrollContainer();
+    if (scrollContainer) {
+      scrollContainer.addEventListener('scroll', handleScroll);
+      // Run once on mount to set initial active section
+      handleScroll();
+      return () => scrollContainer.removeEventListener('scroll', handleScroll);
+    }
   }, [sections]);
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id) || document.querySelector(`[data-section="${id}"]`);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Find the scrollable container
+      const scrollContainer = document.querySelector('.flex-1.overflow-auto') as HTMLElement;
+      if (scrollContainer) {
+        // Scroll within the container
+        const elementTop = element.offsetTop - scrollContainer.offsetTop;
+        scrollContainer.scrollTo({ top: elementTop - 100, behavior: 'smooth' });
+      } else {
+        // Fallback to window scroll
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      setActiveSection(id);
     }
   };
 
