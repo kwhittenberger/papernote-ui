@@ -175,7 +175,7 @@
     max-width: 1400px;
     margin-top: 1rem;
     margin-bottom: 1rem;
-    margin-left: 2.5rem; /* Narrower gutter for page nav */
+    margin-left: 1rem; /* Minimal gutter for page nav */
     margin-right: 2rem;
     padding: 3rem 4rem 3rem 5rem; /* Extra left padding for binding margin */
     min-height: calc(100vh - 12rem);
@@ -224,14 +224,14 @@
     top: 0;
     bottom: 0;
     width: 1px;
-    background-color: rgba(239, 68, 68, 0.15); /* Subtle red margin line */
+    background-color: rgba(239, 68, 68, 0.05); /* Very subtle red margin line */
   }
 
   /* Page Navigation / TOC - Sits in gutter between sidebar and page */
   .page-nav {
     @apply fixed top-32 bottom-8;
-    left: 16.5rem; /* Sidebar (16rem) + small offset */
-    width: 2rem;
+    left: 16.25rem; /* Sidebar (16rem) + minimal offset */
+    width: 1.5rem;
     z-index: 5;
     pointer-events: none;
   }

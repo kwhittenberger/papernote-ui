@@ -45,23 +45,9 @@ export const Page: React.FC<PageProps> = ({
   };
 
   return (
-    <div className={`min-h-full bg-paper-100 p-8 ${className}`}>
-      <div className={`${maxWidthClasses[maxWidth]} mx-auto ${paddingClasses[padding]} bg-white shadow-xl rounded-lg relative overflow-hidden`}>
-        {/* Red margin line on the left - like a notebook */}
-        <div className="absolute left-16 top-0 bottom-0 w-px bg-error-500"></div>
-
-        {/* Ruled paper effect - subtle horizontal lines */}
-        <div
-          className="absolute inset-0 pointer-events-none opacity-[0.03]"
-          style={{
-            backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 31px, #000 31px, #000 32px)',
-          }}
-        ></div>
-
-        {/* Content */}
-        <div className="relative z-10 pl-20">
-          {children}
-        </div>
+    <div className="min-h-screen bg-paper-100">
+      <div className={`notebook-page notebook-margin ${className}`}>
+        {children}
       </div>
     </div>
   );

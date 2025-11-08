@@ -56,7 +56,16 @@ export const PageNavigation: React.FC<PageNavigationProps> = ({ className = '' }
       if (!scrollContainer) return;
 
       const scrollTop = scrollContainer.scrollTop;
+      const scrollHeight = scrollContainer.scrollHeight;
+      const clientHeight = scrollContainer.clientHeight;
       const containerTop = scrollContainer.getBoundingClientRect().top;
+
+      // Check if we're near the bottom (within 100px)
+      const isNearBottom = scrollTop + clientHeight >= scrollHeight - 100;
+      if (isNearBottom && sections.length > 0) {
+        setActiveSection(sections[sections.length - 1].id);
+        return;
+      }
 
       for (const section of sections) {
         const element = document.getElementById(section.id) || document.querySelector(`[data-section="${section.id}"]`);
