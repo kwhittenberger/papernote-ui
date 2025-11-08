@@ -262,11 +262,11 @@
 
   /* Alternative: Dot navigation style (simpler) */
   .page-nav-dots {
-    @apply flex flex-col gap-2 items-center;
+    @apply flex flex-col gap-2 items-center pointer-events-auto;
   }
 
   .page-nav-dot {
-    @apply w-2 h-2 rounded-full bg-paper-300 hover:bg-accent-400 transition-all duration-200 cursor-pointer;
+    @apply w-2 h-2 rounded-full bg-paper-300 hover:bg-accent-400 transition-all duration-200 cursor-pointer pointer-events-auto;
   }
 
   .page-nav-dot.active {
