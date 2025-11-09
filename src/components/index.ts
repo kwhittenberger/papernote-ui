@@ -118,3 +118,15 @@ export type { DashboardProps, DashboardHeaderProps, DashboardContentProps } from
 // Status Bar
 export { default as StatusBar } from './StatusBar';
 export type { StatusBarProps } from './StatusBar';
+
+// Theme Toggle
+export { default as ThemeToggle } from './ThemeToggle';
+export type { ThemeToggleProps } from './ThemeToggle';
+
+// Search Bar
+export { default as SearchBar } from './SearchBar';
+export type { SearchBarProps } from './SearchBar';
+
+// Notification Indicator
+export { default as NotificationIndicator } from './NotificationIndicator';
+export type { NotificationIndicatorProps } from './NotificationIndicator';
