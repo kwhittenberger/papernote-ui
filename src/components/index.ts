@@ -173,3 +173,7 @@ export type {
 // Loading Overlay
 export { default as LoadingOverlay } from './LoadingOverlay';
 export type { LoadingOverlayProps } from './LoadingOverlay';
+
+// Query Transparency
+export { default as QueryTransparency } from './QueryTransparency';
+export type { QueryTransparencyProps, QueryTransparencyInfo } from './QueryTransparency';
