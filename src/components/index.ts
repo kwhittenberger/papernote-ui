@@ -152,3 +152,20 @@ export type { StatusBadgeProps } from './StatusBadge';
 
 export { default as ExportButton } from './ExportButton';
 export type { ExportButtonProps, ExportFormat } from './ExportButton';
+
+// Control Bar
+export { 
+  ControlBar, 
+  createPageControlsSection, 
+  createFiltersSection, 
+  createActionsSection, 
+  createQueryDetailsSection 
+} from './ControlBar';
+export type { 
+  ControlBarProps, 
+  ControlBarSection, 
+  PageControlsSectionProps, 
+  FiltersSectionProps, 
+  ActionsSectionProps, 
+  QueryDetailsSectionProps 
+} from './ControlBar';
