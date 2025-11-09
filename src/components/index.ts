@@ -135,9 +135,7 @@ export type { NotificationIndicatorProps } from './NotificationIndicator';
 export { default as DataTable } from './DataTable';
 export type { 
   DataTableColumn, 
-  DataTableAction, 
-  BaseDataItem, 
-  SortConfig 
+  DataTableAction
 } from './DataTable';
 
 // Display Components
@@ -242,3 +240,38 @@ export type { PermissionGateProps } from './PermissionGate';
 // Payment History Timeline
 export { PaymentHistoryTimeline } from './PaymentHistoryTimeline';
 export type { PaymentStatusHistoryEntry } from './PaymentHistoryTimeline';
+
+// Commission Dashboard UI
+export { CommissionDashboardUI } from './CommissionDashboardUI';
+export type { CommissionDashboardUIProps, CommissionSummary, MonthlyCommission } from './CommissionDashboardUI';
+
+// Chart Visualization UI
+export { ChartVisualizationUI } from './ChartVisualizationUI';
+export type { ChartVisualizationUIProps, ChartData } from './ChartVisualizationUI';
+
+// Chat UI
+export { ChatUI } from './ChatUI';
+export type { ChatUIProps, ChatMessage } from './ChatUI';
+
+// Insights Panel UI
+export { InsightsPanelUI } from './InsightsPanelUI';
+export type { InsightsPanelUIProps, AnalyticsInsight } from './InsightsPanelUI';
+
+// Role Manager
+export { RoleManager } from './RoleManager';
+export type { RoleManagerProps, Role } from './RoleManager';
+
+// Relationship Manager UI
+export { RelationshipManagerUI } from './RelationshipManagerUI';
+export type { RelationshipManagerUIProps, AccountStaffAssignmentDto, RelationshipType, UserLookup } from './RelationshipManagerUI';
+
+// Base types
+export type {
+  BaseDataItem,
+  PaginationResponse,
+  DataFetchParams,
+  SortConfig,
+  AppliedFilter,
+  UseDataTableOptions,
+  UseDataTableReturn,
+} from '../types';

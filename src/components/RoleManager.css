@@ -1,0 +1,10 @@
+/* RoleManager.css - Styles for RoleManager component */
+
+.role-manager-permission-grid {
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+
+.role-manager-list {
+  height: var(--role-manager-height, 400px);
+  min-height: 200px;
+}
