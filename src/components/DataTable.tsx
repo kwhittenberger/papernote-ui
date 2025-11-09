@@ -2,9 +2,8 @@
 // This file is part of the notebook-ui component library.
 // Proprietary and confidential. Unauthorized copying or distribution is prohibited.
 
-import React, { useState } from 'react';
-import { ChevronUp, ChevronDown, ChevronsUpDown, ChevronRight, type LucideIcon } from 'lucide-react';
-import Button from './Button';
+import React, { useState, useRef, useEffect } from 'react';
+import { ChevronDown, ChevronRight, MoreVertical, Edit, Trash } from 'lucide-react';
 
 /**
  * Base data item interface - all data items must have an id
@@ -42,8 +41,8 @@ export interface SortConfig {
 export interface DataTableAction<T> {
   /** Button label text */
   label: string;
-  /** Optional icon from lucide-react */
-  icon?: LucideIcon;
+  /** Optional icon - can be component reference or JSX element */
+  icon?: React.ComponentType<any> | React.ReactNode;
   /** Click handler receives the row item */
   onClick: (item: T) => void;
   /** Button styling variant */
@@ -64,7 +63,11 @@ interface DataTableProps<T extends BaseDataItem = BaseDataItem> {
   className?: string;
   onSortChange?: (sort: SortConfig | null) => void;
   currentSort?: SortConfig | null;
-  /** Optional row actions that appear in a sticky left column */
+  /** Built-in edit handler - adds Edit action to menu */
+  onEdit?: (item: T) => void | Promise<void>;
+  /** Built-in delete handler - adds Delete action to menu */
+  onDelete?: (item: T) => void | Promise<void>;
+  /** Optional custom row actions (in addition to edit/delete) */
   actions?: DataTableAction<T>[];
   /** Optional click handler for rows */
   onRowClick?: (item: T) => void;
@@ -84,6 +87,123 @@ interface DataTableProps<T extends BaseDataItem = BaseDataItem> {
   expandedRows?: Set<string>;
   /** Render function for expanded row content */
   renderExpandedRow?: (row: T) => React.ReactNode;
+}
+
+/**
+ * ActionMenu - Inline dropdown menu for row actions
+ */
+function ActionMenu<T>({
+  actions,
+  item,
+}: {
+  actions: DataTableAction<T>[];
+  item: T;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Update position when menu opens
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setPosition({
+        top: rect.bottom + 4, // 4px below button (mt-1)
+        left: rect.right - 224 // 224px = w-56 (14rem * 16px)
+      });
+    }
+  }, [isOpen]);
+
+  // Click outside handler
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        menuRef.current && !menuRef.current.contains(event.target as Node) &&
+        buttonRef.current && !buttonRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
+
+  const visibleActions = actions.filter(action => !action.show || action.show(item));
+
+  if (visibleActions.length === 0) return null;
+
+  const dropdownContent = isOpen && (
+    <div 
+      ref={menuRef}
+      className="fixed w-56 bg-white rounded-lg shadow-lg border border-gray-300 py-1" 
+      style={{
+        zIndex: 999999,
+        top: `${position.top}px`,
+        left: `${position.left}px`
+      }}
+    >
+      {visibleActions.map((action, idx) => {
+        let iconElement: React.ReactNode = null;
+        if (action.icon) {
+          if (React.isValidElement(action.icon)) {
+            iconElement = action.icon;
+          } else {
+            iconElement = React.createElement(action.icon as any, { className: 'h-4 w-4 flex-shrink-0' });
+          }
+        }
+        
+        return (
+          <button
+            key={idx}
+            type="button"
+            onClick={async (e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              try {
+                await action.onClick(item);
+              } catch (error) {
+                console.error('DataTable action error:', error);
+              }
+              setIsOpen(false);
+            }}
+            className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
+              action.variant === 'danger'
+                ? 'text-error-600 hover:bg-error-50 hover:text-error-700'
+                : 'text-gray-700 hover:bg-gray-50'
+            }`}
+            title={action.tooltip}
+          >
+            {iconElement}
+            <span className="flex-1 text-left">{action.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  return (
+    <>
+      <button
+        ref={buttonRef}
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsOpen(!isOpen);
+        }}
+        className="inline-flex items-center justify-center w-8 h-8 text-ink-600 hover:text-ink-900 hover:bg-paper-100 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-accent-400"
+        aria-label="Actions"
+      >
+        <MoreVertical className="h-5 w-5" />
+      </button>
+      {dropdownContent}
+    </>
+  );
 }
 
 /**
@@ -139,7 +259,9 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
   className = '',
   onSortChange,
   currentSort = null,
-  actions,
+  onEdit,
+  onDelete,
+  actions = [],
   onRowClick,
   onRowDoubleClick,
   selectable = false,
@@ -150,6 +272,43 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
   expandedRows: externalExpandedRows,
   renderExpandedRow,
 }: DataTableProps<T>) {
+  // Build combined actions: built-in edit/delete + custom actions
+  const builtInActions: DataTableAction<T>[] = [];
+  
+  if (onEdit) {
+    builtInActions.push({
+      label: 'Edit',
+      icon: Edit,
+      onClick: onEdit,
+      variant: 'secondary',
+      tooltip: 'Edit item'
+    });
+  }
+  
+  if (onDelete) {
+    builtInActions.push({
+      label: 'Delete',
+      icon: Trash,
+      onClick: onDelete,
+      variant: 'danger',
+      tooltip: 'Delete item'
+    });
+  }
+  
+  const allActions = [...builtInActions, ...actions];
+  
+  // Debug logging
+  if (allActions.length > 0) {
+    console.log('DataTable allActions:', allActions.map(a => ({
+      label: a.label,
+      iconType: typeof a.icon,
+      icon: a.icon,
+      hasIcon: !!a.icon,
+      onClick: a.onClick,
+      hasOnClick: !!a.onClick,
+      onClickType: typeof a.onClick
+    })));
+  }
   // Selection state management
   const [internalSelectedRows, setInternalSelectedRows] = useState<Set<string>>(new Set());
   
@@ -236,21 +395,37 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
     }
   };
 
-  // Get sort icon for column
+  // Get sort icon SVG for column (matches reference ui-preview.html)
   const getSortIcon = (column: DataTableColumn<T>) => {
     if (!column.sortable) return null;
 
     const columnKey = String(column.key);
     const isActive = currentSort?.key === columnKey;
+    const isAscending = currentSort?.direction === 'asc';
 
+    // Inactive state - show neutral up/down arrows
     if (!isActive) {
-      return <ChevronsUpDown className="w-4 h-4 text-gray-400" />;
+      return (
+        <svg className="ml-2 w-4 h-4 text-ink-400 group-hover:text-ink-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+        </svg>
+      );
     }
 
-    return currentSort?.direction === 'asc' ? (
-      <ChevronUp className="w-4 h-4 text-blue-600" />
-    ) : (
-      <ChevronDown className="w-4 h-4 text-blue-600" />
+    // Active ascending state - show up arrow highlighted
+    if (isAscending) {
+      return (
+        <svg className="ml-2 w-4 h-4 text-accent-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+        </svg>
+      );
+    }
+
+    // Active descending state - show down arrow highlighted
+    return (
+      <svg className="ml-2 w-4 h-4 text-accent-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 17l-4 4m0 0l-4-4m4 4V3" />
+      </svg>
     );
   };
 
@@ -276,7 +451,7 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
   // Render empty state
   const renderEmptyState = () => (
     <tr>
-      <td colSpan={columns.length + (actions ? 1 : 0) + (selectable ? 1 : 0) + (expandable ? 1 : 0)} className="px-6 py-8 text-center text-gray-500">
+      <td colSpan={columns.length + (allActions.length > 0 ? 1 : 0) + (selectable ? 1 : 0) + (expandable ? 1 : 0)} className="px-6 py-8 text-center text-gray-500">
         {error || emptyMessage}
       </td>
     </tr>
@@ -327,29 +502,12 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
               </button>
             </td>
           )}
-        {actions && (
-          <td className="sticky left-0 bg-white px-0.5 py-4 whitespace-nowrap shadow-[4px_0_6px_-2px_rgba(0,0,0,0.1)] border-b border-gray-200 z-10 align-middle">
-            <div className="flex items-center gap-0.5 justify-center">
-              {actions.map((action, idx) => {
-                const shouldShow = !action.show || action.show(item);
-                if (!shouldShow) return null;
-                
-                const Icon = action.icon;
-                return (
-                  <Button
-                    key={idx}
-                    variant={action.variant || 'secondary'}
-                    size="sm"
-                    onClick={() => action.onClick(item)}
-                    title={action.tooltip || action.label}
-                    className="min-w-0 px-2"
-                  >
-                    {Icon && <Icon className="h-4 w-4" />}
-                    <span className="sr-only">{action.label}</span>
-                  </Button>
-                );
-              })}
-            </div>
+        {allActions.length > 0 && (
+          <td 
+            className="sticky left-0 bg-white px-2 py-4 whitespace-nowrap shadow-[4px_0_6px_-2px_rgba(0,0,0,0.1)] border-b border-gray-200 z-10 align-middle"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <ActionMenu actions={allActions} item={item} />
           </td>
         )}
         {columns.map((column) => {
@@ -360,7 +518,7 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
           return (
             <td
               key={`${item.id}-${String(column.key)}`}
-              className={`px-6 py-4 ${column.width} table-row-stable ${column.className || ''}`}
+              className={`px-6 py-4 ${column.width || ''} table-row-stable ${column.className || ''}`}
             >
               {column.render ? column.render(item, value) : String(value || '')}
             </td>
@@ -376,7 +534,7 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
                 columns.length + 
                 (selectable ? 1 : 0) + 
                 (expandable ? 1 : 0) + 
-                (actions ? 1 : 0)
+                (allActions.length > 0 ? 1 : 0)
               }
               className="px-6 py-4 bg-paper-50"
             >
@@ -403,11 +561,11 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
         </div>
       )}
       
-      <table className="table-stable w-full table-fixed">
+      <table className="table-stable w-full">
         <colgroup>
           {selectable && <col className="w-12" />}
           {expandable && <col className="w-10" />}
-          {actions && <col className="w-12" />}
+          {allActions.length > 0 && <col className="w-12" />}
           {columns.map((column, index) => (
             <col key={index} className={column.width} />
           ))}
@@ -430,23 +588,29 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
                 {/* Empty header for expand column */}
               </th>
             )}
-            {actions && (
-              <th className="sticky left-0 bg-gray-50 px-0.5 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider border-b border-gray-200 z-20">
-                
+            {allActions.length > 0 && (
+              <th className="sticky left-0 bg-gray-50 px-2 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider border-b border-gray-200 z-20 w-12">
+                {/* Actions column header */}
               </th>
             )}
             {columns.map((column) => (
               <th
                 key={String(column.key)}
-                className={`${column.width} px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b border-gray-200 ${
-                  column.sortable ? 'cursor-pointer select-none hover:bg-gray-100 transition-colors' : ''
-                }`}
-                onClick={() => column.sortable && handleSort(column)}
+                className={`${column.width} px-6 py-3 text-left`}
               >
-                <div className="flex items-center gap-2">
-                  <span>{column.header}</span>
-                  {getSortIcon(column)}
-                </div>
+                {column.sortable ? (
+                  <button
+                    onClick={() => handleSort(column)}
+                    className="group inline-flex items-center text-xs font-medium text-ink-500 uppercase tracking-wider hover:text-ink-900 transition-colors"
+                  >
+                    <span>{column.header}</span>
+                    {getSortIcon(column)}
+                  </button>
+                ) : (
+                  <span className="text-xs font-medium text-ink-500 uppercase tracking-wider">
+                    {column.header}
+                  </span>
+                )}
               </th>
             ))}
           </tr>

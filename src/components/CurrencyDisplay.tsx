@@ -1,0 +1,81 @@
+// Copyright (c) 2025 kwhittenberger. All rights reserved.
+// This file is part of the notebook-ui component library.
+// Proprietary and confidential. Unauthorized copying or distribution is prohibited.
+
+import React from 'react';
+
+export interface CurrencyDisplayProps {
+  amount: number;
+  currency?: string;
+  locale?: string;
+  className?: string;
+  size?: 'sm' | 'md' | 'lg';
+  color?: 'default' | 'success' | 'warning' | 'error' | 'muted';
+  showSign?: boolean;
+  precision?: number;
+}
+
+const sizeConfig = {
+  sm: 'text-sm',
+  md: 'text-base',
+  lg: 'text-lg font-semibold',
+};
+
+const colorConfig = {
+  default: 'text-gray-900',
+  success: 'text-green-600',
+  warning: 'text-orange-600',
+  error: 'text-red-600',
+  muted: 'text-gray-500',
+};
+
+export default function CurrencyDisplay({
+  amount,
+  currency = 'USD',
+  locale = 'en-US',
+  className = '',
+  size = 'md',
+  color = 'default',
+  showSign = false,
+  precision = 2,
+}: CurrencyDisplayProps) {
+  const formatCurrency = (value: number) => {
+    const formatter = new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency,
+      minimumFractionDigits: precision,
+      maximumFractionDigits: precision,
+    });
+
+    return formatter.format(value);
+  };
+
+  const formattedAmount = formatCurrency(Math.abs(amount));
+  const isNegative = amount < 0;
+  const isPositive = amount > 0;
+
+  let displayValue = formattedAmount;
+
+  if (showSign) {
+    if (isNegative) {
+      displayValue = `-${formattedAmount}`;
+    } else if (isPositive) {
+      displayValue = `+${formattedAmount}`;
+    }
+  } else if (isNegative) {
+    displayValue = `-${formattedAmount}`;
+  }
+
+  const combinedClasses = [
+    sizeConfig[size],
+    colorConfig[color],
+    'font-medium',
+    className,
+  ].filter(Boolean).join(' ');
+
+  return (
+    <span className={combinedClasses} title={`${currency} ${amount.toFixed(precision)}`}>
+      {displayValue}
+    </span>
+  );
+}

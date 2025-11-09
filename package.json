@@ -30,17 +30,17 @@
     "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
+    "lucide-react": "^0.553.0",
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0",
-    "react-router-dom": "^6.0.0 || ^7.0.0",
-    "lucide-react": ">=0.263.0"
+    "react-router-dom": "^6.0.0 || ^7.0.0"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.0",
     "@rollup/plugin-node-resolve": "^15.0.0",
     "@rollup/plugin-typescript": "^11.0.0",
-    "@types/react": "^18.0.0",
-    "@types/react-dom": "^18.0.0",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "autoprefixer": "^10.4.0",
