@@ -238,3 +238,7 @@ export { default as NotificationBar } from './NotificationBar';
 // Permission Gate
 export { PermissionGate } from './PermissionGate';
 export type { PermissionGateProps } from './PermissionGate';
+
+// Payment History Timeline
+export { PaymentHistoryTimeline } from './PaymentHistoryTimeline';
+export type { PaymentStatusHistoryEntry } from './PaymentHistoryTimeline';
