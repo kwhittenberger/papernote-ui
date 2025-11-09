@@ -130,3 +130,12 @@ export type { SearchBarProps } from './SearchBar';
 // Notification Indicator
 export { default as NotificationIndicator } from './NotificationIndicator';
 export type { NotificationIndicatorProps } from './NotificationIndicator';
+
+// Data Table
+export { default as DataTable } from './DataTable';
+export type { 
+  DataTableColumn, 
+  DataTableAction, 
+  BaseDataItem, 
+  SortConfig 
+} from './DataTable';

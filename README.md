@@ -99,7 +99,8 @@ function App() {
 - **EmptyState** - No data states
 
 ### Data Display
-- **Table** - Advanced table with sorting, filtering, selection
+- **Table** - Basic table with sorting, filtering, selection
+- **DataTable** - Feature-rich table with actions, expansion, and advanced features
 - **Badge** - Status indicators
 - **Loading** - Spinners, dots, skeleton loaders
 
@@ -166,23 +167,38 @@ function App() {
 }
 ```
 
-### Table with Sorting
+### DataTable with Advanced Features
 
 ```tsx
-import { Table } from 'notebook-ui';
+import { DataTable } from 'notebook-ui';
+import { Edit, Trash } from 'lucide-react';
 
-<Table
-  data={data}
-  columns={[
-    { key: 'name', header: 'Name', sortable: true },
-    { key: 'email', header: 'Email', sortable: true },
-    { key: 'status', header: 'Status', accessor: (row) => (
-      <Badge variant="success">{row.status}</Badge>
-    )},
-  ]}
-  keyExtractor={(row) => row.id}
+const columns = [
+  { key: 'name', header: 'Name', sortable: true },
+  { key: 'email', header: 'Email', sortable: true },
+  { 
+    key: 'status', 
+    header: 'Status', 
+    render: (row) => <Badge variant="success">{row.status}</Badge>
+  },
+];
+
+const actions = [
+  { label: 'Edit', icon: Edit, onClick: (row) => handleEdit(row) },
+  { label: 'Delete', icon: Trash, onClick: (row) => handleDelete(row), variant: 'danger' },
+];
+
+<DataTable
+  data={users}
+  columns={columns}
+  actions={actions}
+  loading={loading}
   selectable
   onRowSelect={(selected) => console.log(selected)}
+  expandable
+  renderExpandedRow={(row) => <UserDetails user={row} />}
+  onSortChange={(sort) => setSort(sort)}
+  currentSort={sort}
 />
 ```
 
