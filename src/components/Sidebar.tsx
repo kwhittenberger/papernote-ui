@@ -68,19 +68,27 @@ function SidebarNavItem({
   };
 
   const paddingLeft = level === 0 ? 'pl-3' : level === 1 ? 'pl-8' : 'pl-12';
-  const isActive = isItemActive || isChildActive;
+  
+  // For parent items: show subtle active state if child is active
+  // For child items: show full active state if this item is active
+  const showFullActive = isItemActive;
+  const showParentActive = isChildActive && !isItemActive;
 
   return (
     <div>
       <button
         onClick={handleClick}
         className={`
-          w-full flex items-center justify-between px-3 py-2 text-sm rounded-lg transition-colors
-          ${isActive
-            ? 'bg-accent-50 text-accent-900 font-medium'
-            : 'text-ink-700 hover:bg-paper-100 hover:text-ink-900'
+          w-full flex items-center justify-between py-2 text-sm transition-colors
+          ${showFullActive
+            ? level > 0 
+              ? 'bg-accent-100 text-accent-900 font-medium rounded-lg border-l-2 border-accent-500' 
+              : 'bg-accent-50 text-accent-900 font-medium rounded-lg'
+            : showParentActive
+            ? 'text-ink-900 rounded-lg'
+            : 'text-ink-700 hover:bg-paper-50 hover:text-ink-900 rounded-lg'
           }
-          ${paddingLeft}
+          ${paddingLeft} pr-3
         `}
       >
         <div className="flex items-center gap-3 min-w-0 flex-1">
