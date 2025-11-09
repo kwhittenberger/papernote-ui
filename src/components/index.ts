@@ -169,3 +169,7 @@ export type {
   ActionsSectionProps, 
   QueryDetailsSectionProps 
 } from './ControlBar';
+
+// Loading Overlay
+export { default as LoadingOverlay } from './LoadingOverlay';
+export type { LoadingOverlayProps } from './LoadingOverlay';
