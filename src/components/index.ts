@@ -212,3 +212,29 @@ export type { ToolbarSection, ExpandableToolbarProps } from './ExpandableToolbar
 // Status Bar (already exported above, but adding message functions)
 export { statusManager, addSuccessMessage, addErrorMessage, addWarningMessage, addInfoMessage } from './StatusBar';
 export type { StatusMessage, StatusType } from './StatusBar';
+
+// Navigation Icons
+export {
+  DashboardIcon,
+  CommissionsIcon,
+  SalesIcon,
+  ReportsIcon,
+  AnalyticsIcon,
+  UsersIcon,
+  AccountsIcon,
+  ProductsIcon,
+  LocationsIcon,
+  RulesIcon,
+  WorkflowsIcon,
+  SettingsIcon,
+  CalendarIcon,
+  ChartIcon,
+  ClipboardIcon
+} from './NavigationIcons';
+
+// Notification Bar
+export { default as NotificationBar } from './NotificationBar';
+
+// Permission Gate
+export { PermissionGate } from './PermissionGate';
+export type { PermissionGateProps } from './PermissionGate';
