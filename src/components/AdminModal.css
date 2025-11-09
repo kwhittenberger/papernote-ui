@@ -1,0 +1,49 @@
+/* AdminModal.css - Styles for AdminModal component */
+
+.admin-modal-overlay {
+  left: 240px;
+}
+
+.admin-modal-content {
+  max-height: 90vh;
+}
+
+.admin-modal-large {
+  max-width: 1200px;
+}
+
+.admin-modal-medium {
+  max-width: 800px;
+}
+
+.admin-modal-sidebar-placeholder {
+  left: 0;
+  width: 240px;
+  z-index: -1;
+}
+
+.admin-modal-tabs {
+  gap: 2rem;
+}
+
+.admin-modal-tab-indicator {
+  height: 2px;
+}
+
+.admin-modal-tab-separator {
+  width: 1px;
+  height: 20px;
+  background-color: #d1d5db;
+  margin: 0 16px;
+}
+
+.admin-modal-form,
+.admin-modal-content-area {
+  height: 0px;
+  min-height: 0px;
+  max-height: none;
+}
+
+.admin-modal-footer {
+  gap: 0.75rem;
+}
