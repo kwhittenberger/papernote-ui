@@ -1,22 +1,24 @@
-// StatsGrid Component - Grid layout for displaying statistics in cards
-// Provides consistent 3-column layout for key metrics
+// StatsGrid Component - Responsive grid layout for displaying statistics in cards
+// Provides consistent responsive layout for key metrics
 
 import React from 'react';
 
 export interface StatItemProps {
   label: string;
   value: string | number;
+  icon?: React.ReactNode;
+  subtitle?: string;
   className?: string;
 }
 
 export interface StatsGridProps {
-  stats: StatItemProps[];
+  children: React.ReactNode;
   columns?: 2 | 3 | 4;
   className?: string;
 }
 
 /**
- * Individual stat display item
+ * Individual stat display item (for non-card usage)
  */
 export const StatItem: React.FC<StatItemProps> = ({ label, value, className = '' }) => {
   return (
@@ -28,23 +30,41 @@ export const StatItem: React.FC<StatItemProps> = ({ label, value, className = ''
 };
 
 /**
- * Grid container for displaying multiple statistics
- * Default: 3 columns with equal spacing
+ * Responsive grid container for displaying statistics cards
+ * Uses CSS custom properties for responsive behavior without Tailwind
  */
 export const StatsGrid: React.FC<StatsGridProps> = ({
-  stats,
+  children,
   columns = 3,
   className = ''
 }) => {
-  // Use flex with flex-1 to ensure equal column widths
+  const gridId = `stats-grid-${Math.random().toString(36).substr(2, 9)}`;
+  
   return (
-    <div className={`flex gap-6 ${className}`}>
-      {stats.map((stat, index) => (
-        <div key={index} className="flex-1">
-          <StatItem {...stat} />
-        </div>
-      ))}
-    </div>
+    <>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          #${gridId} {
+            display: grid;
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+            gap: 1.5rem;
+          }
+          @media (min-width: 768px) {
+            #${gridId} {
+              grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+          }
+          @media (min-width: 1024px) {
+            #${gridId} {
+              grid-template-columns: repeat(${columns}, minmax(0, 1fr));
+            }
+          }
+        `
+      }} />
+      <div id={gridId} className={className}>
+        {children}
+      </div>
+    </>
   );
 };
 
