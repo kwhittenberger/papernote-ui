@@ -86,7 +86,7 @@ function SidebarNavItem({
               : 'bg-accent-50 text-accent-900 font-medium rounded-lg'
             : showParentActive
             ? 'text-ink-900 rounded-lg'
-            : 'text-ink-700 hover:bg-paper-50 hover:text-ink-900 rounded-lg'
+            : 'text-ink-700 hover:bg-paper-200 hover:text-ink-900 rounded-lg'
           }
           ${paddingLeft} pr-3
         `}
