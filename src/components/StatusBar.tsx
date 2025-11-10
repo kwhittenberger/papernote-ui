@@ -277,7 +277,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
           </div>
 
           {/* Right side - Time */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 ml-auto">
             {showTime && (
               <span className="font-mono text-xs text-ink-600">{formatTime()}</span>
             )}
