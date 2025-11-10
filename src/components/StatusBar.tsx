@@ -17,6 +17,14 @@ export interface StatusBarProps {
   className?: string;
   maxMessages?: number;
   defaultAutoHideDelay?: number;
+  /** Status message to display when no toast messages */
+  message?: string;
+  /** Connection status (online/offline/connecting) */
+  connectionStatus?: 'online' | 'offline' | 'connecting';
+  /** Show connection indicator */
+  showConnectionStatus?: boolean;
+  /** Show current time */
+  showTime?: boolean;
 }
 
 // Global status management
@@ -131,83 +139,128 @@ const getStatusStyles = (type: StatusType) => {
 export const StatusBar: React.FC<StatusBarProps> = ({
   className = '',
   maxMessages = 3,
-  defaultAutoHideDelay = 5000
+  defaultAutoHideDelay = 5000,
+  message = 'Ready',
+  connectionStatus = 'online',
+  showConnectionStatus = true,
+  showTime = true
 }) => {
   const [messages, setMessages] = useState<StatusMessage[]>([]);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
     const unsubscribe = statusManager.subscribe(setMessages);
     return unsubscribe;
   }, []);
 
+  useEffect(() => {
+    if (!showTime) return;
+    
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [showTime]);
+
   const handleDismiss = (id: string) => {
     statusManager.removeMessage(id);
+  };
+
+  const getConnectionIcon = () => {
+    switch (connectionStatus) {
+      case 'online':
+        return <div className="w-2 h-2 rounded-full bg-green-500" title="Connected" />;
+      case 'offline':
+        return <div className="w-2 h-2 rounded-full bg-red-500" title="Disconnected" />;
+      case 'connecting':
+        return <div className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse" title="Connecting..." />;
+      default:
+        return null;
+    }
+  };
+
+  const getConnectionText = () => {
+    switch (connectionStatus) {
+      case 'online':
+        return 'Connected';
+      case 'offline':
+        return 'Offline';
+      case 'connecting':
+        return 'Connecting...';
+      default:
+        return '';
+    }
+  };
+
+  const formatTime = () => {
+    return currentTime.toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      second: '2-digit'
+    });
   };
 
   const displayMessages = messages.slice(0, maxMessages);
 
   return (
-    <div className={`fixed bottom-0 left-0 right-0 z-50 ${className}`}>
-      <div className="bg-white border-t border-gray-200 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 py-2">
-          {displayMessages.length > 0 ? (
-            <>
-              <div className="space-y-2">
-                {displayMessages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex items-center justify-between p-3 rounded-lg border ${getStatusStyles(message.type)}`}
+    <div className={`h-8 bg-paper-300 border-t border-paper-400 px-4 flex items-center justify-between text-xs text-ink-700 flex-shrink-0 shadow-md ${className}`}>
+      {displayMessages.length > 0 ? (
+        <>
+          {/* Toast messages mode - different styling */}
+          <div className="flex items-center space-x-2 flex-1">
+            {displayMessages.map((message, index) => (
+              <div
+                key={message.id}
+                className={`flex items-center space-x-1 px-2 py-0.5 rounded ${getStatusStyles(message.type)}`}
+              >
+                {getStatusIcon(message.type)}
+                <span className="text-xs font-medium">{message.message}</span>
+                {!message.persistent && (
+                  <button
+                    onClick={() => handleDismiss(message.id)}
+                    className="ml-1 text-current opacity-70 hover:opacity-100 transition-opacity"
+                    aria-label="Dismiss message"
+                    title="Dismiss message"
                   >
-                    <div className="flex items-center space-x-2">
-                      {getStatusIcon(message.type)}
-                      <span className="text-sm font-medium">{message.message}</span>
-                      <span className="text-xs opacity-75">
-                        {message.timestamp.toLocaleTimeString()}
-                      </span>
-                    </div>
+                    <X className="h-3 w-3" />
+                  </button>
+                )}
+              </div>
+            ))}
+            {messages.length > maxMessages && (
+              <span className="text-xs text-gray-500">
+                +{messages.length - maxMessages} more
+              </span>
+            )}
+          </div>
+        </>
+      ) : (
+        <>
+          {/* Default status when no messages - notebook-ui style */}
+          <div className="flex items-center gap-2">
+            {showConnectionStatus && (
+              <div className="flex items-center gap-1.5">
+                {getConnectionIcon()}
+                <span className="text-xs font-medium">{getConnectionText()}</span>
+              </div>
+            )}
+            {message && (
+              <>
+                {showConnectionStatus && <span className="text-paper-500">|</span>}
+                <span className="font-medium">{message}</span>
+              </>
+            )}
+          </div>
 
-                    {!message.persistent && (
-                      <button
-                        onClick={() => handleDismiss(message.id)}
-                        className="ml-4 text-current opacity-70 hover:opacity-100 transition-opacity"
-                        aria-label="Dismiss message"
-                        title="Dismiss message"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              {messages.length > maxMessages && (
-                <div className="mt-2 text-center">
-                  <span className="text-xs text-gray-500">
-                    {messages.length - maxMessages} more message(s)
-                  </span>
-                </div>
-              )}
-            </>
-          ) : (
-            // Default status when no messages
-            <div className="flex items-center justify-between p-2 text-gray-500">
-              <div className="flex items-center space-x-3">
-                <div className="flex items-center space-x-1">
-                  <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-xs font-medium">System Online</span>
-                </div>
-                <span className="text-xs">•</span>
-                <span className="text-xs">
-                  {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </span>
-              </div>
-              <div className="flex items-center space-x-4 text-xs">
-                <span>Ready</span>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+          {/* Right side - Time */}
+          <div className="flex items-center gap-3">
+            {showTime && (
+              <span className="font-mono text-xs text-ink-600">{formatTime()}</span>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 };
