@@ -46,7 +46,7 @@ export const Page: React.FC<PageProps> = ({
 
   return (
     <div className="min-h-screen bg-paper-100">
-      <div className={`notebook-page notebook-margin ${className}`}>
+      <div className={`notebook-page notebook-margin notebook-ruled ${className}`}>
         {children}
       </div>
     </div>
