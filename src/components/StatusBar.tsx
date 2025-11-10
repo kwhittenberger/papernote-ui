@@ -207,8 +207,8 @@ export const StatusBar: React.FC<StatusBarProps> = ({
     <div className={`h-8 bg-paper-300 border-t border-paper-400 px-4 flex items-center justify-between text-xs text-ink-700 flex-shrink-0 shadow-md ${className}`}>
       {displayMessages.length > 0 ? (
         <>
-          {/* Toast messages mode - different styling */}
-          <div className="flex items-center space-x-2 flex-1">
+          {/* Toast messages mode - show messages on left, time on right */}
+          <div className="flex items-center space-x-2">
             {displayMessages.map((message, index) => (
               <div
                 key={message.id}
@@ -232,6 +232,12 @@ export const StatusBar: React.FC<StatusBarProps> = ({
               <span className="text-xs text-gray-500">
                 +{messages.length - maxMessages} more
               </span>
+            )}
+          </div>
+          {/* Time on the right when messages are showing */}
+          <div className="flex items-center gap-3">
+            {showTime && (
+              <span className="font-mono text-xs text-ink-600">{formatTime()}</span>
             )}
           </div>
         </>
