@@ -204,11 +204,27 @@ export const StatusBar: React.FC<StatusBarProps> = ({
   const displayMessages = messages.slice(0, maxMessages);
 
   return (
-    <div className={`h-8 bg-paper-300 border-t border-paper-400 px-4 flex items-center justify-between text-xs text-ink-700 flex-shrink-0 shadow-md ${className}`}>
+    <div className={`h-8 bg-paper-300 border-t border-paper-400 px-4 flex items-center text-xs text-ink-700 flex-shrink-0 shadow-md ${className}`}>
       {displayMessages.length > 0 ? (
         <>
-          {/* Toast messages mode - show messages on left, time on right */}
-          <div className="flex items-center space-x-2">
+          {/* System status on left */}
+          <div className="flex items-center gap-2">
+            {showConnectionStatus && (
+              <div className="flex items-center gap-1.5">
+                {getConnectionIcon()}
+                <span className="text-xs font-medium">{getConnectionText()}</span>
+              </div>
+            )}
+            {message && (
+              <>
+                {showConnectionStatus && <span className="text-paper-500">|</span>}
+                <span className="font-medium">{message}</span>
+              </>
+            )}
+          </div>
+          
+          {/* Toast messages in center */}
+          <div className="flex items-center space-x-2 flex-1 justify-center">
             {displayMessages.map((message, index) => (
               <div
                 key={message.id}
@@ -234,7 +250,8 @@ export const StatusBar: React.FC<StatusBarProps> = ({
               </span>
             )}
           </div>
-          {/* Time on the right when messages are showing */}
+          
+          {/* Time on the right */}
           <div className="flex items-center gap-3">
             {showTime && (
               <span className="font-mono text-xs text-ink-600">{formatTime()}</span>
