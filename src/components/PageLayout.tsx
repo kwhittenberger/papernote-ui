@@ -6,6 +6,8 @@ interface PageLayoutProps {
   description?: string;
   children: ReactNode;
   className?: string;
+  /** Optional content to render before the title (e.g., ControlBar) */
+  headerContent?: ReactNode;
 }
 
 /**
@@ -19,10 +21,14 @@ export function PageLayout({
   title, 
   description, 
   children, 
-  className = '' 
+  className = '',
+  headerContent
 }: PageLayoutProps) {
   return (
     <Page>
+      {/* Content before title (e.g., ControlBar) */}
+      {headerContent}
+      
       <div className={`p-6 max-w-7xl mx-auto pb-20 ${className}`}>
         {/* Header */}
         <div className="mb-8">
