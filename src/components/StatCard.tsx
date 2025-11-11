@@ -7,7 +7,7 @@ import Card from './Card';
 export interface StatCardProps {
   icon: React.ReactNode;
   label: string;
-  value: string | number;
+  value: string | number | React.ReactNode;
   subtitle?: string;
   valueColor?: string;
   iconColor?: string;
