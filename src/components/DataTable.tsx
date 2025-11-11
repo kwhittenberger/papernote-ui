@@ -57,6 +57,58 @@ export interface DataTableAction<T> {
   tooltip?: string;
 }
 
+/**
+ * Expansion mode types
+ */
+export type ExpansionMode = 'edit' | 'details' | string; // string allows 'addRelated-[key]' | 'manageRelated-[key]'
+
+/**
+ * Configuration for different expansion modes
+ */
+export interface ExpandedRowConfig<T> {
+  /** Edit mode - inline editing of the record */
+  edit?: {
+    render: (item: T, onSave: (updated: T) => Promise<void>, onCancel: () => void) => React.ReactNode;
+    triggerOnDoubleClick?: boolean; // Default: true
+    menuLabel?: string; // Default: 'Edit'
+    menuIcon?: React.ComponentType<any>;
+  };
+  
+  /** View details mode - read-only expanded view */
+  details?: {
+    render: (item: T) => React.ReactNode;
+    triggerOnExpand?: boolean; // Default: true (when clicking chevron)
+    menuLabel?: string; // Default: 'View Details'
+    menuIcon?: React.ComponentType<any>;
+  };
+  
+  /** Add related modes - creating related records */
+  addRelated?: Array<{
+    key: string; // Unique identifier for this add related mode
+    label: string; // e.g., 'Add Line Item', 'Add Contact'
+    icon?: React.ComponentType<any>;
+    render: (parentItem: T, onSave: (newItem: any) => Promise<void>, onCancel: () => void) => React.ReactNode;
+    showInMenu?: boolean; // Default: true
+  }>;
+  
+  /** Manage related modes - viewing/editing related records */
+  manageRelated?: Array<{
+    key: string; // Unique identifier for this manage related mode
+    label: string; // e.g., 'Manage Contacts', 'Manage Assignments'
+    icon?: React.ComponentType<any>;
+    render: (parentItem: T) => React.ReactNode;
+    showInMenu?: boolean; // Default: true
+  }>;
+}
+
+/**
+ * Expansion state - tracks which row is expanded and in what mode
+ */
+interface ExpansionState {
+  rowKey: string;
+  mode: ExpansionMode;
+}
+
 interface DataTableProps<T extends BaseDataItem = BaseDataItem> {
   data: T[];
   columns: DataTableColumn<T>[];
@@ -85,12 +137,14 @@ interface DataTableProps<T extends BaseDataItem = BaseDataItem> {
   onRowSelect?: (selectedRows: string[]) => void;
   /** Function to extract unique key from row (defaults to row.id) */
   keyExtractor?: (row: T) => string;
-  /** Enable row expansion */
+  /** Enable row expansion (legacy - use expandedRowConfig instead) */
   expandable?: boolean;
-  /** Controlled expanded rows (set of row keys) */
+  /** Controlled expanded rows (legacy - set of row keys) */
   expandedRows?: Set<string>;
-  /** Render function for expanded row content */
+  /** Render function for expanded row content (legacy - use expandedRowConfig instead) */
   renderExpandedRow?: (row: T) => React.ReactNode;
+  /** NEW: Enhanced expansion configuration with multiple modes */
+  expandedRowConfig?: ExpandedRowConfig<T>;
 }
 
 /**
@@ -308,10 +362,14 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
   expandable = false,
   expandedRows: externalExpandedRows,
   renderExpandedRow,
+  expandedRowConfig,
 }: DataTableProps<T>) {
-  // Build combined actions: built-in edit/delete + custom actions
+  // NEW: Expansion mode state management (for expandedRowConfig)
+  const [expansionState, setExpansionState] = useState<ExpansionState | null>(null);
+  // Build combined actions: built-in edit/delete + custom actions + expansion mode actions
   const builtInActions: DataTableAction<T>[] = [];
   
+  // Legacy onEdit (still supported)
   if (onEdit) {
     builtInActions.push({
       label: 'Edit',
@@ -319,6 +377,72 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
       onClick: onEdit,
       variant: 'secondary',
       tooltip: 'Edit item'
+    });
+  }
+  
+  // NEW: Edit mode from expandedRowConfig
+  if (expandedRowConfig?.edit && !onEdit) {
+    const editConfig = expandedRowConfig.edit;
+    builtInActions.push({
+      label: editConfig.menuLabel || 'Edit',
+      icon: editConfig.menuIcon || Edit,
+      onClick: (item: T) => {
+        const rowKey = getRowKey(item);
+        handleExpansionWithMode(rowKey, 'edit');
+      },
+      variant: 'secondary',
+      tooltip: 'Edit inline'
+    });
+  }
+  
+  // NEW: View details mode from expandedRowConfig
+  if (expandedRowConfig?.details) {
+    const detailsConfig = expandedRowConfig.details;
+    builtInActions.push({
+      label: detailsConfig.menuLabel || 'View Details',
+      icon: detailsConfig.menuIcon,
+      onClick: (item: T) => {
+        const rowKey = getRowKey(item);
+        handleExpansionWithMode(rowKey, 'details');
+      },
+      variant: 'ghost',
+      tooltip: 'View details'
+    });
+  }
+  
+  // NEW: Add related modes from expandedRowConfig
+  if (expandedRowConfig?.addRelated) {
+    expandedRowConfig.addRelated.forEach(config => {
+      if (config.showInMenu !== false) {
+        builtInActions.push({
+          label: config.label,
+          icon: config.icon,
+          onClick: (item: T) => {
+            const rowKey = getRowKey(item);
+            handleExpansionWithMode(rowKey, `addRelated-${config.key}`);
+          },
+          variant: 'secondary',
+          tooltip: config.label
+        });
+      }
+    });
+  }
+  
+  // NEW: Manage related modes from expandedRowConfig
+  if (expandedRowConfig?.manageRelated) {
+    expandedRowConfig.manageRelated.forEach(config => {
+      if (config.showInMenu !== false) {
+        builtInActions.push({
+          label: config.label,
+          icon: config.icon,
+          onClick: (item: T) => {
+            const rowKey = getRowKey(item);
+            handleExpansionWithMode(rowKey, `manageRelated-${config.key}`);
+          },
+          variant: 'ghost',
+          tooltip: config.label
+        });
+      }
     });
   }
   
@@ -398,6 +522,22 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
       newExpanded.add(rowKey);
     }
     setExpandedRows(newExpanded);
+  };
+
+  // NEW: Handle expansion with mode (for expandedRowConfig)
+  const handleExpansionWithMode = (rowKey: string, mode: ExpansionMode) => {
+    // If same row and mode, collapse
+    if (expansionState?.rowKey === rowKey && expansionState?.mode === mode) {
+      setExpansionState(null);
+    } else {
+      // Expand with new mode (collapses any existing expansion)
+      setExpansionState({ rowKey, mode });
+    }
+  };
+
+  // NEW: Handle collapse
+  const handleCollapseExpansion = () => {
+    setExpansionState(null);
   };
 
   // Handle column header click for sorting
@@ -508,10 +648,19 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
       return (
       <React.Fragment key={rowKey}>
         <tr 
-          className={`hover:bg-gray-50 table-row-stable ${onRowDoubleClick || onRowClick ? 'cursor-pointer' : ''} ${isSelected ? 'bg-accent-50 border-l-2 border-accent-500' : ''}`}
+          className={`hover:bg-gray-50 table-row-stable ${onRowDoubleClick || onRowClick || (expandedRowConfig?.edit?.triggerOnDoubleClick !== false) ? 'cursor-pointer' : ''} ${isSelected ? 'bg-accent-50 border-l-2 border-accent-500' : ''}`}
           onClick={() => onRowClick?.(item)}
-          onDoubleClick={() => onRowDoubleClick?.(item)}
+          onDoubleClick={() => {
+            // NEW: If expandedRowConfig.edit is present and triggerOnDoubleClick is not false, trigger edit mode
+            if (expandedRowConfig?.edit && expandedRowConfig.edit.triggerOnDoubleClick !== false) {
+              handleExpansionWithMode(rowKey, 'edit');
+            } else {
+              // Legacy: use onRowDoubleClick handler
+              onRowDoubleClick?.(item);
+            }
+          }}
           title={
+            expandedRowConfig?.edit && expandedRowConfig.edit.triggerOnDoubleClick !== false ? 'Double-click to edit inline' :
             onRowDoubleClick ? 'Double-click to open details' : 
             onRowClick ? 'Click to select' : 
             undefined
@@ -529,14 +678,26 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
             />
           </td>
           )}
-            {expandable && (
+            {(expandable || expandedRowConfig) && (
             <td className="sticky left-0 bg-white px-2 py-4 border-b border-gray-200 z-10">
               <button
-                onClick={() => handleRowExpand(rowKey)}
+                onClick={() => {
+                  // NEW: Enhanced logic for expandedRowConfig
+                  if (expandedRowConfig?.details && expandedRowConfig.details.triggerOnExpand !== false) {
+                    // Trigger details mode if configured
+                    handleExpansionWithMode(rowKey, 'details');
+                  } else if (expandedRowConfig?.edit && expandedRowConfig.edit.triggerOnDoubleClick !== false) {
+                    // Fallback to edit mode if no details but edit is available
+                    handleExpansionWithMode(rowKey, 'edit');
+                  } else {
+                    // Legacy: use handleRowExpand
+                    handleRowExpand(rowKey);
+                  }
+                }}
                 className="text-ink-500 hover:text-ink-900 transition-colors"
-                aria-label={isExpanded ? 'Collapse row' : 'Expand row'}
+                aria-label={isExpanded || (expansionState?.rowKey === rowKey) ? 'Collapse row' : 'Expand row'}
               >
-                {isExpanded ? (
+                {isExpanded || (expansionState?.rowKey === rowKey) ? (
                   <ChevronDown className="h-4 w-4" />
                 ) : (
                   <ChevronRight className="h-4 w-4" />
@@ -569,7 +730,7 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
           })}
             </tr>
             
-              {/* Expanded row content */}
+              {/* Expanded row content - Legacy mode */}
         {expandable && isExpanded && renderExpandedRow && (
           <tr>
             <td
@@ -585,6 +746,83 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
             </td>
           </tr>
         )}
+        
+        {/* Expanded row content - NEW: Multiple expansion modes */}
+        {expansionState && expansionState.rowKey === rowKey && expandedRowConfig && (() => {
+          const mode = expansionState.mode;
+          let content: React.ReactNode = null;
+          let bgColorClass = 'bg-paper-50'; // Default
+          
+          // Edit mode
+          if (mode === 'edit' && expandedRowConfig.edit) {
+            bgColorClass = 'bg-gray-100/80 border-t border-b border-gray-300/80';
+            content = expandedRowConfig.edit.render(
+              item,
+              async (updated: T) => {
+                // Handle save
+                handleCollapseExpansion();
+              },
+              () => {
+                // Handle cancel
+                handleCollapseExpansion();
+              }
+            );
+          }
+          
+          // Details mode
+          else if (mode === 'details' && expandedRowConfig.details) {
+            bgColorClass = 'bg-blue-50/80 border-t border-b border-blue-200/80';
+            content = expandedRowConfig.details.render(item);
+          }
+          
+          // Add related modes
+          else if (mode.startsWith('addRelated-') && expandedRowConfig.addRelated) {
+            const key = mode.replace('addRelated-', '');
+            const config = expandedRowConfig.addRelated.find(c => c.key === key);
+            if (config) {
+              bgColorClass = 'bg-green-50/80 border-t border-b border-green-200/80';
+              content = config.render(
+                item,
+                async (newItem: any) => {
+                  // Handle save
+                  handleCollapseExpansion();
+                },
+                () => {
+                  // Handle cancel
+                  handleCollapseExpansion();
+                }
+              );
+            }
+          }
+          
+          // Manage related modes
+          else if (mode.startsWith('manageRelated-') && expandedRowConfig.manageRelated) {
+            const key = mode.replace('manageRelated-', '');
+            const config = expandedRowConfig.manageRelated.find(c => c.key === key);
+            if (config) {
+              bgColorClass = 'bg-slate-50/80 border-t border-b border-slate-200/80';
+              content = config.render(item);
+            }
+          }
+          
+          if (!content) return null;
+          
+          return (
+            <tr key={`expanded-${rowKey}`}>
+              <td
+                colSpan={
+                  columns.length + 
+                  (selectable ? 1 : 0) + 
+                  ((expandable || expandedRowConfig) ? 1 : 0) + 
+                  (allActions.length > 0 ? 1 : 0)
+                }
+                className={`px-6 py-4 ${bgColorClass} animate-expand`}
+              >
+                {content}
+              </td>
+            </tr>
+          );
+        })()}
       </React.Fragment>
       );
     });
@@ -607,7 +845,7 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
       <table className="table-stable w-full">
         <colgroup>
           {selectable && <col className="w-12" />}
-          {expandable && <col className="w-10" />}
+          {(expandable || expandedRowConfig) && <col className="w-10" />}
           {allActions.length > 0 && <col className="w-12" />}
           {columns.map((column, index) => (
             <col key={index} style={getColumnStyle(column)} />
@@ -626,7 +864,7 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
                 />
               </th>
             )}
-            {expandable && (
+            {(expandable || expandedRowConfig) && (
               <th className="sticky left-0 bg-gray-50 px-2 py-3 border-b border-gray-200 z-19 w-10">
                 {/* Empty header for expand column */}
               </th>

@@ -138,8 +138,22 @@ export type { NotificationIndicatorProps } from './NotificationIndicator';
 export { default as DataTable } from './DataTable';
 export type { 
   DataTableColumn, 
-  DataTableAction
+  DataTableAction,
+  ExpandedRowConfig,
+  ExpansionMode
 } from './DataTable';
+
+export { default as ExpandedRowEditForm } from './ExpandedRowEditForm';
+export type {
+  ExpandedRowEditFormProps,
+  FormField,
+  FormFieldType,
+  TextFormField,
+  SelectFormField,
+  TextareaFormField,
+  CheckboxFormField,
+  SwitchFormField
+} from './ExpandedRowEditForm';
 
 // Display Components
 export { default as CurrencyDisplay } from './CurrencyDisplay';
