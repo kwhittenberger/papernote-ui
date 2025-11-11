@@ -517,14 +517,16 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
           }
         >
           {selectable && (
-          <td className="sticky left-0 bg-white px-4 py-4 border-b border-gray-200 z-10 align-middle">
-            <input
-              type="checkbox"
-              checked={isSelected}
-              onChange={() => handleRowSelect(rowKey)}
-              className="w-4 h-4 text-accent-600 border-paper-300 rounded focus:ring-accent-400"
-              aria-label={`Select row ${rowKey}`}
-            />
+          <td className="sticky left-0 bg-white px-4 py-4 border-b border-gray-200 z-10">
+            <div className="flex items-center justify-center">
+              <input
+                type="checkbox"
+                checked={isSelected}
+                onChange={() => handleRowSelect(rowKey)}
+                className="w-4 h-4 text-accent-600 border-paper-300 rounded focus:ring-accent-400"
+                aria-label={`Select row ${rowKey}`}
+              />
+            </div>
           </td>
           )}
             {expandable && (
