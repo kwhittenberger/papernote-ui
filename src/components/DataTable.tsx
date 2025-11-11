@@ -201,6 +201,7 @@ function ActionMenu<T>({
           setIsOpen(!isOpen);
         }}
         className="inline-flex items-center justify-center w-8 h-8 text-ink-600 hover:text-ink-900 hover:bg-paper-100 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-accent-400"
+        style={{ verticalAlign: 'middle' }}
         aria-label="Actions"
       >
         <MoreVertical className="h-5 w-5" />
@@ -545,9 +546,8 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
           )}
         {allActions.length > 0 && (
           <td 
-            className="sticky left-0 bg-white px-2 py-4 whitespace-nowrap shadow-[4px_0_6px_-2px_rgba(0,0,0,0.1)] border-b border-gray-200 z-10"
+            className="sticky left-0 bg-white px-2 py-4 whitespace-nowrap shadow-[4px_0_6px_-2px_rgba(0,0,0,0.1)] border-b border-gray-200 z-10 align-middle"
             onClick={(e) => e.stopPropagation()}
-            style={{ verticalAlign: 'middle' }}
           >
             <ActionMenu actions={allActions} item={item} />
           </td>
