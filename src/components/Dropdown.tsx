@@ -18,9 +18,10 @@ export interface DropdownProps {
   trigger: React.ReactNode;
   items: DropdownItem[];
   align?: 'left' | 'right';
+  placement?: 'top' | 'bottom';
 }
 
-export default function Dropdown({ trigger, items, align = 'right' }: DropdownProps) {
+export default function Dropdown({ trigger, items, align = 'right', placement = 'bottom' }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -50,15 +51,24 @@ export default function Dropdown({ trigger, items, align = 'right' }: DropdownPr
 
   return (
     <div className="relative inline-block" ref={dropdownRef}>
-      <div onClick={() => setIsOpen(!isOpen)} className="cursor-pointer">
+      <div 
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setIsOpen(!isOpen);
+        }} 
+        className="cursor-pointer"
+      >
         {trigger}
       </div>
 
       {isOpen && (
         <div
-          className={`absolute top-full mt-2 ${
+          className={`absolute ${
+            placement === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
+          } ${
             align === 'right' ? 'right-0' : 'left-0'
-          } w-56 bg-white bg-subtle-grain rounded-lg shadow-lg border border-paper-200 py-1 z-50 animate-fade-in`}
+          } w-56 bg-white bg-subtle-grain rounded-lg shadow-lg border border-paper-200 py-1 z-[9999] animate-fade-in`}
         >
           {items.map((item) => (
             <React.Fragment key={item.id}>

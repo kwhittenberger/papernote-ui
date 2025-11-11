@@ -12,6 +12,9 @@ export type { InputProps, ValidationState } from './Input';
 export { default as Select } from './Select';
 export type { SelectProps, SelectOption } from './Select';
 
+export { default as MultiSelect } from './MultiSelect';
+export type { MultiSelectProps, MultiSelectOption } from './MultiSelect';
+
 export { default as Switch } from './Switch';
 export type { SwitchProps } from './Switch';
 

@@ -70,6 +70,7 @@ export default function UserProfileButton({
   // Trigger button
   const trigger = (
     <button
+      type="button"
       className={`
         w-full flex items-center gap-2 p-2.5 rounded-lg
         bg-white bg-subtle-grain border border-paper-300
@@ -107,6 +108,7 @@ export default function UserProfileButton({
       trigger={trigger}
       items={items}
       align="left"
+      placement="top"
     />
   );
 }

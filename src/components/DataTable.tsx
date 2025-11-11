@@ -19,10 +19,14 @@ export interface BaseDataItem {
 export interface DataTableColumn<T> {
   key: keyof T | string;
   header: string;
-  width?: string;
+  width?: string | number;      // '120px', '15%', '1fr', 120
+  minWidth?: string | number;   // '100px', 100
+  maxWidth?: string | number;   // '300px', 300
+  flex?: number;                // flex-grow value
   render?: (item: T, value: any) => React.ReactNode;
   sortable?: boolean;
   className?: string;
+  align?: 'left' | 'center' | 'right';
 }
 
 /**
@@ -207,6 +211,37 @@ function ActionMenu<T>({
 }
 
 /**
+ * Helper function to generate column styles from width configuration
+ */
+function getColumnStyle<T>(column: DataTableColumn<T>): React.CSSProperties {
+  const style: React.CSSProperties = {};
+  
+  if (column.width !== undefined) {
+    style.width = typeof column.width === 'number' ? `${column.width}px` : column.width;
+  }
+  
+  if (column.minWidth !== undefined) {
+    style.minWidth = typeof column.minWidth === 'number' ? `${column.minWidth}px` : column.minWidth;
+  }
+  
+  if (column.maxWidth !== undefined) {
+    style.maxWidth = typeof column.maxWidth === 'number' ? `${column.maxWidth}px` : column.maxWidth;
+  }
+  
+  if (column.flex !== undefined) {
+    style.flexGrow = column.flex;
+    style.flexShrink = 1;
+    style.flexBasis = 0;
+  }
+  
+  if (column.align) {
+    style.textAlign = column.align;
+  }
+  
+  return style;
+}
+
+/**
  * DataTable - Feature-rich data table component
  * 
  * Features:
@@ -221,13 +256,14 @@ function ActionMenu<T>({
  * - Fixed layout for stability
  * - Custom cell rendering
  * - Controlled or uncontrolled selection and expansion
+ * - Column width configuration (width, minWidth, maxWidth, flex)
  * 
  * @example
  * ```tsx
  * const columns: DataTableColumn<User>[] = [
- *   { key: 'name', header: 'Name', sortable: true },
- *   { key: 'email', header: 'Email', sortable: true },
- *   { key: 'role', header: 'Role' },
+ *   { key: 'name', header: 'Name', sortable: true, width: '200px', minWidth: '150px' },
+ *   { key: 'email', header: 'Email', sortable: true, width: '250px' },
+ *   { key: 'role', header: 'Role', width: '120px' },
  * ];
  * 
  * const actions: DataTableAction<User>[] = [
@@ -297,18 +333,6 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
   
   const allActions = [...builtInActions, ...actions];
   
-  // Debug logging
-  if (allActions.length > 0) {
-    console.log('DataTable allActions:', allActions.map(a => ({
-      label: a.label,
-      iconType: typeof a.icon,
-      icon: a.icon,
-      hasIcon: !!a.icon,
-      onClick: a.onClick,
-      hasOnClick: !!a.onClick,
-      onClickType: typeof a.onClick
-    })));
-  }
   // Selection state management
   const [internalSelectedRows, setInternalSelectedRows] = useState<Set<string>>(new Set());
   
@@ -434,10 +458,26 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
     <>
       {Array.from({ length: loadingRows }, (_, i) => (
         <tr key={`loading-${i}`} className="animate-pulse table-row-stable">
+          {selectable && (
+            <td className="sticky left-0 bg-white px-4 py-4 border-b border-gray-200 z-10 align-middle">
+              <div className="h-4 w-4 bg-gray-200 rounded"></div>
+            </td>
+          )}
+          {expandable && (
+            <td className="sticky left-0 bg-white px-2 py-4 border-b border-gray-200 z-10">
+              <div className="h-4 w-4 bg-gray-200 rounded"></div>
+            </td>
+          )}
+          {allActions.length > 0 && (
+            <td className="sticky left-0 bg-white px-2 py-4 border-b border-gray-200 z-10">
+              <div className="h-8 w-8 bg-gray-200 rounded"></div>
+            </td>
+          )}
           {columns.map((column, colIndex) => (
             <td
               key={`loading-${i}-${colIndex}`}
-              className={`px-6 py-4 whitespace-nowrap ${column.width} table-row-stable`}
+              className={`px-6 py-4 whitespace-nowrap table-row-stable`}
+              style={getColumnStyle(column)}
             >
               <div className="h-4 bg-gray-200 rounded mb-1"></div>
               <div className="h-3 bg-gray-200 rounded w-3/4"></div>
@@ -477,7 +517,7 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
           }
         >
           {selectable && (
-          <td className="sticky left-0 bg-white px-4 py-4 border-b border-gray-200 z-10">
+          <td className="sticky left-0 bg-white px-4 py-4 border-b border-gray-200 z-10 align-middle">
             <input
               type="checkbox"
               checked={isSelected}
@@ -518,7 +558,8 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
           return (
             <td
               key={`${item.id}-${String(column.key)}`}
-              className={`px-6 py-4 ${column.width || ''} table-row-stable ${column.className || ''}`}
+              className={`px-6 py-4 table-row-stable align-middle ${column.className || ''}`}
+              style={getColumnStyle(column)}
             >
               {column.render ? column.render(item, value) : String(value || '')}
             </td>
@@ -567,7 +608,7 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
           {expandable && <col className="w-10" />}
           {allActions.length > 0 && <col className="w-12" />}
           {columns.map((column, index) => (
-            <col key={index} className={column.width} />
+            <col key={index} style={getColumnStyle(column)} />
           ))}
         </colgroup>
         <thead className="bg-gray-50 sticky top-0 z-10">
@@ -596,7 +637,8 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
             {columns.map((column) => (
               <th
                 key={String(column.key)}
-                className={`${column.width} px-6 py-3 text-left`}
+                className={`px-6 py-3 text-left`}
+                style={getColumnStyle(column)}
               >
                 {column.sortable ? (
                   <button
