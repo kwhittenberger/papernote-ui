@@ -517,16 +517,15 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
           }
         >
           {selectable && (
-          <td className="sticky left-0 bg-white px-4 py-4 border-b border-gray-200 z-10">
-            <div className="flex items-center justify-center">
-              <input
-                type="checkbox"
-                checked={isSelected}
-                onChange={() => handleRowSelect(rowKey)}
-                className="w-4 h-4 text-accent-600 border-paper-300 rounded focus:ring-accent-400"
-                aria-label={`Select row ${rowKey}`}
-              />
-            </div>
+          <td className="sticky left-0 bg-white px-4 py-4 border-b border-gray-200 z-10 align-middle">
+            <input
+              type="checkbox"
+              checked={isSelected}
+              onChange={() => handleRowSelect(rowKey)}
+              className="w-4 h-4 text-accent-600 border-paper-300 rounded focus:ring-accent-400"
+              style={{ verticalAlign: 'middle' }}
+              aria-label={`Select row ${rowKey}`}
+            />
           </td>
           )}
             {expandable && (
@@ -546,8 +545,9 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
           )}
         {allActions.length > 0 && (
           <td 
-            className="sticky left-0 bg-white px-2 py-4 whitespace-nowrap shadow-[4px_0_6px_-2px_rgba(0,0,0,0.1)] border-b border-gray-200 z-10 align-middle"
+            className="sticky left-0 bg-white px-2 py-4 whitespace-nowrap shadow-[4px_0_6px_-2px_rgba(0,0,0,0.1)] border-b border-gray-200 z-10"
             onClick={(e) => e.stopPropagation()}
+            style={{ verticalAlign: 'middle' }}
           >
             <ActionMenu actions={allActions} item={item} />
           </td>
