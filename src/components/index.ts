@@ -53,6 +53,9 @@ export type { AlertProps } from './Alert';
 export { default as Modal, ModalFooter } from './Modal';
 export type { ModalProps } from './Modal';
 
+export { default as ConfirmDialog, useConfirmDialog } from './ConfirmDialog';
+export type { ConfirmDialogProps } from './ConfirmDialog';
+
 export { default as Tooltip } from './Tooltip';
 export type { TooltipProps } from './Tooltip';
 

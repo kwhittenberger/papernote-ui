@@ -3,6 +3,7 @@
 // Proprietary and confidential. Unauthorized copying or distribution is prohibited.
 
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronDown, ChevronRight, MoreVertical, Edit, Trash } from 'lucide-react';
 
 /**
@@ -24,6 +25,7 @@ export interface DataTableColumn<T> {
   maxWidth?: string | number;   // '300px', 300
   flex?: number;                // flex-grow value
   render?: (item: T, value: any) => React.ReactNode;
+  renderSecondary?: (item: T, value: any) => React.ReactNode; // Secondary line content (smaller, muted)
   sortable?: boolean;
   className?: string;
   align?: 'left' | 'center' | 'right';
@@ -96,7 +98,7 @@ export interface ExpandedRowConfig<T> {
     key: string; // Unique identifier for this manage related mode
     label: string; // e.g., 'Manage Contacts', 'Manage Assignments'
     icon?: React.ComponentType<any>;
-    render: (parentItem: T) => React.ReactNode;
+    render: (parentItem: T, onClose: () => void) => React.ReactNode;
     showInMenu?: boolean; // Default: true
   }>;
 }
@@ -145,6 +147,8 @@ interface DataTableProps<T extends BaseDataItem = BaseDataItem> {
   renderExpandedRow?: (row: T) => React.ReactNode;
   /** NEW: Enhanced expansion configuration with multiple modes */
   expandedRowConfig?: ExpandedRowConfig<T>;
+  /** Show the expand chevron column - hidden by default when using expandedRowConfig with double-click or menu */
+  showExpandChevron?: boolean;
 }
 
 /**
@@ -166,10 +170,28 @@ function ActionMenu<T>({
   useEffect(() => {
     if (isOpen && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
-      setPosition({
-        top: rect.bottom + 4, // 4px below button (mt-1)
-        left: rect.right - 224 // 224px = w-56 (14rem * 16px)
-      });
+      const menuWidth = 224; // 224px = w-56 (14rem * 16px)
+
+      let left = rect.right - menuWidth;
+      let top = rect.bottom + 4; // 4px below button (mt-1)
+
+      // Ensure menu doesn't go off-screen to the left
+      if (left < 8) {
+        left = 8;
+      }
+
+      // Ensure menu doesn't go off-screen to the right
+      if (left + menuWidth > window.innerWidth) {
+        left = window.innerWidth - menuWidth - 8;
+      }
+
+      // Ensure menu doesn't go off-screen vertically
+      const estimatedMenuHeight = 150; // rough estimate
+      if (top + estimatedMenuHeight > window.innerHeight) {
+        top = rect.top - estimatedMenuHeight - 4;
+      }
+
+      setPosition({ top, left });
     }
   }, [isOpen]);
 
@@ -254,13 +276,12 @@ function ActionMenu<T>({
           e.stopPropagation();
           setIsOpen(!isOpen);
         }}
-        className="inline-flex items-center justify-center w-8 h-8 text-ink-600 hover:text-ink-900 hover:bg-paper-100 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-accent-400"
-        style={{ verticalAlign: 'middle' }}
+        className="flex items-center justify-center w-8 h-8 text-ink-600 hover:text-ink-900 hover:bg-paper-100 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-accent-400"
         aria-label="Actions"
       >
         <MoreVertical className="h-5 w-5" />
       </button>
-      {dropdownContent}
+      {dropdownContent && createPortal(dropdownContent, document.body)}
     </>
   );
 }
@@ -363,6 +384,7 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
   expandedRows: externalExpandedRows,
   renderExpandedRow,
   expandedRowConfig,
+  showExpandChevron = false,
 }: DataTableProps<T>) {
   // NEW: Expansion mode state management (for expandedRowConfig)
   const [expansionState, setExpansionState] = useState<ExpansionState | null>(null);
@@ -648,7 +670,7 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
       return (
       <React.Fragment key={rowKey}>
         <tr 
-          className={`hover:bg-gray-50 table-row-stable ${onRowDoubleClick || onRowClick || (expandedRowConfig?.edit?.triggerOnDoubleClick !== false) ? 'cursor-pointer' : ''} ${isSelected ? 'bg-accent-50 border-l-2 border-accent-500' : ''}`}
+          className={`hover:bg-gray-50 table-row-stable ${onRowDoubleClick || onRowClick || (expandedRowConfig?.edit?.triggerOnDoubleClick !== false) ? 'cursor-pointer' : ''} ${isSelected ? 'bg-accent-50 border-l-2 border-accent-500' : ''} ${!columns.some(col => !!col.renderSecondary) ? 'border-b border-gray-200' : ''}`}
           onClick={() => onRowClick?.(item)}
           onDoubleClick={() => {
             // NEW: If expandedRowConfig.edit is present and triggerOnDoubleClick is not false, trigger edit mode
@@ -667,7 +689,7 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
           }
         >
           {selectable && (
-          <td className="sticky left-0 bg-white px-4 py-4 border-b border-gray-200 z-10 align-middle">
+          <td className="sticky left-0 bg-white px-4 py-1.5 z-10 align-middle">
             <input
               type="checkbox"
               checked={isSelected}
@@ -678,8 +700,8 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
             />
           </td>
           )}
-            {(expandable || expandedRowConfig) && (
-            <td className="sticky left-0 bg-white px-2 py-4 border-b border-gray-200 z-10">
+            {((expandable || expandedRowConfig) && showExpandChevron) && (
+            <td className="sticky left-0 bg-white px-2 py-1.5 z-10">
               <button
                 onClick={() => {
                   // NEW: Enhanced logic for expandedRowConfig
@@ -707,28 +729,59 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
           )}
         {allActions.length > 0 && (
           <td 
-            className="sticky left-0 bg-white px-2 py-4 whitespace-nowrap shadow-[4px_0_6px_-2px_rgba(0,0,0,0.1)] border-b border-gray-200 z-10 align-middle"
+            className="sticky left-0 px-0.5 py-1.5 whitespace-nowrap shadow-[4px_0_6px_-2px_rgba(0,0,0,0.1)] z-10"
+            style={{ width: '28px', backgroundColor: 'inherit' }}
             onClick={(e) => e.stopPropagation()}
           >
-            <ActionMenu actions={allActions} item={item} />
+            <div className="flex items-center justify-center">
+              <ActionMenu actions={allActions} item={item} />
+            </div>
           </td>
         )}
         {columns.map((column) => {
-          const value = typeof column.key === 'string' 
+          const value = typeof column.key === 'string'
             ? item[column.key as keyof T]
             : item[column.key];
-          
+
+          const primaryContent = column.render ? column.render(item, value) : String(value || '');
+
           return (
             <td
               key={`${item.id}-${String(column.key)}`}
-              className={`px-6 py-4 table-row-stable align-middle ${column.className || ''}`}
+              className={`px-6 py-1.5 ${column.className || ''}`}
               style={getColumnStyle(column)}
             >
-              {column.render ? column.render(item, value) : String(value || '')}
+              <div className="text-sm leading-tight">{primaryContent}</div>
             </td>
           );
           })}
             </tr>
+            
+            {/* Secondary row - only render if any column has renderSecondary */}
+            {columns.some(col => !!col.renderSecondary) && (
+              <tr className="secondary-row hover:bg-gray-50 border-b border-gray-200">
+                {selectable && <td className="sticky left-0 bg-white px-4 py-0.5 z-10"></td>}
+                {((expandable || expandedRowConfig) && showExpandChevron) && <td className="sticky left-0 bg-white px-2 py-0.5 z-10"></td>}
+                {allActions.length > 0 && <td className="sticky left-0 px-0.5 py-0.5 z-10" style={{ width: '28px', backgroundColor: 'inherit' }}></td>}
+                {columns.map((column) => {
+                  const value = typeof column.key === 'string'
+                    ? item[column.key as keyof T]
+                    : item[column.key];
+                  const secondaryContent = column.renderSecondary ? column.renderSecondary(item, value) : null;
+
+                  return (
+                    <td
+                      key={`${item.id}-${String(column.key)}-secondary`}
+                      className={`px-6 py-0.5 ${column.className || ''}`}
+                      style={getColumnStyle(column)}
+                    >
+                      <div className="text-xs text-gray-500 leading-tight">
+                        {secondaryContent || <span className="invisible">—</span>}
+                      </div>
+                    </td>
+                  );                })}
+              </tr>
+            )}
             
               {/* Expanded row content - Legacy mode */}
         {expandable && isExpanded && renderExpandedRow && (
@@ -737,7 +790,7 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
               colSpan={
                 columns.length + 
                 (selectable ? 1 : 0) + 
-                (expandable ? 1 : 0) + 
+                (((expandable || expandedRowConfig) && showExpandChevron) ? 1 : 0) + 
                 (allActions.length > 0 ? 1 : 0)
               }
               className="px-6 py-4 bg-paper-50"
@@ -801,7 +854,8 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
             const config = expandedRowConfig.manageRelated.find(c => c.key === key);
             if (config) {
               bgColorClass = 'bg-slate-50/80 border-t border-b border-slate-200/80';
-              content = config.render(item);
+              const handleClose = () => setExpansionState(null);
+              content = config.render(item, handleClose);
             }
           }
           
@@ -813,10 +867,10 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
                 colSpan={
                   columns.length + 
                   (selectable ? 1 : 0) + 
-                  ((expandable || expandedRowConfig) ? 1 : 0) + 
+                  (((expandable || expandedRowConfig) && showExpandChevron) ? 1 : 0) + 
                   (allActions.length > 0 ? 1 : 0)
                 }
-                className={`px-6 py-4 ${bgColorClass} animate-expand`}
+                className={`px-4 py-4 ${bgColorClass} animate-expand`}
               >
                 {content}
               </td>
@@ -828,7 +882,7 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
     });
 
   return (
-    <div className={`bg-white rounded-lg shadow border-2 border-gray-300 overflow-auto ${className}`} style={{ height: '100%', position: 'relative' }}>
+    <div className={`bg-white rounded-lg shadow border-2 border-gray-300 overflow-x-auto overflow-y-visible ${className}`} style={{ position: 'relative' }}>
       {/* Loading overlay for when data is being refreshed */}
       {loading && data.length > 0 && (
         <div 
@@ -845,8 +899,8 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
       <table className="table-stable w-full">
         <colgroup>
           {selectable && <col className="w-12" />}
-          {(expandable || expandedRowConfig) && <col className="w-10" />}
-          {allActions.length > 0 && <col className="w-12" />}
+          {((expandable || expandedRowConfig) && showExpandChevron) && <col className="w-10" />}
+          {allActions.length > 0 && <col style={{ width: '28px' }} />}
           {columns.map((column, index) => (
             <col key={index} style={getColumnStyle(column)} />
           ))}
@@ -864,13 +918,13 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
                 />
               </th>
             )}
-            {(expandable || expandedRowConfig) && (
+            {((expandable || expandedRowConfig) && showExpandChevron) && (
               <th className="sticky left-0 bg-gray-50 px-2 py-3 border-b border-gray-200 z-19 w-10">
                 {/* Empty header for expand column */}
               </th>
             )}
             {allActions.length > 0 && (
-              <th className="sticky left-0 bg-gray-50 px-2 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider border-b border-gray-200 z-20 w-12">
+              <th className="sticky left-0 bg-gray-50 px-0.5 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider border-b border-gray-200 z-20" style={{ width: '28px' }}>
                 {/* Actions column header */}
               </th>
             )}
@@ -898,7 +952,7 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
           </tr>
         </thead>
         <tbody
-          className="bg-white divide-y divide-gray-200 table-loading transition-opacity duration-200"
+          className="bg-white table-loading transition-opacity duration-200"
         >
           {loading && data.length === 0 ? (
             renderLoadingSkeleton()

@@ -393,7 +393,7 @@
 
 .table-stable {
   @apply table-fixed;
-  min-height: 400px;
+  /* Removed min-height to allow content-based sizing for two-row layout */
 }
 
   .table-stable thead {
@@ -416,8 +416,16 @@
     box-sizing: border-box !important;
     font-size: 0.75rem !important;
     border-bottom: 1px solid #e7e5e4;
-  }.table-stable tbody tr {
-  height: 73px; /* Fixed row height to prevent shifts */
+  }
+
+/* Primary rows with normal content */
+.table-stable tbody tr {
+  height: auto; /* Allow content-based sizing for two-row layout */
+}
+
+/* Secondary rows should be compact */
+.table-stable tbody tr.secondary-row {
+  height: auto;
 }
 
 .table-stable tbody tr td {
