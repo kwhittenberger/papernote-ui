@@ -173,10 +173,7 @@
   .notebook-page {
     @apply bg-white bg-subtle-grain rounded-sm shadow-lg border-l-4 border-paper-300;
     max-width: 1400px;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-    margin-left: 1rem; /* Small margin from gutter */
-    margin-right: 2rem;
+    margin: 1rem auto 1rem 1rem; /* Top margin, auto right for anchoring, bottom margin, small left margin */
     padding: 3rem 4rem 3rem 5rem; /* Extra left padding for binding margin */
     min-height: calc(100vh - 12rem);
     position: relative;

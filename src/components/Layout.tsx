@@ -4,6 +4,11 @@
 import React from 'react';
 import { PageNavigation } from './PageNavigation';
 
+interface Section {
+  id: string;
+  label: string;
+}
+
 export interface LayoutProps {
   /** Sidebar content (usually the Sidebar component) */
   sidebar: React.ReactNode;
@@ -13,6 +18,8 @@ export interface LayoutProps {
   statusBar?: React.ReactNode;
   /** Custom className for the layout container */
   className?: string;
+  /** External sections for PageNavigation (e.g., from iframe PostMessage) */
+  sections?: Section[];
 }
 
 /**
@@ -28,8 +35,11 @@ export const Layout: React.FC<LayoutProps> = ({
   sidebar,
   children,
   statusBar,
-  className = ''
+  className = '',
+  sections
 }) => {
+  console.log('🏗️ Layout render with sections:', sections);
+  
   return (
     <div className={`h-screen flex flex-col bg-paper-100 ${className}`}>
       {/* Main layout - sidebar, gutter, and content */}
@@ -39,7 +49,7 @@ export const Layout: React.FC<LayoutProps> = ({
 
         {/* Gutter area - between sidebar and content with page navigation */}
         <div className="w-8 h-full bg-paper-100 flex-shrink-0 relative flex items-center justify-center">
-          <PageNavigation />
+          <PageNavigation sections={sections} />
         </div>
 
         {/* Main content area - scrollable */}

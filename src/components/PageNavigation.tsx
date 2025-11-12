@@ -1,5 +1,6 @@
 // Page Navigation Dots Component for notebook-style applications
 // Auto-detects sections in the page and provides navigation dots in the gutter
+// Can also accept external sections (e.g., from iframe PostMessage)
 
 import React, { useEffect, useState } from 'react';
 
@@ -10,13 +11,36 @@ interface Section {
 
 export interface PageNavigationProps {
   className?: string;
+  /** External sections to display (overrides auto-detection) */
+  sections?: Section[];
 }
 
-export const PageNavigation: React.FC<PageNavigationProps> = ({ className = '' }) => {
-  const [sections, setSections] = useState<Section[]>([]);
+export const PageNavigation: React.FC<PageNavigationProps> = ({ 
+  className = '',
+  sections: externalSections 
+}) => {
+  const [detectedSections, setDetectedSections] = useState<Section[]>([]);
   const [activeSection, setActiveSection] = useState<string>('');
 
+  // Use external sections if provided, otherwise use detected sections
+  const sections = externalSections && externalSections.length > 0 ? externalSections : detectedSections;
+
+  console.log('🎯 PageNavigation render:', {
+    externalSections: externalSections || 'none',
+    externalSectionsLength: externalSections?.length || 0,
+    detectedSections: detectedSections || 'none',
+    detectedSectionsLength: detectedSections.length,
+    sections: sections || 'none',
+    sectionsLength: sections.length
+  });
+
   useEffect(() => {
+    // Skip auto-detection if external sections prop is provided (even if empty array)
+    // This allows parent to explicitly control whether to show PageNavigation
+    if (externalSections !== undefined) {
+      return;
+    }
+
     // Auto-detect sections with IDs in the page
     const detectSections = () => {
       const elements = document.querySelectorAll('[id^="section-"], [data-section]');
@@ -30,7 +54,7 @@ export const PageNavigation: React.FC<PageNavigationProps> = ({ className = '' }
         }
       });
 
-      setSections(detected);
+      setDetectedSections(detected);
       if (detected.length > 0) {
         setActiveSection(detected[0].id);
       }
@@ -42,9 +66,18 @@ export const PageNavigation: React.FC<PageNavigationProps> = ({ className = '' }
     observer.observe(document.body, { childList: true, subtree: true });
 
     return () => observer.disconnect();
-  }, []);
+  }, [externalSections]);
 
   useEffect(() => {
+    // Skip scroll spy for external sections (from iframe) since we can't detect scroll in iframe
+    if (externalSections && externalSections.length > 0) {
+      // Set first section as active by default
+      if (externalSections.length > 0) {
+        setActiveSection(externalSections[0].id);
+      }
+      return;
+    }
+
     // Scroll spy - listen to the correct scroll container
     const findScrollContainer = () => {
       const container = document.querySelector('.flex-1.overflow-auto');
@@ -93,6 +126,23 @@ export const PageNavigation: React.FC<PageNavigationProps> = ({ className = '' }
   }, [sections]);
 
   const scrollToSection = (id: string) => {
+    // For external sections (from iframe), we can't scroll directly
+    // Instead, we could send a message back to the iframe
+    if (externalSections && externalSections.length > 0) {
+      // Find the iframe
+      const iframe = document.querySelector('iframe[title="Conductor Admin"]') as HTMLIFrameElement;
+      if (iframe && iframe.contentWindow) {
+        // Send scroll request to iframe
+        iframe.contentWindow.postMessage({
+          type: 'SCROLL_TO_SECTION',
+          sectionId: id
+        }, '*');
+      }
+      setActiveSection(id);
+      return;
+    }
+
+    // For local sections, scroll normally
     const element = document.getElementById(id) || document.querySelector(`[data-section="${id}"]`);
     if (element) {
       // Find the scrollable container

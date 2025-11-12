@@ -174,7 +174,7 @@ export function SidebarGroup({ title, items, onNavigate, defaultExpanded = true,
 
 export default function Sidebar({ items, onNavigate, className = '', header, footer, currentPath }: SidebarProps) {
   return (
-    <div className={`flex flex-col h-full bg-white border-r border-paper-300 ${className}`}>
+    <div className={`flex flex-col h-full bg-white border-r border-paper-300 notebook-binding ${className}`}>
       {/* Header (Logo) */}
       {header && (
         <div className="px-6 pt-6 pb-4">
