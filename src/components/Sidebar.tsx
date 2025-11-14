@@ -204,7 +204,7 @@ export default function Sidebar({ items, onNavigate, className = '', header, foo
 
       {/* Footer (User Profile) */}
       {footer && (
-        <div className="border-t border-paper-300 p-4 overflow-visible">
+        <div className="border-t border-paper-300 pl-2 pr-6 py-4 overflow-visible">
           {footer}
         </div>
       )}

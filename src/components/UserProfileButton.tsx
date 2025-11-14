@@ -72,7 +72,7 @@ export default function UserProfileButton({
     <button
       type="button"
       className={`
-        w-full flex items-center gap-2 p-2.5 rounded-lg
+        w-full max-w-[calc(100%-0.25rem)] flex items-center gap-2 p-2.5 rounded-lg
         bg-white bg-subtle-grain border border-paper-300
         hover:bg-paper-50 transition-colors duration-200 group
         ${className}

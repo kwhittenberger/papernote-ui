@@ -30,11 +30,13 @@ export default function Dropdown({ trigger, items, align = 'right', placement = 
 
   // Calculate menu position when opened
   useEffect(() => {
-    if (isOpen && triggerRef.current) {
+    if (isOpen && triggerRef.current && menuRef.current) {
       const rect = triggerRef.current.getBoundingClientRect();
       const menuWidth = 224; // w-56 = 14rem = 224px
+      const menuHeight = menuRef.current.offsetHeight || 200; // Get actual menu height
       
-      let top = placement === 'top' ? rect.top - 8 : rect.bottom + 8;
+      // For 'top' placement, position menu above the trigger (subtract menu height)
+      let top = placement === 'top' ? rect.top - menuHeight - 8 : rect.bottom + 8;
       let left = align === 'right' ? rect.right - menuWidth : rect.left;
       
       // Ensure menu doesn't go off-screen
@@ -43,6 +45,11 @@ export default function Dropdown({ trigger, items, align = 'right', placement = 
       }
       if (left < 8) {
         left = 8;
+      }
+      
+      // Ensure menu doesn't go off top of screen
+      if (top < 8) {
+        top = 8;
       }
       
       setMenuPosition({ top, left });
