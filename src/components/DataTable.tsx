@@ -80,6 +80,7 @@ export interface ExpandedRowConfig<T> {
   details?: {
     render: (item: T) => React.ReactNode;
     triggerOnExpand?: boolean; // Default: true (when clicking chevron)
+    triggerOnDoubleClick?: boolean; // Default: false
     menuLabel?: string; // Default: 'View Details'
     menuIcon?: React.ComponentType<any>;
   };
@@ -670,19 +671,25 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
       return (
       <React.Fragment key={rowKey}>
         <tr 
-          className={`hover:bg-gray-50 table-row-stable ${onRowDoubleClick || onRowClick || (expandedRowConfig?.edit?.triggerOnDoubleClick !== false) ? 'cursor-pointer' : ''} ${isSelected ? 'bg-accent-50 border-l-2 border-accent-500' : ''} ${!columns.some(col => !!col.renderSecondary) ? 'border-b border-gray-200' : ''}`}
+          className={`hover:bg-gray-50 table-row-stable ${onRowDoubleClick || onRowClick || (expandedRowConfig?.edit?.triggerOnDoubleClick !== false) || (expandedRowConfig?.details?.triggerOnDoubleClick === true) ? 'cursor-pointer' : ''} ${isSelected ? 'bg-accent-50 border-l-2 border-accent-500' : ''} ${!columns.some(col => !!col.renderSecondary) ? 'border-b border-gray-200' : ''}`}
           onClick={() => onRowClick?.(item)}
           onDoubleClick={() => {
-            // NEW: If expandedRowConfig.edit is present and triggerOnDoubleClick is not false, trigger edit mode
+            // Check for edit mode with triggerOnDoubleClick
             if (expandedRowConfig?.edit && expandedRowConfig.edit.triggerOnDoubleClick !== false) {
               handleExpansionWithMode(rowKey, 'edit');
-            } else {
-              // Legacy: use onRowDoubleClick handler
+            }
+            // Check for details mode with triggerOnDoubleClick
+            else if (expandedRowConfig?.details && expandedRowConfig.details.triggerOnDoubleClick === true) {
+              handleExpansionWithMode(rowKey, 'details');
+            }
+            // Legacy: use onRowDoubleClick handler
+            else {
               onRowDoubleClick?.(item);
             }
           }}
           title={
             expandedRowConfig?.edit && expandedRowConfig.edit.triggerOnDoubleClick !== false ? 'Double-click to edit inline' :
+            expandedRowConfig?.details && expandedRowConfig.details.triggerOnDoubleClick === true ? 'Double-click to view details' :
             onRowDoubleClick ? 'Double-click to open details' : 
             onRowClick ? 'Click to select' : 
             undefined
