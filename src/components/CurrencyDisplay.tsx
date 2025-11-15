@@ -5,7 +5,7 @@
 import React from 'react';
 
 export interface CurrencyDisplayProps {
-  amount: number;
+  amount: number | null | undefined;
   currency?: string;
   locale?: string;
   className?: string;
@@ -39,6 +39,9 @@ export default function CurrencyDisplay({
   showSign = false,
   precision = 2,
 }: CurrencyDisplayProps) {
+  // Handle null/undefined amounts - default to 0
+  const safeAmount = amount ?? 0;
+  
   const formatCurrency = (value: number) => {
     const formatter = new Intl.NumberFormat(locale, {
       style: 'currency',
@@ -50,9 +53,9 @@ export default function CurrencyDisplay({
     return formatter.format(value);
   };
 
-  const formattedAmount = formatCurrency(Math.abs(amount));
-  const isNegative = amount < 0;
-  const isPositive = amount > 0;
+  const formattedAmount = formatCurrency(Math.abs(safeAmount));
+  const isNegative = safeAmount < 0;
+  const isPositive = safeAmount > 0;
 
   let displayValue = formattedAmount;
 
@@ -74,7 +77,7 @@ export default function CurrencyDisplay({
   ].filter(Boolean).join(' ');
 
   return (
-    <span className={combinedClasses} title={`${currency} ${amount.toFixed(precision)}`}>
+    <span className={combinedClasses} title={`${currency} ${safeAmount.toFixed(precision)}`}>
       {displayValue}
     </span>
   );
