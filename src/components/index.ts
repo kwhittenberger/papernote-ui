@@ -316,3 +316,7 @@ export type {
   UseDataTableOptions,
   UseDataTableReturn,
 } from '../types';
+
+// Utilities
+export { formatStatisticValue, formatStatistics } from '../utils/statisticsFormatter';
+export type { StatisticFormat, StatisticConfig, FormattedStatistic } from '../utils/statisticsFormatter';
