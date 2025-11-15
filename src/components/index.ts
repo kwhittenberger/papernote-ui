@@ -49,6 +49,9 @@ export type { StackProps } from './Stack';
 export { default as Grid } from './Grid';
 export type { GridProps } from './Grid';
 
+export { default as GridItem } from './GridItem';
+export type { GridItemProps } from './GridItem';
+
 export { default as Box } from './Box';
 export type { BoxProps } from './Box';
 

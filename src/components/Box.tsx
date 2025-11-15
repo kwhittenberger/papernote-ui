@@ -3,7 +3,7 @@
 
 import React from 'react';
 
-export interface BoxProps {
+export interface BoxProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Content */
   children: React.ReactNode;
   /** Padding */
@@ -26,6 +26,8 @@ export interface BoxProps {
   border?: 'none' | 'top' | 'bottom' | 'left' | 'right' | 'all';
   /** Border color */
   borderColor?: 'default' | 'primary' | 'accent';
+  /** Width */
+  width?: 'auto' | 'full' | 'fit' | 'screen';
   /** Custom className */
   className?: string;
 }
@@ -45,7 +47,9 @@ export const Box: React.FC<BoxProps> = ({
   marginBottom,
   border = 'none',
   borderColor = 'default',
+  width,
   className = '',
+  ...htmlProps
 }) => {
   const spacingMap = {
     none: '0',
@@ -93,13 +97,26 @@ export const Box: React.FC<BoxProps> = ({
     accent: 'border-accent-500',
   };
 
+  const getWidthClass = () => {
+    if (!width) return '';
+    const widthClasses = {
+      auto: 'w-auto',
+      full: 'w-full',
+      fit: 'w-fit',
+      screen: 'w-screen',
+    };
+    return widthClasses[width];
+  };
+
   return (
     <div
+      {...htmlProps}
       className={`
         ${getPaddingClass()}
         ${getMarginClass()}
         ${borderClasses[border]}
         ${border !== 'none' ? borderColorClasses[borderColor] : ''}
+        ${getWidthClass()}
         ${className}
       `}
     >
