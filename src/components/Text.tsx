@@ -1,0 +1,89 @@
+// Text Component - Typography with consistent styling
+// Provides semantic text elements with design system styling
+
+import React from 'react';
+
+export interface TextProps {
+  /** Text content */
+  children: React.ReactNode;
+  /** HTML element to render */
+  as?: 'p' | 'span' | 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'label';
+  /** Size variant */
+  size?: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl';
+  /** Weight variant */
+  weight?: 'normal' | 'medium' | 'semibold' | 'bold';
+  /** Color variant */
+  color?: 'primary' | 'secondary' | 'muted' | 'accent' | 'error' | 'success';
+  /** Text alignment */
+  align?: 'left' | 'center' | 'right';
+  /** Custom className */
+  className?: string;
+}
+
+/**
+ * Text component for consistent typography across the application.
+ * 
+ * Size scale:
+ * - xs: 0.75rem (12px)
+ * - sm: 0.875rem (14px)
+ * - base: 1rem (16px)
+ * - lg: 1.125rem (18px)
+ * - xl: 1.25rem (20px)
+ * - 2xl: 1.5rem (24px)
+ */
+export const Text: React.FC<TextProps> = ({
+  children,
+  as: Component = 'p',
+  size = 'base',
+  weight = 'normal',
+  color = 'primary',
+  align = 'left',
+  className = '',
+}) => {
+  const sizeClasses = {
+    xs: 'text-xs',
+    sm: 'text-sm',
+    base: 'text-base',
+    lg: 'text-lg',
+    xl: 'text-xl',
+    '2xl': 'text-2xl',
+  };
+
+  const weightClasses = {
+    normal: 'font-normal',
+    medium: 'font-medium',
+    semibold: 'font-semibold',
+    bold: 'font-bold',
+  };
+
+  const colorClasses = {
+    primary: 'text-ink-900',
+    secondary: 'text-ink-700',
+    muted: 'text-ink-500',
+    accent: 'text-primary-600',
+    error: 'text-error-600',
+    success: 'text-success-600',
+  };
+
+  const alignClasses = {
+    left: 'text-left',
+    center: 'text-center',
+    right: 'text-right',
+  };
+
+  return (
+    <Component
+      className={`
+        ${sizeClasses[size]}
+        ${weightClasses[weight]}
+        ${colorClasses[color]}
+        ${alignClasses[align]}
+        ${className}
+      `}
+    >
+      {children}
+    </Component>
+  );
+};
+
+export default Text;

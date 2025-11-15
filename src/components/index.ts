@@ -43,6 +43,18 @@ export type { SeparatorProps } from './Separator';
 export { default as Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './Card';
 export type { CardProps } from './Card';
 
+export { default as Stack } from './Stack';
+export type { StackProps } from './Stack';
+
+export { default as Grid } from './Grid';
+export type { GridProps } from './Grid';
+
+export { default as Box } from './Box';
+export type { BoxProps } from './Box';
+
+export { default as Text } from './Text';
+export type { TextProps } from './Text';
+
 // Feedback Components
 export { default as Toast, ToastContainer } from './Toast';
 export type { ToastProps, ToastType } from './Toast';
@@ -78,6 +90,9 @@ export type { TableProps, Column, SortDirection } from './Table';
 
 export { default as Badge } from './Badge';
 export type { BadgeProps } from './Badge';
+
+export { default as Avatar } from './Avatar';
+export type { AvatarProps } from './Avatar';
 
 export { default as EmptyState } from './EmptyState';
 export type { EmptyStateProps } from './EmptyState';
@@ -116,6 +131,9 @@ export type { UserProfileButtonProps } from './UserProfileButton';
 // Layout
 export { default as Layout } from './Layout';
 export type { LayoutProps } from './Layout';
+
+export { default as TwoColumnContent } from './TwoColumnContent';
+export type { TwoColumnContentProps } from './TwoColumnContent';
 
 export { default as Page } from './Page';
 export type { PageProps } from './Page';

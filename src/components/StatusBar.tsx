@@ -204,7 +204,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
   const displayMessages = messages.slice(0, maxMessages);
 
   return (
-    <div className={`h-8 bg-paper-300 border-t border-paper-400 px-4 flex items-center text-xs text-ink-700 flex-shrink-0 shadow-md ${className}`}>
+    <div className={`h-8 bg-paper-200 border-t border-paper-300 px-4 flex items-center text-xs text-ink-700 flex-shrink-0 shadow-md ${className}`}>
       {displayMessages.length > 0 ? (
         <>
           {/* System status on left */}
