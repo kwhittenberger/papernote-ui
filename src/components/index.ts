@@ -100,6 +100,9 @@ export type { AvatarProps } from './Avatar';
 export { default as EmptyState } from './EmptyState';
 export type { EmptyStateProps } from './EmptyState';
 
+export { ComingSoon } from './ComingSoon';
+export type { ComingSoonProps } from './ComingSoon';
+
 // Loading Components
 export { default as Loading, Skeleton, SkeletonCard, SkeletonTable } from './Loading';
 export type { LoadingProps } from './Loading';

@@ -1,4 +1,5 @@
-import { StatusBadge, DateDisplay } from './index';
+import StatusBadge from './StatusBadge';
+import DateDisplay from './DateDisplay';
 import { Clock, User, FileText } from 'lucide-react';
 
 /**
