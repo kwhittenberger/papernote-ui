@@ -88,7 +88,7 @@ export const Avatar: React.FC<AvatarProps> = ({
         rounded-full
         flex items-center justify-center
         shadow-lg
-        bg-slate-500
+        bg-primary-500
         ${className}
       `}
     >

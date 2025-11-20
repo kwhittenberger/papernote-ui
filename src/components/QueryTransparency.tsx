@@ -2,7 +2,7 @@
 // This file is part of the Commissions Management System (CMMS).
 // Proprietary and confidential. Unauthorized copying or distribution is prohibited.
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 export interface QueryTransparencyInfo {
   appliedFilters?: Array<{

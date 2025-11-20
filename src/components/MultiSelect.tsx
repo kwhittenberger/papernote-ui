@@ -22,6 +22,8 @@ export interface MultiSelectProps {
   helperText?: string;
   error?: string;
   maxHeight?: number;
+  /** Maximum number of selections allowed */
+  maxSelections?: number;
   'aria-label'?: string;
 }
 
@@ -36,6 +38,7 @@ export default function MultiSelect({
   helperText,
   error,
   maxHeight = 240,
+  maxSelections,
   'aria-label': ariaLabel,
 }: MultiSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -44,6 +47,7 @@ export default function MultiSelect({
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const selectedOptions = options.filter(opt => value.includes(opt.value));
+  const hasReachedMax = maxSelections ? value.length >= maxSelections : false;
 
   const filteredOptions = searchable && searchQuery
     ? options.filter(opt =>
@@ -78,9 +82,13 @@ export default function MultiSelect({
 
   const handleToggle = (optionValue: string) => {
     if (value.includes(optionValue)) {
+      // Allow deselection
       onChange?.(value.filter(v => v !== optionValue));
     } else {
-      onChange?.([...value, optionValue]);
+      // Check max selections before adding
+      if (!hasReachedMax) {
+        onChange?.([...value, optionValue]);
+      }
     }
   };
 
@@ -189,17 +197,18 @@ export default function MultiSelect({
               ) : (
                 filteredOptions.map((option) => {
                   const isSelected = value.includes(option.value);
+                  const isDisabled = option.disabled || (hasReachedMax && !isSelected);
 
                   return (
                     <button
                       key={option.value}
                       type="button"
-                      onClick={() => !option.disabled && handleToggle(option.value)}
-                      disabled={option.disabled}
+                      onClick={() => !isDisabled && handleToggle(option.value)}
+                      disabled={isDisabled}
                       className={`
                         w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors
                         ${isSelected ? 'bg-accent-50 text-accent-900' : 'text-ink-700'}
-                        ${option.disabled ? 'opacity-40 cursor-not-allowed' : 'hover:bg-paper-50 cursor-pointer'}
+                        ${isDisabled ? 'opacity-40 cursor-not-allowed' : 'hover:bg-paper-50 cursor-pointer'}
                       `}
                       role="option"
                       aria-selected={isSelected}
@@ -223,12 +232,19 @@ export default function MultiSelect({
         )}
       </div>
 
-      {/* Helper Text or Error */}
-      {(helperText || error) && (
-        <p className={`mt-2 text-xs ${error ? 'text-error-600' : 'text-ink-600'}`}>
-          {error || helperText}
-        </p>
-      )}
+      {/* Helper Text, Error, or Selection Count */}
+      <div className="flex justify-between items-center mt-2">
+        {(helperText || error) && (
+          <p className={`text-xs ${error ? 'text-error-600' : 'text-ink-600'}`}>
+            {error || helperText}
+          </p>
+        )}
+        {maxSelections && (
+          <p className={`text-xs ml-auto ${hasReachedMax ? 'text-warning-600 font-medium' : 'text-ink-500'}`}>
+            {value.length} / {maxSelections} selected
+          </p>
+        )}
+      </div>
     </div>
   );
 }

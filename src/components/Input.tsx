@@ -1,8 +1,8 @@
 // Copyright (c) 2025 kwhittenberger. All rights reserved.
 // This file is part of the Commissions Management System (CMMS).
 // Proprietary and confidential. Unauthorized copying or distribution is prohibited.
-import React, { forwardRef } from 'react';
-import { AlertCircle, CheckCircle, AlertTriangle } from 'lucide-react';
+import React, { forwardRef, useState } from 'react';
+import { AlertCircle, CheckCircle, AlertTriangle, Eye, EyeOff, X } from 'lucide-react';
 
 export type ValidationState = 'error' | 'success' | 'warning' | null;
 
@@ -13,6 +13,22 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   validationMessage?: string;
   icon?: React.ReactNode;
   iconPosition?: 'left' | 'right';
+  /** Show character counter (requires maxLength prop) */
+  showCount?: boolean;
+  /** Text prefix (displayed inside input, before value) */
+  prefix?: string;
+  /** Text suffix (displayed inside input, after value) */
+  suffix?: string;
+  /** Icon prefix (displayed inside input, before value) */
+  prefixIcon?: React.ReactNode;
+  /** Icon suffix (displayed inside input, after value) */
+  suffixIcon?: React.ReactNode;
+  /** Show password visibility toggle (only for type="password") */
+  showPasswordToggle?: boolean;
+  /** Show clearable button to clear input value */
+  clearable?: boolean;
+  /** Callback when clear button is clicked */
+  onClear?: () => void;
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
@@ -24,13 +40,49 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       validationMessage,
       icon,
       iconPosition = 'left',
+      showCount = false,
+      prefix,
+      suffix,
+      prefixIcon,
+      suffixIcon,
+      showPasswordToggle = false,
+      clearable = false,
+      onClear,
       className = '',
       id,
+      type = 'text',
+      value,
+      maxLength,
       ...props
     },
     ref
   ) => {
     const inputId = id || `input-${Math.random().toString(36).substring(2, 9)}`;
+    const [showPassword, setShowPassword] = useState(false);
+
+    // Handle clear button click
+    const handleClear = () => {
+      if (onClear) {
+        onClear();
+      } else if (props.onChange) {
+        // Create a synthetic event to trigger onChange
+        const syntheticEvent = {
+          target: { value: '' },
+          currentTarget: { value: '' },
+        } as React.ChangeEvent<HTMLInputElement>;
+        props.onChange(syntheticEvent);
+      }
+    };
+
+    // Show clear button if clearable and has value
+    const showClearButton = clearable && value && String(value).length > 0;
+
+    // Determine actual input type (handle password toggle)
+    const actualType = type === 'password' && showPassword ? 'text' : type;
+
+    // Calculate character count
+    const currentLength = value ? String(value).length : 0;
+    const showCounter = showCount && maxLength;
 
     const getValidationIcon = () => {
       switch (validationState) {
@@ -83,8 +135,22 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
         {/* Input Container */}
         <div className="relative">
-          {/* Left Icon */}
-          {icon && iconPosition === 'left' && (
+          {/* Prefix Text */}
+          {prefix && (
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-ink-500 text-sm">
+              {prefix}
+            </div>
+          )}
+
+          {/* Prefix Icon */}
+          {prefixIcon && !prefix && (
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-ink-400">
+              {prefixIcon}
+            </div>
+          )}
+
+          {/* Left Icon (legacy support) */}
+          {icon && iconPosition === 'left' && !prefix && !prefixIcon && (
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-ink-400">
               {icon}
             </div>
@@ -94,31 +160,94 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           <input
             ref={ref}
             id={inputId}
+            type={actualType}
+            value={value}
+            maxLength={maxLength}
             className={`
               input
               ${getValidationClasses()}
-              ${icon && iconPosition === 'left' ? 'pl-10' : ''}
-              ${icon && iconPosition === 'right' ? 'pr-10' : ''}
-              ${validationState ? 'pr-10' : ''}
+              ${prefix ? 'pl-' + (prefix.length * 8 + 12) : ''}
+              ${prefixIcon && !prefix ? 'pl-10' : ''}
+              ${icon && iconPosition === 'left' && !prefix && !prefixIcon ? 'pl-10' : ''}
+              ${suffix ? 'pr-' + (suffix.length * 8 + 12) : ''}
+              ${suffixIcon && !suffix ? 'pr-10' : ''}
+              ${icon && iconPosition === 'right' && !suffix && !suffixIcon ? 'pr-10' : ''}
+              ${validationState && !suffix && !suffixIcon && !showPasswordToggle ? 'pr-10' : ''}
+              ${(showPasswordToggle && type === 'password') || validationState || suffix || suffixIcon ? 'pr-20' : ''}
               ${className}
             `}
             {...props}
           />
 
-          {/* Right Icon or Validation Icon */}
-          {(icon && iconPosition === 'right') || validationState ? (
-            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              {validationState ? getValidationIcon() : icon}
+          {/* Suffix Text */}
+          {suffix && (
+            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-ink-500 text-sm">
+              {suffix}
             </div>
-          ) : null}
+          )}
+
+          {/* Right Icon, Validation Icon, Clear Button, or Password Toggle */}
+          <div className="absolute inset-y-0 right-0 pr-3 flex items-center gap-2">
+            {/* Suffix Icon */}
+            {suffixIcon && !suffix && !validationState && !showPasswordToggle && !showClearButton && (
+              <div className="pointer-events-none text-ink-400">
+                {suffixIcon}
+              </div>
+            )}
+
+            {/* Clear Button */}
+            {showClearButton && (
+              <button
+                type="button"
+                onClick={handleClear}
+                className="text-ink-400 hover:text-ink-600 focus:outline-none cursor-pointer pointer-events-auto"
+                aria-label="Clear input"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+
+            {/* Password Toggle */}
+            {type === 'password' && showPasswordToggle && (
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="text-ink-400 hover:text-ink-600 focus:outline-none cursor-pointer pointer-events-auto"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              </button>
+            )}
+
+            {/* Validation Icon */}
+            {validationState && (
+              <div className="pointer-events-none">
+                {getValidationIcon()}
+              </div>
+            )}
+
+            {/* Right Icon (legacy support - if no suffix/suffixIcon) */}
+            {icon && iconPosition === 'right' && !suffix && !suffixIcon && !validationState && (
+              <div className="pointer-events-none text-ink-400">
+                {icon}
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Helper Text or Validation Message */}
-        {(helperText || validationMessage) && (
-          <p className={`mt-2 text-xs ${validationMessage ? getValidationMessageColor() : 'text-ink-600'}`}>
-            {validationMessage || helperText}
-          </p>
-        )}
+        {/* Helper Text, Validation Message, or Character Counter */}
+        <div className="flex justify-between items-center mt-2">
+          {(helperText || validationMessage) && (
+            <p className={`text-xs ${validationMessage ? getValidationMessageColor() : 'text-ink-600'}`}>
+              {validationMessage || helperText}
+            </p>
+          )}
+          {showCounter && (
+            <p className={`text-xs ml-auto ${currentLength > maxLength! ? 'text-error-600' : 'text-ink-500'}`}>
+              {currentLength} / {maxLength}
+            </p>
+          )}
+        </div>
       </div>
     );
   }

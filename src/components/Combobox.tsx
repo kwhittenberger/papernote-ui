@@ -1,0 +1,418 @@
+// Copyright (c) 2025 kwhittenberger. All rights reserved.
+// This file is part of the notebook-ui component library.
+// Proprietary and confidential. Unauthorized copying or distribution is prohibited.
+
+import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { Check, ChevronDown, Search, X, Plus } from 'lucide-react';
+
+export interface ComboboxHandle {
+  focus: () => void;
+  blur: () => void;
+  open: () => void;
+  close: () => void;
+}
+
+export interface ComboboxOption {
+  /** Option value */
+  value: string;
+  /** Display label */
+  label: string;
+  /** Optional icon */
+  icon?: React.ComponentType<any>;
+  /** Disabled state */
+  disabled?: boolean;
+}
+
+export interface ComboboxProps {
+  /** Selected value */
+  value?: string;
+  /** Change handler */
+  onChange?: (value: string) => void;
+  /** Available options */
+  options: ComboboxOption[];
+  /** Search handler (for async/server-side filtering) */
+  onSearch?: (query: string) => void;
+  /** Create option handler */
+  onCreateOption?: (value: string) => void;
+  /** Input label */
+  label?: string;
+  /** Placeholder text */
+  placeholder?: string;
+  /** Allow custom value input (typeahead mode) */
+  allowCustomValue?: boolean;
+  /** Loading state */
+  loading?: boolean;
+  /** Validation state */
+  validationState?: 'error' | 'success' | 'warning' | null;
+  /** Validation message */
+  validationMessage?: string;
+  /** Helper text */
+  helperText?: string;
+  /** Required field */
+  required?: boolean;
+  /** Disabled state */
+  disabled?: boolean;
+  /** Custom className */
+  className?: string;
+  /** Size variant */
+  size?: 'sm' | 'md' | 'lg';
+}
+
+/**
+ * Combobox component - searchable select with typeahead and custom value support.
+ *
+ * Features:
+ * - Typeahead search with filtering
+ * - Create custom options
+ * - Async search support
+ * - Keyboard navigation
+ * - Validation states
+ * - Custom value input
+ *
+ * @example
+ * ```tsx
+ * <Combobox
+ *   label="Country"
+ *   value={country}
+ *   onChange={setCountry}
+ *   options={countryOptions}
+ *   allowCustomValue
+ *   onCreateOption={handleCreateCountry}
+ * />
+ * ```
+ */
+const Combobox = forwardRef<ComboboxHandle, ComboboxProps>(({
+  value = '',
+  onChange,
+  options,
+  onSearch,
+  onCreateOption,
+  label,
+  placeholder = 'Search or select...',
+  allowCustomValue = false,
+  loading = false,
+  validationState,
+  validationMessage,
+  helperText,
+  required = false,
+  disabled = false,
+  className = '',
+  size = 'md',
+}, ref) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [highlightedIndex, setHighlightedIndex] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
+
+  // Expose methods via ref
+  useImperativeHandle(ref, () => ({
+    focus: () => inputRef.current?.focus(),
+    blur: () => inputRef.current?.blur(),
+    open: () => setIsOpen(true),
+    close: () => setIsOpen(false),
+  }));
+
+  // Filter options based on search query
+  const filteredOptions = options.filter(option =>
+    option.label.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Get display value
+  const selectedOption = options.find(opt => opt.value === value);
+  const displayValue = isOpen ? searchQuery : (selectedOption?.label || value || '');
+
+  // Close on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+        setSearchQuery('');
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
+
+  // Scroll highlighted option into view
+  useEffect(() => {
+    if (isOpen && listRef.current) {
+      const highlightedElement = listRef.current.children[highlightedIndex] as HTMLElement;
+      if (highlightedElement) {
+        highlightedElement.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    }
+  }, [highlightedIndex, isOpen]);
+
+  // Handle search input change
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    setIsOpen(true);
+    setHighlightedIndex(0);
+
+    // Trigger search callback for async filtering
+    if (onSearch) {
+      onSearch(query);
+    }
+
+    // If allowCustomValue, update value immediately
+    if (allowCustomValue) {
+      onChange?.(query);
+    }
+  };
+
+  // Handle option selection
+  const handleSelectOption = (option: ComboboxOption) => {
+    if (option.disabled) return;
+    onChange?.(option.value);
+    setSearchQuery('');
+    setIsOpen(false);
+    inputRef.current?.blur();
+  };
+
+  // Handle create custom option
+  const handleCreateOption = () => {
+    if (searchQuery.trim() && onCreateOption) {
+      onCreateOption(searchQuery.trim());
+      setSearchQuery('');
+      setIsOpen(false);
+    }
+  };
+
+  // Handle clear
+  const handleClear = () => {
+    onChange?.('');
+    setSearchQuery('');
+    inputRef.current?.focus();
+  };
+
+  // Keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (disabled) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        if (!isOpen) {
+          setIsOpen(true);
+        } else {
+          setHighlightedIndex(prev =>
+            prev < filteredOptions.length - 1 ? prev + 1 : prev
+          );
+        }
+        break;
+
+      case 'ArrowUp':
+        e.preventDefault();
+        if (isOpen) {
+          setHighlightedIndex(prev => (prev > 0 ? prev - 1 : 0));
+        }
+        break;
+
+      case 'Enter':
+        e.preventDefault();
+        if (isOpen && filteredOptions.length > 0) {
+          handleSelectOption(filteredOptions[highlightedIndex]);
+        } else if (allowCustomValue && searchQuery.trim()) {
+          onChange?.(searchQuery.trim());
+          setIsOpen(false);
+        }
+        break;
+
+      case 'Escape':
+        e.preventDefault();
+        setIsOpen(false);
+        setSearchQuery('');
+        break;
+
+      case 'Tab':
+        setIsOpen(false);
+        setSearchQuery('');
+        break;
+    }
+  };
+
+  // Size classes
+  const sizeClasses = {
+    sm: 'text-sm py-1.5 px-3',
+    md: 'text-sm py-2 px-3',
+    lg: 'text-base py-2.5 px-4',
+  };
+
+  const iconSizeClasses = {
+    sm: 'h-4 w-4',
+    md: 'h-4 w-4',
+    lg: 'h-5 w-5',
+  };
+
+  // Validation classes
+  const validationClasses = {
+    error: 'border-error-500 focus:ring-error-500 focus:border-error-500',
+    success: 'border-success-500 focus:ring-success-500 focus:border-success-500',
+    warning: 'border-warning-500 focus:ring-warning-500 focus:border-warning-500',
+  };
+
+  const validationMessageColors = {
+    error: 'text-error-600',
+    success: 'text-success-600',
+    warning: 'text-warning-600',
+  };
+
+  // Check if can create custom option
+  const canCreateOption =
+    onCreateOption &&
+    searchQuery.trim() &&
+    !filteredOptions.some(opt => opt.label.toLowerCase() === searchQuery.toLowerCase());
+
+  return (
+    <div className={`relative ${className}`} ref={containerRef}>
+      {/* Label */}
+      {label && (
+        <label className="block text-sm font-medium text-ink-700 mb-1">
+          {label}
+          {required && <span className="text-error-500 ml-1">*</span>}
+        </label>
+      )}
+
+      {/* Input */}
+      <div className="relative">
+        <div className="relative">
+          <input
+            ref={inputRef}
+            type="text"
+            value={displayValue}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            onFocus={() => setIsOpen(true)}
+            placeholder={placeholder}
+            disabled={disabled}
+            className={`
+              w-full rounded-md border bg-white
+              ${sizeClasses[size]}
+              ${validationState ? validationClasses[validationState] : 'border-paper-300 focus:ring-primary-500 focus:border-primary-500'}
+              ${disabled ? 'bg-paper-100 text-ink-400 cursor-not-allowed' : ''}
+              focus:outline-none focus:ring-2
+              pr-20
+            `}
+            aria-label={label || 'Combobox'}
+            aria-expanded={isOpen}
+            aria-autocomplete="list"
+            aria-controls="combobox-options"
+            aria-activedescendant={isOpen ? `option-${highlightedIndex}` : undefined}
+            role="combobox"
+          />
+
+          {/* Icons */}
+          <div className="absolute inset-y-0 right-0 flex items-center pr-2 gap-1">
+            {loading && (
+              <div className="animate-spin">
+                <Search className={`${iconSizeClasses[size]} text-ink-400`} />
+              </div>
+            )}
+            {!loading && value && !disabled && (
+              <button
+                type="button"
+                onClick={handleClear}
+                className="p-0.5 text-ink-400 hover:text-ink-600 focus:outline-none"
+                aria-label="Clear"
+                tabIndex={-1}
+              >
+                <X className={iconSizeClasses[size]} />
+              </button>
+            )}
+            {!loading && (
+              <ChevronDown className={`${iconSizeClasses[size]} text-ink-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Helper text or validation message */}
+      {(helperText || validationMessage) && (
+        <p className={`mt-1 text-xs ${validationState ? validationMessageColors[validationState] : 'text-ink-500'}`}>
+          {validationMessage || helperText}
+        </p>
+      )}
+
+      {/* Dropdown */}
+      {isOpen && (
+        <div
+          className="absolute z-50 mt-1 w-full bg-white rounded-md shadow-lg border border-paper-200 max-h-60 overflow-auto"
+          role="listbox"
+          id="combobox-options"
+        >
+          {loading ? (
+            <div className="px-4 py-8 text-center text-ink-500 text-sm">
+              Loading...
+            </div>
+          ) : filteredOptions.length === 0 && !canCreateOption ? (
+            <div className="px-4 py-8 text-center text-ink-500 text-sm">
+              No options found
+            </div>
+          ) : (
+            <ul ref={listRef}>
+              {/* Filtered options */}
+              {filteredOptions.map((option, index) => {
+                const Icon = option.icon;
+                const isSelected = option.value === value;
+                const isHighlighted = index === highlightedIndex;
+
+                return (
+                  <li
+                    key={option.value}
+                    id={`option-${index}`}
+                    role="option"
+                    aria-selected={isSelected}
+                    aria-disabled={option.disabled}
+                    onClick={() => handleSelectOption(option)}
+                    onMouseEnter={() => setHighlightedIndex(index)}
+                    className={`
+                      px-3 py-2 cursor-pointer flex items-center justify-between gap-2
+                      ${option.disabled ? 'opacity-50 cursor-not-allowed' : ''}
+                      ${isHighlighted ? 'bg-primary-50' : ''}
+                      ${isSelected ? 'bg-primary-100 font-medium' : ''}
+                      hover:bg-primary-50
+                    `}
+                  >
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      {Icon && <Icon className={`${iconSizeClasses[size]} flex-shrink-0 text-ink-600`} />}
+                      <span className="truncate text-sm text-ink-900">{option.label}</span>
+                    </div>
+                    {isSelected && (
+                      <Check className={`${iconSizeClasses[size]} flex-shrink-0 text-primary-600`} />
+                    )}
+                  </li>
+                );
+              })}
+
+              {/* Create option */}
+              {canCreateOption && (
+                <li
+                  role="option"
+                  onClick={handleCreateOption}
+                  className="px-3 py-2 cursor-pointer flex items-center gap-2 border-t border-paper-200 hover:bg-primary-50 bg-success-50"
+                >
+                  <Plus className={`${iconSizeClasses[size]} text-success-600`} />
+                  <span className="text-sm text-success-700 font-medium">
+                    Create "{searchQuery}"
+                  </span>
+                </li>
+              )}
+            </ul>
+          )}
+        </div>
+      )}
+    </div>
+  );
+});
+
+Combobox.displayName = 'Combobox';
+export default Combobox;

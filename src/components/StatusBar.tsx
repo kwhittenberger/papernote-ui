@@ -126,20 +126,20 @@ const getStatusIcon = (type: StatusType) => {
 const getStatusStyles = (type: StatusType) => {
   switch (type) {
     case 'success':
-      return 'bg-green-50 text-green-800 border-green-200';
+      return 'bg-success-50 text-success-800 border-success-200';
     case 'error':
-      return 'bg-red-50 text-red-800 border-red-200';
+      return 'bg-error-50 text-error-800 border-error-200';
     case 'warning':
-      return 'bg-yellow-50 text-yellow-800 border-yellow-200';
+      return 'bg-warning-50 text-warning-800 border-warning-200';
     case 'info':
-      return 'bg-blue-50 text-blue-800 border-blue-200';
+      return 'bg-primary-50 text-primary-800 border-primary-200';
   }
 };
 
 export const StatusBar: React.FC<StatusBarProps> = ({
   className = '',
   maxMessages = 3,
-  defaultAutoHideDelay = 5000,
+  defaultAutoHideDelay: _defaultAutoHideDelay = 5000,
   message = 'Ready',
   connectionStatus = 'online',
   showConnectionStatus = true,
@@ -170,11 +170,11 @@ export const StatusBar: React.FC<StatusBarProps> = ({
   const getConnectionIcon = () => {
     switch (connectionStatus) {
       case 'online':
-        return <div className="w-2 h-2 rounded-full bg-green-500" title="Connected" />;
+        return <div className="w-2 h-2 rounded-full bg-success-500" title="Connected" />;
       case 'offline':
-        return <div className="w-2 h-2 rounded-full bg-red-500" title="Disconnected" />;
+        return <div className="w-2 h-2 rounded-full bg-error-500" title="Disconnected" />;
       case 'connecting':
-        return <div className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse" title="Connecting..." />;
+        return <div className="w-2 h-2 rounded-full bg-warning-500 animate-pulse" title="Connecting..." />;
       default:
         return null;
     }
@@ -225,7 +225,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
           
           {/* Toast messages in center */}
           <div className="flex items-center space-x-2 flex-1 justify-center">
-            {displayMessages.map((message, index) => (
+            {displayMessages.map((message) => (
               <div
                 key={message.id}
                 className={`flex items-center space-x-1 px-2 py-0.5 rounded ${getStatusStyles(message.type)}`}
@@ -245,7 +245,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
               </div>
             ))}
             {messages.length > maxMessages && (
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-ink-500">
                 +{messages.length - maxMessages} more
               </span>
             )}

@@ -73,9 +73,9 @@ export default function ExportButton({
   };
 
   const buttonVariantClasses = {
-    primary: 'bg-blue-600 text-white hover:bg-blue-700 border-blue-600',
-    secondary: 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300',
-    ghost: 'bg-transparent text-gray-700 hover:bg-gray-100 border-transparent',
+    primary: 'bg-primary-600 text-white hover:bg-primary-700 border-primary-600',
+    secondary: 'bg-white text-ink-700 hover:bg-paper-50 border-paper-300',
+    ghost: 'bg-transparent text-ink-700 hover:bg-paper-100 border-transparent',
   };
 
   const baseClasses = `inline-flex items-center gap-2 font-medium border rounded-md transition-colors ${buttonSizeClasses[size]} ${buttonVariantClasses[variant]} ${className}`;
@@ -97,7 +97,7 @@ export default function ExportButton({
           {formatLabels[formats[0]]}
         </button>
         {isLoading && loadingMessage && (
-          <div className="absolute top-full left-0 mt-2 px-3 py-2 bg-blue-600 text-white text-xs rounded shadow-lg whitespace-nowrap z-50">
+          <div className="absolute top-full left-0 mt-2 px-3 py-2 bg-primary-600 text-white text-xs rounded shadow-lg whitespace-nowrap z-50">
             {loadingMessage}
           </div>
         )}
@@ -122,7 +122,7 @@ export default function ExportButton({
           {label}
         </button>
         {isLoading && loadingMessage && (
-          <div className="absolute top-full left-0 mt-2 px-3 py-2 bg-blue-600 text-white text-xs rounded shadow-lg whitespace-nowrap z-50">
+          <div className="absolute top-full left-0 mt-2 px-3 py-2 bg-primary-600 text-white text-xs rounded shadow-lg whitespace-nowrap z-50">
             {loadingMessage}
           </div>
         )}
@@ -149,7 +149,7 @@ export default function ExportButton({
       </button>
 
       {isLoading && loadingMessage && (
-        <div className="absolute top-full left-0 mt-2 px-3 py-2 bg-blue-600 text-white text-xs rounded shadow-lg whitespace-nowrap z-50">
+        <div className="absolute top-full left-0 mt-2 px-3 py-2 bg-primary-600 text-white text-xs rounded shadow-lg whitespace-nowrap z-50">
           {loadingMessage}
         </div>
       )}
@@ -172,7 +172,7 @@ export default function ExportButton({
                     e.stopPropagation();
                     handleExport(format);
                   }}
-                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                  className="w-full text-left px-4 py-2 text-sm text-ink-700 hover:bg-paper-100 flex items-center gap-2"
                   role="menuitem"
                 >
                   {formatIcons[format]}

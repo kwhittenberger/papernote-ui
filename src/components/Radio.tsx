@@ -1,12 +1,14 @@
 // Copyright (c) 2025 kwhittenberger. All rights reserved.
 // This file is part of the Commissions Management System (CMMS).
 // Proprietary and confidential. Unauthorized copying or distribution is prohibited.
+import { forwardRef } from 'react';
 
 export interface RadioOption {
   value: string;
   label: string;
   description?: string;
   disabled?: boolean;
+  icon?: React.ReactNode;
 }
 
 export interface RadioGroupProps {
@@ -21,7 +23,7 @@ export interface RadioGroupProps {
   className?: string;
 }
 
-export default function RadioGroup({
+const RadioGroup = forwardRef<HTMLFieldSetElement, RadioGroupProps>(({
   name,
   value,
   onChange,
@@ -31,7 +33,7 @@ export default function RadioGroup({
   helperText,
   disabled = false,
   className = '',
-}: RadioGroupProps) {
+}, ref) => {
   const groupId = `radio-group-${Math.random().toString(36).substring(2, 9)}`;
 
   const handleKeyDown = (e: React.KeyboardEvent, currentValue: string) => {
@@ -73,6 +75,7 @@ export default function RadioGroup({
 
       {/* Radio Options */}
       <div
+        ref={ref}
         role="radiogroup"
         aria-labelledby={label ? groupId : undefined}
         aria-describedby={helperText ? `${groupId}-help` : undefined}
@@ -130,7 +133,10 @@ export default function RadioGroup({
 
               {/* Label & Description */}
               <div className="flex-1">
-                <p className="text-sm font-medium text-ink-900">{option.label}</p>
+                <div className="flex items-center gap-2">
+                  {option.icon && <span className="text-ink-700">{option.icon}</span>}
+                  <p className="text-sm font-medium text-ink-900">{option.label}</p>
+                </div>
                 {option.description && (
                   <p className="text-xs text-ink-600 mt-0.5">{option.description}</p>
                 )}
@@ -148,4 +154,7 @@ export default function RadioGroup({
       )}
     </div>
   );
-}
+});
+
+RadioGroup.displayName = 'RadioGroup';
+export default RadioGroup;

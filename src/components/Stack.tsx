@@ -14,6 +14,8 @@ export interface StackProps {
   align?: 'start' | 'center' | 'end' | 'stretch';
   /** Justify content */
   justify?: 'start' | 'center' | 'end' | 'between' | 'around';
+  /** Enable wrapping (for horizontal stacks) */
+  wrap?: boolean;
   /** Custom className */
   className?: string;
 }
@@ -35,6 +37,7 @@ export const Stack: React.FC<StackProps> = ({
   spacing = 'md',
   align = 'stretch',
   justify = 'start',
+  wrap = false,
   className = '',
 }) => {
   const spacingClasses = {
@@ -76,6 +79,7 @@ export const Stack: React.FC<StackProps> = ({
       className={`
         flex
         ${direction === 'vertical' ? 'flex-col' : 'flex-row'}
+        ${wrap ? 'flex-wrap' : ''}
         ${spacingClasses[direction][spacing]}
         ${alignClasses[align]}
         ${justifyClasses[justify]}

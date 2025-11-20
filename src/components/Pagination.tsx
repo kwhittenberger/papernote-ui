@@ -1,8 +1,9 @@
 // Copyright (c) 2025 kwhittenberger. All rights reserved.
 // This file is part of the Commissions Management System (CMMS).
 // Proprietary and confidential. Unauthorized copying or distribution is prohibited.
-import React from 'react';
+
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState } from 'react';
 
 export interface PaginationProps {
   currentPage: number;
@@ -10,6 +11,8 @@ export interface PaginationProps {
   onPageChange: (page: number) => void;
   showPageNumbers?: boolean;
   maxPageNumbers?: number;
+  /** Show page jump input field */
+  showPageJump?: boolean;
 }
 
 export default function Pagination({
@@ -18,7 +21,9 @@ export default function Pagination({
   onPageChange,
   showPageNumbers = true,
   maxPageNumbers = 5,
+  showPageJump = false,
 }: PaginationProps) {
+  const [jumpValue, setJumpValue] = useState('');
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
     const halfMax = Math.floor(maxPageNumbers / 2);
@@ -55,6 +60,15 @@ export default function Pagination({
   };
 
   const pageNumbers = showPageNumbers ? getPageNumbers() : [];
+
+  const handlePageJump = (e: React.FormEvent) => {
+    e.preventDefault();
+    const pageNum = parseInt(jumpValue, 10);
+    if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= totalPages) {
+      onPageChange(pageNum);
+      setJumpValue('');
+    }
+  };
 
   return (
     <nav className="flex items-center justify-center gap-2" aria-label="Pagination">
@@ -113,6 +127,30 @@ export default function Pagination({
         <span className="hidden sm:inline">Next</span>
         <ChevronRight className="h-4 w-4" />
       </button>
+
+      {/* Page Jump */}
+      {showPageJump && (
+        <form onSubmit={handlePageJump} className="flex items-center gap-2 ml-2">
+          <span className="text-sm text-ink-600 hidden sm:inline">Go to:</span>
+          <input
+            type="number"
+            min="1"
+            max={totalPages}
+            value={jumpValue}
+            onChange={(e) => setJumpValue(e.target.value)}
+            placeholder="#"
+            className="w-16 px-2 py-1.5 text-sm text-center border border-paper-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-accent-400"
+            aria-label="Jump to page"
+          />
+          <button
+            type="submit"
+            disabled={!jumpValue}
+            className="px-3 py-1.5 text-sm font-medium text-white bg-accent-500 rounded-lg hover:bg-accent-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+          >
+            Go
+          </button>
+        </form>
+      )}
     </nav>
   );
 }

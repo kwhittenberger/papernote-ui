@@ -292,7 +292,7 @@ export interface QueryDetailsSectionProps {
 
 // Component for query details content that can use hooks
 const QueryDetailsContent: React.FC<QueryDetailsSectionProps> = (props) => {
-  const { queryTransparencyInfo, recordCount, filterSummary } = props;
+  const { queryTransparencyInfo, recordCount: _recordCount, filterSummary: _filterSummary } = props;
   const [showTechnical, setShowTechnical] = useState(false);
 
   // Translate SQL to natural language if available

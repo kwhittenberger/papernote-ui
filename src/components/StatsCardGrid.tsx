@@ -50,16 +50,16 @@ export function StatsCardGrid({ stats, className = '', columns = 4 }: StatsCardG
           className="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-6"
         >
           <div className="flex items-center">
-            <div className={`flex-shrink-0 ${stat.iconColor || 'text-blue-600'}`}>
+            <div className={`flex-shrink-0 ${stat.iconColor || 'text-primary-600'}`}>
               {stat.icon}
             </div>
             <div className="ml-4 flex-1">
-              <div className="text-sm font-medium text-gray-500">{stat.label}</div>
-              <div className={`text-2xl font-bold ${stat.valueColor || 'text-gray-900'}`}>
+              <div className="text-sm font-medium text-ink-500">{stat.label}</div>
+              <div className={`text-2xl font-bold ${stat.valueColor || 'text-ink-900'}`}>
                 {stat.value}
               </div>
               {stat.subtitle && (
-                <div className="text-sm text-gray-500 mt-1">{stat.subtitle}</div>
+                <div className="text-sm text-ink-500 mt-1">{stat.subtitle}</div>
               )}
             </div>
           </div>

@@ -25,24 +25,10 @@ export interface PageProps {
  */
 export const Page: React.FC<PageProps> = ({
   children,
-  maxWidth = '7xl',
+  maxWidth: _maxWidth = '7xl',
   className = '',
-  padding = 'normal'
+  padding: _padding = 'normal'
 }) => {
-  const maxWidthClasses = {
-    '4xl': 'max-w-4xl',   // 896px
-    '5xl': 'max-w-5xl',   // 1024px
-    '6xl': 'max-w-6xl',   // 1152px
-    '7xl': 'max-w-7xl',   // 1280px
-    'full': 'max-w-full'
-  };
-
-  const paddingClasses = {
-    'none': '',
-    'sm': 'p-4',
-    'normal': 'p-8',
-    'lg': 'p-12'
-  };
 
   return (
     <div className="min-h-screen bg-paper-100">

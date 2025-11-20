@@ -6,11 +6,14 @@
 export { default as Button } from './Button';
 export type { ButtonProps } from './Button';
 
+export { default as ButtonGroup } from './ButtonGroup';
+export type { ButtonGroupProps, ButtonGroupOption } from './ButtonGroup';
+
 export { default as Input } from './Input';
 export type { InputProps, ValidationState } from './Input';
 
 export { default as Select } from './Select';
-export type { SelectProps, SelectOption } from './Select';
+export type { SelectProps, SelectOption, SelectHandle } from './Select';
 
 export { default as MultiSelect } from './MultiSelect';
 export type { MultiSelectProps, MultiSelectOption } from './MultiSelect';
@@ -26,6 +29,27 @@ export type { CheckboxProps } from './Checkbox';
 
 export { default as RadioGroup } from './Radio';
 export type { RadioGroupProps, RadioOption } from './Radio';
+
+export { default as Rating } from './Rating';
+export type { RatingProps } from './Rating';
+
+export { default as DatePicker } from './DatePicker';
+export type { DatePickerProps, DatePickerHandle } from './DatePicker';
+
+export { default as TimePicker } from './TimePicker';
+export type { TimePickerProps, TimePickerHandle } from './TimePicker';
+
+export { default as DateRangePicker } from './DateRangePicker';
+export type { DateRangePickerProps, DateRange, DateRangePickerHandle } from './DateRangePicker';
+
+export { default as DateTimePicker } from './DateTimePicker';
+export type { DateTimePickerProps } from './DateTimePicker';
+
+export { default as Combobox } from './Combobox';
+export type { ComboboxProps, ComboboxOption, ComboboxHandle } from './Combobox';
+
+export { default as FormControl } from './FormControl';
+export type { FormControlProps } from './FormControl';
 
 export { default as FilterBar } from './FilterBar';
 export type { FilterBarProps, FilterConfig } from './FilterBar';
@@ -68,11 +92,107 @@ export type { AlertProps } from './Alert';
 export { default as Modal, ModalFooter } from './Modal';
 export type { ModalProps } from './Modal';
 
+export { default as Drawer, DrawerFooter } from './Drawer';
+export type { DrawerProps } from './Drawer';
+
 export { default as ConfirmDialog, useConfirmDialog } from './ConfirmDialog';
 export type { ConfirmDialogProps } from './ConfirmDialog';
 
 export { default as Tooltip } from './Tooltip';
 export type { TooltipProps } from './Tooltip';
+
+export { default as Popover } from './Popover';
+export type { PopoverProps } from './Popover';
+
+export { default as CommandPalette, useCommandPalette } from './CommandPalette';
+export type { CommandPaletteProps, Command } from './CommandPalette';
+
+export { default as Slider } from './Slider';
+export type { SliderProps } from './Slider';
+
+export { default as TreeView } from './TreeView';
+export type { TreeViewProps, TreeNode } from './TreeView';
+
+export { default as ColorPicker } from './ColorPicker';
+export type { ColorPickerProps } from './ColorPicker';
+
+export { default as Stepper } from './Stepper';
+export type { StepperProps, StepConfig } from './Stepper';
+
+export { default as Calendar } from './Calendar';
+export type { CalendarProps, CalendarEvent } from './Calendar';
+
+export { default as Timeline } from './Timeline';
+export type { TimelineProps, TimelineItem } from './Timeline';
+
+export { default as Transfer } from './Transfer';
+export type { TransferProps, TransferItem } from './Transfer';
+
+export { default as Carousel } from './Carousel';
+export type { CarouselProps, CarouselItem } from './Carousel';
+
+export { default as KanbanBoard } from './KanbanBoard';
+export type { KanbanBoardProps, KanbanColumn, KanbanCard } from './KanbanBoard';
+
+export { default as PasswordInput } from './PasswordInput';
+export type { PasswordInputProps, PasswordStrength, PasswordInputHandle } from './PasswordInput';
+
+export { default as MaskedInput } from './MaskedInput';
+export type { MaskedInputProps, MaskType, MaskedInputHandle } from './MaskedInput';
+
+export { default as Autocomplete } from './Autocomplete';
+export type { AutocompleteProps, AutocompleteOption, AutocompleteHandle } from './Autocomplete';
+
+export { default as Form, useFormContext, FormContext } from './Form';
+export type { FormProps, FormContextValue, ValidationRule, FieldErrors } from './Form';
+
+export { default as FieldArray } from './FieldArray';
+export type { FieldArrayProps } from './FieldArray';
+
+export { default as FormWizard } from './FormWizard';
+export type { FormWizardProps, WizardStep } from './FormWizard';
+
+export { default as InfiniteScroll } from './InfiniteScroll';
+export type { InfiniteScrollProps } from './InfiniteScroll';
+
+export { default as DropZone } from './DropZone';
+export type { DropZoneProps } from './DropZone';
+
+export { default as RichTextEditor } from './RichTextEditor';
+export type { RichTextEditorProps } from './RichTextEditor';
+
+export { default as MarkdownEditor } from './MarkdownEditor';
+export type { MarkdownEditorProps } from './MarkdownEditor';
+
+// New Core Components (Phase 3)
+export { default as Menu, MenuDivider } from './Menu';
+export type { MenuProps, MenuItem } from './Menu';
+
+export { default as Chip } from './Chip';
+export type { ChipProps } from './Chip';
+
+export { default as NumberInput } from './NumberInput';
+export type { NumberInputProps } from './NumberInput';
+
+export { default as AlertDialog } from './AlertDialog';
+export type { AlertDialogProps, AlertDialogAction } from './AlertDialog';
+
+export { default as HoverCard } from './HoverCard';
+export type { HoverCardProps } from './HoverCard';
+
+export { default as ContextMenu } from './ContextMenu';
+export type { ContextMenuProps } from './ContextMenu';
+
+export { default as ErrorBoundary } from './ErrorBoundary';
+export type { ErrorBoundaryProps } from './ErrorBoundary';
+
+export { default as BottomSheet } from './BottomSheet';
+export type { BottomSheetProps } from './BottomSheet';
+
+export { default as Collapsible } from './Collapsible';
+export type { CollapsibleProps } from './Collapsible';
+
+export { Show, Hide, useMediaQuery } from './ResponsiveUtilities';
 
 // Navigation Components
 export { default as Breadcrumbs } from './Breadcrumbs';
@@ -106,6 +226,9 @@ export type { ComingSoonProps } from './ComingSoon';
 // Loading Components
 export { default as Loading, Skeleton, SkeletonCard, SkeletonTable } from './Loading';
 export type { LoadingProps } from './Loading';
+
+export { default as Progress } from './Progress';
+export type { ProgressProps } from './Progress';
 
 // Disclosure Components
 export { default as Accordion } from './Accordion';
@@ -220,7 +343,7 @@ export type { LoadingOverlayProps } from './LoadingOverlay';
 export { default as QueryTransparency } from './QueryTransparency';
 export type { QueryTransparencyProps, QueryTransparencyInfo } from './QueryTransparency';
 
-// App-Specific Layout Components
+// App Layout Components
 export { AppLayout } from './AppLayout';
 export type { AppLayoutProps } from './AppLayout';
 
@@ -229,7 +352,7 @@ export { PageLayout } from './PageLayout';
 export { AdminModal } from './AdminModal';
 export type { AdminModalProps, AdminModalTab } from './AdminModal';
 
-// App-Specific Display Components
+// Additional Display Components
 export { StatsCardGrid } from './StatsCardGrid';
 
 export { default as ActionButton } from './ActionButton';
@@ -237,9 +360,6 @@ export type { ActionButtonProps } from './ActionButton';
 
 export { default as ExpandableRowButton } from './ExpandableRowButton';
 export type { ExpandableRowButtonProps } from './ExpandableRowButton';
-
-export { default as SplitCommissionBadge } from './SplitCommissionBadge';
-export type { SplitCommissionBadgeProps, SplitData } from './SplitCommissionBadge';
 
 export { CardView } from './CardView';
 export type { CardViewItem } from './CardView';
@@ -281,33 +401,7 @@ export { default as NotificationBar } from './NotificationBar';
 export { PermissionGate } from './PermissionGate';
 export type { PermissionGateProps } from './PermissionGate';
 
-// Payment History Timeline
-export { PaymentHistoryTimeline } from './PaymentHistoryTimeline';
-export type { PaymentStatusHistoryEntry } from './PaymentHistoryTimeline';
 
-// Commission Dashboard UI
-export { CommissionDashboardUI } from './CommissionDashboardUI';
-export type { CommissionDashboardUIProps, CommissionSummary, MonthlyCommission } from './CommissionDashboardUI';
-
-// Chart Visualization UI
-export { ChartVisualizationUI } from './ChartVisualizationUI';
-export type { ChartVisualizationUIProps, ChartData } from './ChartVisualizationUI';
-
-// Chat UI
-export { ChatUI } from './ChatUI';
-export type { ChatUIProps, ChatMessage } from './ChatUI';
-
-// Insights Panel UI
-export { InsightsPanelUI } from './InsightsPanelUI';
-export type { InsightsPanelUIProps, AnalyticsInsight } from './InsightsPanelUI';
-
-// Role Manager
-export { RoleManager } from './RoleManager';
-export type { RoleManagerProps, Role } from './RoleManager';
-
-// Relationship Manager UI
-export { RelationshipManagerUI } from './RelationshipManagerUI';
-export type { RelationshipManagerUIProps, AccountStaffAssignmentDto, RelationshipType, UserLookup } from './RelationshipManagerUI';
 
 // Base types
 export type {
@@ -323,3 +417,17 @@ export type {
 // Utilities
 export { formatStatisticValue, formatStatistics } from '../utils/statisticsFormatter';
 export type { StatisticFormat, StatisticConfig, FormattedStatistic } from '../utils/statisticsFormatter';
+
+export {
+  calculateColumnWidth,
+  reorderArray,
+  saveColumnWidths,
+  loadColumnWidths,
+  saveColumnOrder,
+  loadColumnOrder,
+} from '../utils/tableEnhancements';
+export type { ColumnResize, ColumnOrder } from '../utils/tableEnhancements';
+
+// Hooks
+export { useColumnResize, useColumnReorder } from '../hooks/useTableEnhancements';
+export type { UseColumnResizeOptions, UseColumnReorderOptions } from '../hooks/useTableEnhancements';

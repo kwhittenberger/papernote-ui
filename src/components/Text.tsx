@@ -16,6 +16,12 @@ export interface TextProps {
   color?: 'primary' | 'secondary' | 'muted' | 'accent' | 'error' | 'success';
   /** Text alignment */
   align?: 'left' | 'center' | 'right';
+  /** Truncate text with ellipsis (single line) */
+  truncate?: boolean;
+  /** Clamp text to specific number of lines (with ellipsis) */
+  lineClamp?: 1 | 2 | 3 | 4 | 5 | 6;
+  /** Text transform */
+  transform?: 'uppercase' | 'lowercase' | 'capitalize' | 'normal';
   /** Custom className */
   className?: string;
 }
@@ -38,6 +44,9 @@ export const Text: React.FC<TextProps> = ({
   weight = 'normal',
   color = 'primary',
   align = 'left',
+  truncate = false,
+  lineClamp,
+  transform,
   className = '',
 }) => {
   const sizeClasses = {
@@ -71,16 +80,36 @@ export const Text: React.FC<TextProps> = ({
     right: 'text-right',
   };
 
+  const transformClasses = {
+    uppercase: 'uppercase',
+    lowercase: 'lowercase',
+    capitalize: 'capitalize',
+    normal: 'normal-case',
+  };
+
+  const lineClampClasses = {
+    1: 'line-clamp-1',
+    2: 'line-clamp-2',
+    3: 'line-clamp-3',
+    4: 'line-clamp-4',
+    5: 'line-clamp-5',
+    6: 'line-clamp-6',
+  };
+
+  // Build class list
+  const classes = [
+    sizeClasses[size],
+    weightClasses[weight],
+    colorClasses[color],
+    alignClasses[align],
+    transform ? transformClasses[transform] : '',
+    truncate ? 'truncate' : '',
+    lineClamp ? lineClampClasses[lineClamp] : '',
+    className,
+  ].filter(Boolean).join(' ');
+
   return (
-    <Component
-      className={`
-        ${sizeClasses[size]}
-        ${weightClasses[weight]}
-        ${colorClasses[color]}
-        ${alignClasses[align]}
-        ${className}
-      `}
-    >
+    <Component className={classes}>
       {children}
     </Component>
   );

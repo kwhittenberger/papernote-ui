@@ -1,6 +1,7 @@
 // Copyright (c) 2025 kwhittenberger. All rights reserved.
 // This file is part of the Commissions Management System (CMMS).
 // Proprietary and confidential. Unauthorized copying or distribution is prohibited.
+import { forwardRef } from 'react';
 import { Check, Minus } from 'lucide-react';
 
 export interface CheckboxProps {
@@ -13,9 +14,11 @@ export interface CheckboxProps {
   className?: string;
   id?: string;
   name?: string;
+  /** Optional icon to display next to label */
+  icon?: React.ReactNode;
 }
 
-export default function Checkbox({
+const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
   checked,
   onChange,
   label,
@@ -25,7 +28,8 @@ export default function Checkbox({
   className = '',
   id,
   name,
-}: CheckboxProps) {
+  icon,
+}, ref) => {
   const checkboxId = id || `checkbox-${Math.random().toString(36).substring(2, 9)}`;
 
   const handleChange = () => {
@@ -51,6 +55,7 @@ export default function Checkbox({
       {/* Checkbox */}
       <div className="relative inline-block flex-shrink-0 mt-0.5">
         <input
+          ref={ref}
           type="checkbox"
           id={checkboxId}
           name={name}
@@ -85,7 +90,10 @@ export default function Checkbox({
       {(label || description) && (
         <div className="flex-1">
           {label && (
-            <p className="text-sm font-medium text-ink-900">{label}</p>
+            <div className="flex items-center gap-2">
+              {icon && <span className="text-ink-700">{icon}</span>}
+              <p className="text-sm font-medium text-ink-900">{label}</p>
+            </div>
           )}
           {description && (
             <p className="text-xs text-ink-600 mt-0.5">{description}</p>
@@ -94,4 +102,7 @@ export default function Checkbox({
       )}
     </label>
   );
-}
+});
+
+Checkbox.displayName = 'Checkbox';
+export default Checkbox;

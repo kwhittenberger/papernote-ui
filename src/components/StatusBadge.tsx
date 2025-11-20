@@ -2,7 +2,6 @@
 // This file is part of the notebook-ui component library.
 // Proprietary and confidential. Unauthorized copying or distribution is prohibited.
 
-import React from 'react';
 import { CheckCircle, Clock, AlertCircle, XCircle } from 'lucide-react';
 
 export interface StatusBadgeProps {
@@ -16,42 +15,42 @@ const statusConfig = {
   paid: {
     icon: CheckCircle,
     defaultLabel: 'Paid',
-    className: 'bg-green-100 text-green-800',
+    className: 'bg-success-100 text-success-800',
   },
   success: {
     icon: CheckCircle,
     defaultLabel: 'Success',
-    className: 'bg-green-100 text-green-800',
+    className: 'bg-success-100 text-success-800',
   },
   pending: {
     icon: Clock,
     defaultLabel: 'Pending',
-    className: 'bg-yellow-100 text-yellow-800',
+    className: 'bg-warning-100 text-warning-800',
   },
   warning: {
     icon: AlertCircle,
     defaultLabel: 'Warning',
-    className: 'bg-yellow-100 text-yellow-800',
+    className: 'bg-warning-100 text-warning-800',
   },
   overdue: {
     icon: AlertCircle,
     defaultLabel: 'Overdue',
-    className: 'bg-red-100 text-red-800',
+    className: 'bg-error-100 text-error-800',
   },
   error: {
     icon: XCircle,
     defaultLabel: 'Error',
-    className: 'bg-red-100 text-red-800',
+    className: 'bg-error-100 text-error-800',
   },
   cancelled: {
     icon: XCircle,
     defaultLabel: 'Cancelled',
-    className: 'bg-gray-100 text-gray-800',
+    className: 'bg-paper-200 text-ink-700',
   },
   info: {
     icon: CheckCircle,
     defaultLabel: 'Info',
-    className: 'bg-blue-100 text-blue-800',
+    className: 'bg-primary-100 text-primary-800',
   },
 };
 

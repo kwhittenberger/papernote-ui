@@ -541,20 +541,20 @@ function parseLimit(sql: string): string | null {
 }
 
 /**
- * Parse JOIN clauses
+ * Parse JOIN clauses (currently unused)
  */
-function parseJoins(sql: string, friendlyNames: FriendlyNameConfig): string[] {
-  const joins: string[] = [];
-  const joinMatches = sql.matchAll(/(left|right|inner|outer)?\s*join\s+["']?(\w+)["']?/gi);
-
-  for (const match of joinMatches) {
-    const joinType = match[1] ? match[1].toLowerCase() : 'inner';
-    const tableName = formatTableName(match[2], friendlyNames);
-    joins.push(tableName);
-  }
-
-  return joins;
-}
+// function _parseJoins(sql: string, friendlyNames: FriendlyNameConfig): string[] {
+//   const joins: string[] = [];
+//   const joinMatches = sql.matchAll(/(left|right|inner|outer)?\s*join\s+["']?(\w+)["']?/gi);
+//
+//   for (const match of joinMatches) {
+//     const _joinType = match[1] ? match[1].toLowerCase() : 'inner';
+//     const tableName = formatTableName(match[2], friendlyNames);
+//     joins.push(tableName);
+//   }
+//
+//   return joins;
+// }
 
 /**
  * Parse aggregation functions

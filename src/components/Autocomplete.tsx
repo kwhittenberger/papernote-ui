@@ -1,0 +1,313 @@
+// Copyright (c) 2025 kwhittenberger. All rights reserved.
+// This file is part of the Commissions Management System (CMMS).
+// Proprietary and confidential. Unauthorized copying or distribution is prohibited.
+
+import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { Search, X, Loader2 } from 'lucide-react';
+
+export interface AutocompleteHandle {
+  focus: () => void;
+  blur: () => void;
+}
+
+export interface AutocompleteOption {
+  value: string;
+  label: string;
+  description?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface AutocompleteProps {
+  value: string;
+  onChange: (value: string, option?: AutocompleteOption) => void;
+  options?: AutocompleteOption[];
+  onSearch?: (query: string) => Promise<AutocompleteOption[]>;
+  label?: string;
+  placeholder?: string;
+  required?: boolean;
+  disabled?: boolean;
+  error?: string;
+  helperText?: string;
+  minChars?: number;
+  debounceMs?: number;
+  maxResults?: number;
+  clearable?: boolean;
+  className?: string;
+}
+
+const Autocomplete = forwardRef<AutocompleteHandle, AutocompleteProps>(({
+  value,
+  onChange,
+  options = [],
+  onSearch,
+  label,
+  placeholder = 'Search...',
+  required = false,
+  disabled = false,
+  error,
+  helperText,
+  minChars = 1,
+  debounceMs = 300,
+  maxResults = 10,
+  clearable = true,
+  className = '',
+}, ref) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [filteredOptions, setFilteredOptions] = useState<AutocompleteOption[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Expose methods via ref
+  useImperativeHandle(ref, () => ({
+    focus: () => inputRef.current?.focus(),
+    blur: () => inputRef.current?.blur(),
+  }));
+
+  // Filter options locally
+  const filterOptions = (query: string): AutocompleteOption[] => {
+    if (!query || query.length < minChars) return [];
+
+    const lowerQuery = query.toLowerCase();
+    return options
+      .filter(
+        (option) =>
+          option.label.toLowerCase().includes(lowerQuery) ||
+          option.description?.toLowerCase().includes(lowerQuery)
+      )
+      .slice(0, maxResults);
+  };
+
+  // Handle search
+  const handleSearch = async (query: string) => {
+    if (query.length < minChars) {
+      setFilteredOptions([]);
+      setIsOpen(false);
+      return;
+    }
+
+    if (onSearch) {
+      // API search
+      setLoading(true);
+      try {
+        const results = await onSearch(query);
+        setFilteredOptions(results.slice(0, maxResults));
+        setIsOpen(results.length > 0);
+      } catch (err) {
+        console.error('Autocomplete search error:', err);
+        setFilteredOptions([]);
+        setIsOpen(false);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      // Local filter
+      const filtered = filterOptions(query);
+      setFilteredOptions(filtered);
+      setIsOpen(filtered.length > 0);
+    }
+  };
+
+  // Debounced search
+  const debouncedSearch = (query: string) => {
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+
+    debounceRef.current = setTimeout(() => {
+      handleSearch(query);
+    }, debounceMs);
+  };
+
+  // Handle input change
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    onChange(newValue);
+    debouncedSearch(newValue);
+    setHighlightedIndex(-1);
+  };
+
+  // Handle option select
+  const handleSelect = (option: AutocompleteOption) => {
+    onChange(option.value, option);
+    setIsOpen(false);
+    setHighlightedIndex(-1);
+    inputRef.current?.blur();
+  };
+
+  // Handle clear
+  const handleClear = () => {
+    onChange('');
+    setFilteredOptions([]);
+    setIsOpen(false);
+    inputRef.current?.focus();
+  };
+
+  // Keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!isOpen) {
+      if (e.key === 'ArrowDown') {
+        handleSearch(value);
+      }
+      return;
+    }
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setHighlightedIndex((prev) =>
+          prev < filteredOptions.length - 1 ? prev + 1 : prev
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : -1));
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (highlightedIndex >= 0 && highlightedIndex < filteredOptions.length) {
+          handleSelect(filteredOptions[highlightedIndex]);
+        }
+        break;
+      case 'Escape':
+        setIsOpen(false);
+        setHighlightedIndex(-1);
+        break;
+    }
+  };
+
+  // Click outside to close
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node) &&
+        inputRef.current &&
+        !inputRef.current.contains(e.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Cleanup debounce
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
+  }, []);
+
+  return (
+    <div className={`relative ${className}`}>
+      {/* Label */}
+      {label && (
+        <label className="block text-sm font-medium text-ink-900 mb-1.5">
+          {label}
+          {required && <span className="text-error-500 ml-1">*</span>}
+        </label>
+      )}
+
+      {/* Input Container */}
+      <div className="relative">
+        <div className="absolute left-3 top-1/2 -translate-y-1/2">
+          {loading ? (
+            <Loader2 className="h-4 w-4 text-ink-400 animate-spin" />
+          ) : (
+            <Search className="h-4 w-4 text-ink-400" />
+          )}
+        </div>
+
+        <input
+          ref={inputRef}
+          type="text"
+          value={value}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+          onFocus={() => value.length >= minChars && handleSearch(value)}
+          placeholder={placeholder}
+          disabled={disabled}
+          className={`
+            w-full pl-9 pr-9 py-2
+            text-sm text-ink-900 placeholder-ink-400
+            bg-white border rounded-lg
+            focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-accent-400
+            disabled:bg-paper-100 disabled:cursor-not-allowed
+            transition-colors
+            ${error
+              ? 'border-error-500 focus:ring-error-400 focus:border-error-400'
+              : 'border-paper-300'
+            }
+          `}
+        />
+
+        {/* Clear Button */}
+        {clearable && value && !disabled && (
+          <button
+            type="button"
+            onClick={handleClear}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600 transition-colors"
+            aria-label="Clear"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
+      </div>
+
+      {/* Dropdown */}
+      {isOpen && filteredOptions.length > 0 && (
+        <div
+          ref={dropdownRef}
+          className="absolute z-50 w-full mt-1 bg-white border border-paper-200 rounded-lg shadow-lg max-h-60 overflow-y-auto"
+        >
+          {filteredOptions.map((option, index) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => handleSelect(option)}
+              onMouseEnter={() => setHighlightedIndex(index)}
+              className={`
+                w-full text-left px-3 py-2 transition-colors
+                ${highlightedIndex === index
+                  ? 'bg-accent-50'
+                  : 'hover:bg-paper-50'
+                }
+              `}
+            >
+              <div className="text-sm font-medium text-ink-900">{option.label}</div>
+              {option.description && (
+                <div className="text-xs text-ink-600 mt-0.5">{option.description}</div>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* No results */}
+      {isOpen && !loading && filteredOptions.length === 0 && value.length >= minChars && (
+        <div className="absolute z-50 w-full mt-1 bg-white border border-paper-200 rounded-lg shadow-lg p-3">
+          <p className="text-sm text-ink-500 text-center">No results found</p>
+        </div>
+      )}
+
+      {/* Error Message */}
+      {error && (
+        <p className="mt-1.5 text-xs text-error-600">{error}</p>
+      )}
+
+      {/* Helper Text */}
+      {helperText && !error && (
+        <p className="mt-1.5 text-xs text-ink-600">{helperText}</p>
+      )}
+    </div>
+  );
+});
+
+Autocomplete.displayName = 'Autocomplete';
+export default Autocomplete;

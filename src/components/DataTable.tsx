@@ -150,6 +150,46 @@ interface DataTableProps<T extends BaseDataItem = BaseDataItem> {
   expandedRowConfig?: ExpandedRowConfig<T>;
   /** Show the expand chevron column - hidden by default when using expandedRowConfig with double-click or menu */
   showExpandChevron?: boolean;
+
+  // Visual customization props
+  /** Enable zebra striping - true for default, 'odd' or 'even' for specific rows */
+  striped?: boolean | 'odd' | 'even';
+  /** Custom color for striped rows (Tailwind class like 'bg-primary-50' or 'bg-accent-50') */
+  stripedColor?: string;
+  /** Row density - affects padding and text size */
+  density?: 'compact' | 'normal' | 'comfortable';
+  /** Custom class name for rows - static string or function returning class per row */
+  rowClassName?: string | ((item: T, index: number) => string);
+  /** Conditional row highlighting - returns color class (e.g., 'bg-warning-50') */
+  rowHighlight?: (item: T) => string | undefined;
+  /** ID of a single row to highlight */
+  highlightedRowId?: string | number;
+  /** Enable cell borders */
+  bordered?: boolean;
+  /** Custom border color (Tailwind class like 'border-paper-200') */
+  borderColor?: string;
+  /** Disable hover effect on rows */
+  disableHover?: boolean;
+  /** Array of column keys to hide */
+  hiddenColumns?: string[];
+  /** Custom header class name */
+  headerClassName?: string;
+  /** Custom empty state render function */
+  renderEmptyState?: () => React.ReactNode;
+  /** Enable column resizing */
+  resizable?: boolean;
+  /** Callback when column widths change */
+  onColumnResize?: (columnKey: string, width: number) => void;
+  /** Enable column reordering */
+  reorderable?: boolean;
+  /** Callback when column order changes */
+  onColumnReorder?: (newOrder: string[]) => void;
+  /** Enable virtual scrolling for large datasets */
+  virtualized?: boolean;
+  /** Container height for virtual scrolling (default: '600px') */
+  virtualHeight?: string;
+  /** Row height for virtual scrolling (default: 60) */
+  virtualRowHeight?: number;
 }
 
 /**
@@ -223,7 +263,7 @@ function ActionMenu<T>({
   const dropdownContent = isOpen && (
     <div 
       ref={menuRef}
-      className="fixed w-56 bg-white rounded-lg shadow-lg border border-gray-300 py-1" 
+      className="fixed w-56 bg-white rounded-lg shadow-lg border border-paper-300 py-1" 
       style={{
         zIndex: 999999,
         top: `${position.top}px`,
@@ -257,7 +297,7 @@ function ActionMenu<T>({
             className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
               action.variant === 'danger'
                 ? 'text-error-600 hover:bg-error-50 hover:text-error-700'
-                : 'text-gray-700 hover:bg-gray-50'
+                : 'text-ink-700 hover:bg-paper-50'
             }`}
             title={action.tooltip}
           >
@@ -290,10 +330,13 @@ function ActionMenu<T>({
 /**
  * Helper function to generate column styles from width configuration
  */
-function getColumnStyle<T>(column: DataTableColumn<T>): React.CSSProperties {
+function getColumnStyle<T>(column: DataTableColumn<T>, dynamicWidth?: number): React.CSSProperties {
   const style: React.CSSProperties = {};
   
-  if (column.width !== undefined) {
+  // Use dynamic width if provided (from resizing)
+  if (dynamicWidth !== undefined) {
+    style.width = `${dynamicWidth}px`;
+  } else if (column.width !== undefined) {
     style.width = typeof column.width === 'number' ? `${column.width}px` : column.width;
   }
   
@@ -386,9 +429,203 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
   renderExpandedRow,
   expandedRowConfig,
   showExpandChevron = false,
+  // Visual customization props
+  striped = false,
+  stripedColor,
+  density = 'normal',
+  rowClassName,
+  rowHighlight,
+  highlightedRowId,
+  bordered = false,
+  borderColor = 'border-paper-200',
+  disableHover = false,
+  hiddenColumns = [],
+  headerClassName = '',
+  renderEmptyState: customRenderEmptyState,
+  resizable = false,
+  onColumnResize,
+  reorderable = false,
+  onColumnReorder,
+  virtualized = false,
+  virtualHeight = '600px',
+  virtualRowHeight = 60,
 }: DataTableProps<T>) {
+  // Column resizing state
+  const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
+  const [resizingColumn, setResizingColumn] = useState<string | null>(null);
+  const [resizeStartX, setResizeStartX] = useState<number>(0);
+  const [resizeStartWidth, setResizeStartWidth] = useState<number>(0);
+
+  // Column reordering state
+  const [columnOrder, setColumnOrder] = useState<string[]>([]);
+  const [draggingColumn, setDraggingColumn] = useState<string | null>(null);
+  const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
+
+  // Virtual scrolling state
+  const [scrollTop, setScrollTop] = useState(0);
+  const tableContainerRef = useRef<HTMLDivElement>(null);
+
+  // Filter columns based on hiddenColumns
+  const baseVisibleColumns = columns.filter(
+    col => !hiddenColumns.includes(String(col.key))
+  );
+
+  // Initialize column order on mount or when columns change
+  useEffect(() => {
+    if (columnOrder.length === 0) {
+      setColumnOrder(baseVisibleColumns.map(col => String(col.key)));
+    }
+  }, [baseVisibleColumns, columnOrder.length]);
+
+  // Apply column order
+  const visibleColumns = reorderable && columnOrder.length > 0
+    ? columnOrder
+        .map(key => baseVisibleColumns.find(col => String(col.key) === key))
+        .filter((col): col is DataTableColumn<T> => col !== undefined)
+    : baseVisibleColumns;
+
+  // Density classes
+  const densityClasses = {
+    compact: {
+      cell: 'px-3 py-1',
+      text: 'text-xs',
+      header: 'px-3 py-2',
+    },
+    normal: {
+      cell: 'px-6 py-1.5',
+      text: 'text-sm',
+      header: 'px-6 py-3',
+    },
+    comfortable: {
+      cell: 'px-6 py-3',
+      text: 'text-base',
+      header: 'px-6 py-4',
+    },
+  };
+
+  const currentDensity = densityClasses[density];
+
+  // Key extractor function - defined early for use in other functions
+  const getRowKey = keyExtractor || ((row: T) => String(row.id));
+
+  // Get row background class based on striping and highlighting
+  const getRowBackgroundClass = (item: T, index: number): string => {
+    const classes: string[] = [];
+
+    // Check for highlighted row
+    if (highlightedRowId !== undefined && getRowKey(item) === String(highlightedRowId)) {
+      classes.push('bg-accent-100');
+    }
+    // Check for custom row highlight
+    else if (rowHighlight) {
+      const highlightClass = rowHighlight(item);
+      if (highlightClass) {
+        classes.push(highlightClass);
+      }
+    }
+    // Check for striping
+    else if (striped) {
+      const isOdd = index % 2 === 0; // 0-indexed, so even index = odd row
+      const shouldStripe =
+        striped === true ? isOdd :
+        striped === 'odd' ? isOdd :
+        striped === 'even' ? !isOdd :
+        false;
+
+      if (shouldStripe) {
+        classes.push(stripedColor || 'bg-paper-50');
+      }
+    }
+
+    // Add custom row class
+    if (rowClassName) {
+      if (typeof rowClassName === 'string') {
+        classes.push(rowClassName);
+      } else {
+        classes.push(rowClassName(item, index));
+      }
+    }
+
+    return classes.join(' ');
+  };
   // NEW: Expansion mode state management (for expandedRowConfig)
   const [expansionState, setExpansionState] = useState<ExpansionState | null>(null);
+
+  // Column resize handlers
+  const handleResizeStart = (e: React.MouseEvent, columnKey: string, currentWidth: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setResizingColumn(columnKey);
+    setResizeStartX(e.clientX);
+    setResizeStartWidth(currentWidth);
+  };
+
+  // Column reorder handlers
+  const handleDragStart = (e: React.DragEvent, columnKey: string) => {
+    setDraggingColumn(columnKey);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', columnKey);
+  };
+
+  const handleDragOver = (e: React.DragEvent, columnKey: string) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (draggingColumn && draggingColumn !== columnKey) {
+      setDragOverColumn(columnKey);
+    }
+  };
+
+  const handleDragEnd = () => {
+    setDraggingColumn(null);
+    setDragOverColumn(null);
+  };
+
+  const handleDrop = (e: React.DragEvent, targetColumnKey: string) => {
+    e.preventDefault();
+    if (!draggingColumn || draggingColumn === targetColumnKey) return;
+
+    const newOrder = [...columnOrder];
+    const dragIndex = newOrder.indexOf(draggingColumn);
+    const dropIndex = newOrder.indexOf(targetColumnKey);
+
+    // Remove from old position
+    newOrder.splice(dragIndex, 1);
+    // Insert at new position
+    newOrder.splice(dropIndex, 0, draggingColumn);
+
+    setColumnOrder(newOrder);
+    onColumnReorder?.(newOrder);
+    setDraggingColumn(null);
+    setDragOverColumn(null);
+  };
+
+  useEffect(() => {
+    if (!resizingColumn) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const delta = e.clientX - resizeStartX;
+      const newWidth = Math.max(50, resizeStartWidth + delta); // Min width 50px
+      setColumnWidths(prev => ({
+        ...prev,
+        [resizingColumn]: newWidth,
+      }));
+    };
+
+    const handleMouseUp = () => {
+      if (resizingColumn && columnWidths[resizingColumn]) {
+        onColumnResize?.(resizingColumn, columnWidths[resizingColumn]);
+      }
+      setResizingColumn(null);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [resizingColumn, resizeStartX, resizeStartWidth, columnWidths, onColumnResize]);
   // Build combined actions: built-in edit/delete + custom actions + expansion mode actions
   const builtInActions: DataTableAction<T>[] = [];
   
@@ -499,10 +736,7 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
       onRowSelect?.(Array.from(newSet));
     }
   };
-  
-  // Key extractor function
-  const getRowKey = keyExtractor || ((row: T) => String(row.id));
-  
+
   // Handle row selection
   const handleRowSelect = (rowKey: string) => {
     const newSelected = new Set(selectedRowsSet);
@@ -621,57 +855,101 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
   const renderLoadingSkeleton = () => (
     <>
       {Array.from({ length: loadingRows }, (_, i) => (
-        <tr key={`loading-${i}`} className="animate-pulse table-row-stable">
+        <tr key={`loading-${i}`} className={`animate-pulse table-row-stable ${bordered ? `border-b ${borderColor}` : ''}`}>
           {selectable && (
-            <td className="sticky left-0 bg-white px-4 py-4 border-b border-gray-200 z-10 align-middle">
-              <div className="h-4 w-4 bg-gray-200 rounded"></div>
+            <td className={`sticky left-0 bg-white ${currentDensity.cell} border-b ${borderColor} z-10 align-middle`}>
+              <div className="h-4 w-4 bg-paper-200 rounded"></div>
             </td>
           )}
           {expandable && (
-            <td className="sticky left-0 bg-white px-2 py-4 border-b border-gray-200 z-10">
-              <div className="h-4 w-4 bg-gray-200 rounded"></div>
+            <td className={`sticky left-0 bg-white px-2 ${currentDensity.cell} border-b ${borderColor} z-10`}>
+              <div className="h-4 w-4 bg-paper-200 rounded"></div>
             </td>
           )}
           {allActions.length > 0 && (
-            <td className="sticky left-0 bg-white px-2 py-4 border-b border-gray-200 z-10">
-              <div className="h-8 w-8 bg-gray-200 rounded"></div>
+            <td className={`sticky left-0 bg-white px-2 ${currentDensity.cell} border-b ${borderColor} z-10`}>
+              <div className="h-8 w-8 bg-paper-200 rounded"></div>
             </td>
           )}
-          {columns.map((column, colIndex) => (
-            <td
-              key={`loading-${i}-${colIndex}`}
-              className={`px-6 py-4 whitespace-nowrap table-row-stable`}
-              style={getColumnStyle(column)}
-            >
-              <div className="h-4 bg-gray-200 rounded mb-1"></div>
-              <div className="h-3 bg-gray-200 rounded w-3/4"></div>
-            </td>
-          ))}
+          {visibleColumns.map((column, colIndex) => {
+            const columnKey = String(column.key);
+            const dynamicWidth = columnWidths[columnKey];
+            return (
+              <td
+                key={`loading-${i}-${colIndex}`}
+                className={`${currentDensity.cell} whitespace-nowrap table-row-stable ${bordered ? `border ${borderColor}` : ''}`}
+                style={getColumnStyle(column, dynamicWidth)}
+              >
+                <div className="h-4 bg-paper-200 rounded mb-1"></div>
+                <div className="h-3 bg-paper-200 rounded w-3/4"></div>
+              </td>
+            );
+          })}
         </tr>
       ))}
     </>
   );
 
   // Render empty state
-  const renderEmptyState = () => (
-    <tr>
-      <td colSpan={columns.length + (allActions.length > 0 ? 1 : 0) + (selectable ? 1 : 0) + (expandable ? 1 : 0)} className="px-6 py-8 text-center text-gray-500">
-        {error || emptyMessage}
-      </td>
-    </tr>
-  );
+  const renderEmptyStateContent = () => {
+    if (customRenderEmptyState) {
+      return (
+        <tr>
+          <td colSpan={visibleColumns.length + (allActions.length > 0 ? 1 : 0) + (selectable ? 1 : 0) + (expandable ? 1 : 0)}>
+            {customRenderEmptyState()}
+          </td>
+        </tr>
+      );
+    }
+    return (
+      <tr>
+        <td colSpan={visibleColumns.length + (allActions.length > 0 ? 1 : 0) + (selectable ? 1 : 0) + (expandable ? 1 : 0)} className={`${currentDensity.cell} py-8 text-center text-ink-500`}>
+          {error || emptyMessage}
+        </td>
+      </tr>
+    );
+  };
+
+  // Virtual scrolling calculations
+  const getVisibleRange = () => {
+    if (!virtualized) return { start: 0, end: data.length };
+    
+    const overscan = 5;
+    const start = Math.max(0, Math.floor(scrollTop / virtualRowHeight) - overscan);
+    const visibleCount = Math.ceil(parseInt(virtualHeight) / virtualRowHeight);
+    const end = Math.min(data.length, start + visibleCount + overscan * 2);
+    
+    return { start, end };
+  };
+
+  const { start: visibleStart, end: visibleEnd } = getVisibleRange();
+
+  // Handle scroll for virtual scrolling
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    if (virtualized) {
+      setScrollTop(e.currentTarget.scrollTop);
+    }
+  };
 
   // Render data rows
-  const renderDataRows = () =>
-    data.map((item) => {
+  const renderDataRows = () => {
+    const rowsToRender = virtualized 
+      ? data.slice(visibleStart, visibleEnd)
+      : data;
+
+    return rowsToRender.map((item, idx) => {
+      const index = virtualized ? visibleStart + idx : idx;
       const rowKey = getRowKey(item);
       const isSelected = selectedRowsSet.has(rowKey);
       const isExpanded = expandedRowsSet.has(rowKey);
-      
+      const rowBgClass = getRowBackgroundClass(item, index);
+      const hoverClass = disableHover ? '' : 'hover:bg-paper-100';
+      const borderClass = bordered ? `border-b ${borderColor}` : (!visibleColumns.some(col => !!col.renderSecondary) ? `border-b ${borderColor}` : '');
+
       return (
       <React.Fragment key={rowKey}>
-        <tr 
-          className={`hover:bg-gray-50 table-row-stable ${onRowDoubleClick || onRowClick || (expandedRowConfig?.edit?.triggerOnDoubleClick !== false) || (expandedRowConfig?.details?.triggerOnDoubleClick === true) ? 'cursor-pointer' : ''} ${isSelected ? 'bg-accent-50 border-l-2 border-accent-500' : ''} ${!columns.some(col => !!col.renderSecondary) ? 'border-b border-gray-200' : ''}`}
+        <tr
+          className={`${hoverClass} table-row-stable ${onRowDoubleClick || onRowClick || (expandedRowConfig?.edit?.triggerOnDoubleClick !== false) || (expandedRowConfig?.details?.triggerOnDoubleClick === true) ? 'cursor-pointer' : ''} ${isSelected ? 'bg-accent-50 border-l-2 border-accent-500' : rowBgClass} ${borderClass}`}
           onClick={() => onRowClick?.(item)}
           onDoubleClick={() => {
             // Check for edit mode with triggerOnDoubleClick
@@ -696,7 +974,7 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
           }
         >
           {selectable && (
-          <td className="sticky left-0 bg-white px-4 py-1.5 z-10 align-middle">
+          <td className={`sticky left-0 bg-white ${currentDensity.cell} z-10 align-middle ${bordered ? `border ${borderColor}` : ''}`}>
             <input
               type="checkbox"
               checked={isSelected}
@@ -708,7 +986,7 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
           </td>
           )}
             {((expandable || expandedRowConfig) && showExpandChevron) && (
-            <td className="sticky left-0 bg-white px-2 py-1.5 z-10">
+            <td className={`sticky left-0 bg-white px-2 ${currentDensity.cell} z-10 ${bordered ? `border ${borderColor}` : ''}`}>
               <button
                 onClick={() => {
                   // NEW: Enhanced logic for expandedRowConfig
@@ -736,7 +1014,7 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
           )}
         {allActions.length > 0 && (
           <td 
-            className="sticky left-0 px-0.5 py-1.5 whitespace-nowrap shadow-[4px_0_6px_-2px_rgba(0,0,0,0.1)] z-10"
+            className="sticky left-0 px-0 py-1.5 whitespace-nowrap shadow-[4px_0_6px_-2px_rgba(0,0,0,0.1)] z-10"
             style={{ width: '28px', backgroundColor: 'inherit' }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -745,7 +1023,9 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
             </div>
           </td>
         )}
-        {columns.map((column) => {
+        {visibleColumns.map((column) => {
+          const columnKey = String(column.key);
+          const dynamicWidth = columnWidths[columnKey];
           const value = typeof column.key === 'string'
             ? item[column.key as keyof T]
             : item[column.key];
@@ -754,23 +1034,25 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
 
           return (
             <td
-              key={`${item.id}-${String(column.key)}`}
-              className={`px-6 py-1.5 ${column.className || ''}`}
-              style={getColumnStyle(column)}
+              key={`${item.id}-${columnKey}`}
+              className={`${currentDensity.cell} ${column.className || ''} ${bordered ? `border ${borderColor}` : ''}`}
+              style={getColumnStyle(column, dynamicWidth)}
             >
-              <div className="text-sm leading-tight">{primaryContent}</div>
+              <div className={`${currentDensity.text} leading-tight`}>{primaryContent}</div>
             </td>
           );
           })}
             </tr>
             
             {/* Secondary row - only render if any column has renderSecondary */}
-            {columns.some(col => !!col.renderSecondary) && (
-              <tr className="secondary-row hover:bg-gray-50 border-b border-gray-200">
-                {selectable && <td className="sticky left-0 bg-white px-4 py-0.5 z-10"></td>}
-                {((expandable || expandedRowConfig) && showExpandChevron) && <td className="sticky left-0 bg-white px-2 py-0.5 z-10"></td>}
-                {allActions.length > 0 && <td className="sticky left-0 px-0.5 py-0.5 z-10" style={{ width: '28px', backgroundColor: 'inherit' }}></td>}
-                {columns.map((column) => {
+            {visibleColumns.some(col => !!col.renderSecondary) && (
+              <tr className={`secondary-row ${hoverClass} border-b ${borderColor}`}>
+                {selectable && <td className={`sticky left-0 bg-white ${currentDensity.cell} py-0.5 z-10 ${bordered ? `border ${borderColor}` : ''}`}></td>}
+                {((expandable || expandedRowConfig) && showExpandChevron) && <td className={`sticky left-0 bg-white px-2 py-0.5 z-10 ${bordered ? `border ${borderColor}` : ''}`}></td>}
+                {allActions.length > 0 && <td className={`sticky left-0 px-0.5 py-0.5 z-10 ${bordered ? `border ${borderColor}` : ''}`} style={{ width: '28px', backgroundColor: 'inherit' }}></td>}
+                {visibleColumns.map((column) => {
+                  const columnKey = String(column.key);
+                  const dynamicWidth = columnWidths[columnKey];
                   const value = typeof column.key === 'string'
                     ? item[column.key as keyof T]
                     : item[column.key];
@@ -778,11 +1060,11 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
 
                   return (
                     <td
-                      key={`${item.id}-${String(column.key)}-secondary`}
-                      className={`px-6 py-0.5 ${column.className || ''}`}
-                      style={getColumnStyle(column)}
+                      key={`${item.id}-${columnKey}-secondary`}
+                      className={`${currentDensity.cell} py-0.5 ${column.className || ''} ${bordered ? `border ${borderColor}` : ''}`}
+                      style={getColumnStyle(column, dynamicWidth)}
                     >
-                      <div className="text-xs text-gray-500 leading-tight">
+                      <div className="text-xs text-ink-500 leading-tight">
                         {secondaryContent || <span className="invisible">—</span>}
                       </div>
                     </td>
@@ -795,12 +1077,12 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
           <tr>
             <td
               colSpan={
-                columns.length + 
-                (selectable ? 1 : 0) + 
-                (((expandable || expandedRowConfig) && showExpandChevron) ? 1 : 0) + 
+                visibleColumns.length +
+                (selectable ? 1 : 0) +
+                (((expandable || expandedRowConfig) && showExpandChevron) ? 1 : 0) +
                 (allActions.length > 0 ? 1 : 0)
               }
-              className="px-6 py-4 bg-paper-50"
+              className={`${currentDensity.cell} py-4 bg-paper-50`}
             >
               {renderExpandedRow(item)}
             </td>
@@ -815,10 +1097,10 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
           
           // Edit mode
           if (mode === 'edit' && expandedRowConfig.edit) {
-            bgColorClass = 'bg-gray-100/80 border-t border-b border-gray-300/80';
+            bgColorClass = 'bg-paper-100/80 border-t border-b border-paper-300/80';
             content = expandedRowConfig.edit.render(
               item,
-              async (updated: T) => {
+              async (_updated: T) => {
                 // Handle save
                 handleCollapseExpansion();
               },
@@ -831,7 +1113,7 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
           
           // Details mode
           else if (mode === 'details' && expandedRowConfig.details) {
-            bgColorClass = 'bg-blue-50/80 border-t border-b border-blue-200/80';
+            bgColorClass = 'bg-primary-50/80 border-t border-b border-primary-200/80';
             content = expandedRowConfig.details.render(item);
           }
           
@@ -840,10 +1122,10 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
             const key = mode.replace('addRelated-', '');
             const config = expandedRowConfig.addRelated.find(c => c.key === key);
             if (config) {
-              bgColorClass = 'bg-green-50/80 border-t border-b border-green-200/80';
+              bgColorClass = 'bg-success-50/80 border-t border-b border-success-200/80';
               content = config.render(
                 item,
-                async (newItem: any) => {
+                async (_newItem: any) => {
                   // Handle save
                   handleCollapseExpansion();
                 },
@@ -872,12 +1154,12 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
             <tr key={`expanded-${rowKey}`}>
               <td
                 colSpan={
-                  columns.length + 
-                  (selectable ? 1 : 0) + 
-                  (((expandable || expandedRowConfig) && showExpandChevron) ? 1 : 0) + 
+                  visibleColumns.length +
+                  (selectable ? 1 : 0) +
+                  (((expandable || expandedRowConfig) && showExpandChevron) ? 1 : 0) +
                   (allActions.length > 0 ? 1 : 0)
                 }
-                className={`px-4 py-4 ${bgColorClass} animate-expand`}
+                className={`${currentDensity.cell} py-4 ${bgColorClass} animate-expand`}
               >
                 {content}
               </td>
@@ -887,35 +1169,40 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
       </React.Fragment>
       );
     });
+  };
 
-  return (
-    <div className={`bg-white rounded-lg shadow border-2 border-gray-300 overflow-x-auto overflow-y-visible ${className}`} style={{ position: 'relative' }}>
+  const tableContent = (
+    <div className={`bg-white rounded-lg shadow border-2 ${borderColor} ${virtualized ? 'overflow-hidden' : 'overflow-x-auto overflow-y-visible'} ${className}`} style={{ position: 'relative' }}>
       {/* Loading overlay for when data is being refreshed */}
       {loading && data.length > 0 && (
-        <div 
+        <div
           className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-20"
           style={{ backdropFilter: 'blur(2px)' }}
         >
           <div className="flex flex-col items-center gap-3">
             <div className="loading-spinner" style={{ width: '32px', height: '32px', borderWidth: '3px' }}></div>
-            <span className="text-sm font-medium text-gray-600">Loading...</span>
+            <span className="text-sm font-medium text-ink-600">Loading...</span>
           </div>
         </div>
       )}
-      
-      <table className="table-stable w-full">
+
+      <table className={`table-stable w-full ${bordered ? 'border-collapse' : ''}`}>
         <colgroup>
           {selectable && <col className="w-12" />}
           {((expandable || expandedRowConfig) && showExpandChevron) && <col className="w-10" />}
           {allActions.length > 0 && <col style={{ width: '28px' }} />}
-          {columns.map((column, index) => (
-            <col key={index} style={getColumnStyle(column)} />
-          ))}
+          {visibleColumns.map((column, index) => {
+            const columnKey = String(column.key);
+            const dynamicWidth = columnWidths[columnKey];
+            return (
+              <col key={index} style={getColumnStyle(column, dynamicWidth)} />
+            );
+          })}
         </colgroup>
-        <thead className="bg-gray-50 sticky top-0 z-10">
+        <thead className={`bg-paper-100 sticky top-0 z-10 ${headerClassName}`}>
           <tr className="table-header-row">
             {selectable && (
-              <th className="sticky left-0 bg-gray-50 px-4 py-3 border-b border-gray-200 z-20 w-12">
+              <th className={`sticky left-0 bg-paper-100 ${currentDensity.header} border-b ${borderColor} z-20 w-12 ${bordered ? `border ${borderColor}` : ''}`}>
                 <input
                   type="checkbox"
                   checked={selectedRowsSet.size === data.length && data.length > 0}
@@ -926,36 +1213,66 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
               </th>
             )}
             {((expandable || expandedRowConfig) && showExpandChevron) && (
-              <th className="sticky left-0 bg-gray-50 px-2 py-3 border-b border-gray-200 z-19 w-10">
+              <th className={`sticky left-0 bg-paper-100 px-2 ${currentDensity.header} border-b ${borderColor} z-19 w-10 ${bordered ? `border ${borderColor}` : ''}`}>
                 {/* Empty header for expand column */}
               </th>
             )}
             {allActions.length > 0 && (
-              <th className="sticky left-0 bg-gray-50 px-0.5 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider border-b border-gray-200 z-20" style={{ width: '28px' }}>
+              <th className={`sticky left-0 bg-paper-100 px-0.5 ${currentDensity.header} text-center text-xs font-medium text-ink-700 uppercase tracking-wider border-b ${borderColor} z-20 ${bordered ? `border ${borderColor}` : ''}`} style={{ width: '28px' }}>
                 {/* Actions column header */}
               </th>
             )}
-            {columns.map((column) => (
-              <th
-                key={String(column.key)}
-                className={`px-6 py-3 text-left`}
-                style={getColumnStyle(column)}
-              >
-                {column.sortable ? (
-                  <button
-                    onClick={() => handleSort(column)}
-                    className="group inline-flex items-center text-xs font-medium text-ink-500 uppercase tracking-wider hover:text-ink-900 transition-colors"
-                  >
-                    <span>{column.header}</span>
-                    {getSortIcon(column)}
-                  </button>
-                ) : (
-                  <span className="text-xs font-medium text-ink-500 uppercase tracking-wider">
-                    {column.header}
-                  </span>
-                )}
-              </th>
-            ))}
+            {visibleColumns.map((column) => {
+              const columnKey = String(column.key);
+              const dynamicWidth = columnWidths[columnKey];
+              const thRef = useRef<HTMLTableCellElement>(null);
+              const isDragging = draggingColumn === columnKey;
+              const isDragOver = dragOverColumn === columnKey;
+
+              return (
+                <th
+                  key={columnKey}
+                  ref={thRef}
+                  draggable={reorderable}
+                  onDragStart={(e) => reorderable && handleDragStart(e, columnKey)}
+                  onDragOver={(e) => reorderable && handleDragOver(e, columnKey)}
+                  onDragEnd={handleDragEnd}
+                  onDrop={(e) => reorderable && handleDrop(e, columnKey)}
+                  className={`
+                    ${currentDensity.header} text-left border-b ${borderColor} ${bordered ? `border ${borderColor}` : ''} relative
+                    ${reorderable ? 'cursor-move' : ''}
+                    ${isDragging ? 'opacity-50' : ''}
+                    ${isDragOver ? 'bg-accent-100' : ''}
+                  `}
+                  style={getColumnStyle(column, dynamicWidth)}
+                >
+                  {column.sortable ? (
+                    <button
+                      onClick={() => handleSort(column)}
+                      className="group inline-flex items-center text-xs font-medium text-ink-500 uppercase tracking-wider hover:text-ink-900 transition-colors"
+                    >
+                      <span>{column.header}</span>
+                      {getSortIcon(column)}
+                    </button>
+                  ) : (
+                    <span className="text-xs font-medium text-ink-500 uppercase tracking-wider">
+                      {column.header}
+                    </span>
+                  )}
+                  {resizable && (
+                    <div
+                      className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-accent-400 group"
+                      onMouseDown={(e) => {
+                        const currentWidth = thRef.current?.offsetWidth || 100;
+                        handleResizeStart(e, columnKey, currentWidth);
+                      }}
+                    >
+                      <div className="absolute right-0 top-0 bottom-0 w-1 bg-paper-300 group-hover:bg-accent-400 transition-colors" />
+                    </div>
+                  )}
+                </th>
+              );
+            })}
           </tr>
         </thead>
         <tbody
@@ -964,7 +1281,7 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
           {loading && data.length === 0 ? (
             renderLoadingSkeleton()
           ) : data.length === 0 ? (
-            renderEmptyState()
+            renderEmptyStateContent()
           ) : (
             renderDataRows()
           )}
@@ -972,4 +1289,20 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
       </table>
     </div>
   );
+
+  // Wrap in scrollable container if virtualized
+  if (virtualized) {
+    return (
+      <div
+        ref={tableContainerRef}
+        onScroll={handleScroll}
+        style={{ height: virtualHeight, overflow: 'auto' }}
+        className="rounded-lg"
+      >
+        {tableContent}
+      </div>
+    );
+  }
+
+  return tableContent;
 }

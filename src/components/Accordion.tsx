@@ -17,6 +17,12 @@ export interface AccordionProps {
   allowMultiple?: boolean;
   defaultOpen?: string[];
   onChange?: (openItems: string[]) => void;
+  /** Custom icon for collapsed state (default: ChevronDown) */
+  expandIcon?: React.ReactNode;
+  /** Custom icon for expanded state (default: rotated ChevronDown) */
+  collapseIcon?: React.ReactNode;
+  /** Show step numbers (1, 2, 3...) instead of icons */
+  showStepNumbers?: boolean;
 }
 
 export default function Accordion({
@@ -24,6 +30,9 @@ export default function Accordion({
   allowMultiple = false,
   defaultOpen = [],
   onChange,
+  expandIcon,
+  collapseIcon,
+  showStepNumbers = false,
 }: AccordionProps) {
   const [openItems, setOpenItems] = useState<Set<string>>(new Set(defaultOpen));
 
@@ -45,8 +54,9 @@ export default function Accordion({
 
   return (
     <div className="space-y-2">
-      {items.map((item) => {
+      {items.map((item, index) => {
         const isOpen = openItems.has(item.id);
+        const stepNumber = index + 1;
 
         return (
           <div
@@ -65,16 +75,34 @@ export default function Accordion({
               aria-controls={`accordion-content-${item.id}`}
             >
               <div className="flex items-center gap-3 flex-1">
-                {item.icon && (
+                {/* Step Number or Icon */}
+                {showStepNumbers ? (
+                  <div className={`
+                    flex items-center justify-center h-7 w-7 rounded-full text-sm font-semibold flex-shrink-0
+                    ${isOpen ? 'bg-accent-600 text-white' : 'bg-paper-200 text-ink-600'}
+                    transition-colors duration-200
+                  `}>
+                    {stepNumber}
+                  </div>
+                ) : item.icon ? (
                   <span className="flex-shrink-0 text-ink-600">{item.icon}</span>
-                )}
+                ) : null}
                 <span className="text-sm font-medium text-ink-900">{item.title}</span>
               </div>
-              <ChevronDown
-                className={`h-5 w-5 text-ink-500 transition-transform duration-200 ${
-                  isOpen ? 'rotate-180' : ''
-                }`}
-              />
+              {/* Expand/Collapse Icon (hidden when showStepNumbers is true) */}
+              {!showStepNumbers && (
+                <>
+                  {isOpen && collapseIcon ? (
+                    <span className="h-5 w-5 text-ink-500">{collapseIcon}</span>
+                  ) : isOpen && !collapseIcon ? (
+                    <ChevronDown className="h-5 w-5 text-ink-500 transition-transform duration-200 rotate-180" />
+                  ) : !isOpen && expandIcon ? (
+                    <span className="h-5 w-5 text-ink-500">{expandIcon}</span>
+                  ) : (
+                    <ChevronDown className="h-5 w-5 text-ink-500 transition-transform duration-200" />
+                  )}
+                </>
+              )}
             </button>
 
             {/* Content */}

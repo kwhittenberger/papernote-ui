@@ -17,17 +17,25 @@ export interface BoxProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Padding right */
   paddingRight?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   /** Margin */
-  margin?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  margin?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'auto';
   /** Margin top */
-  marginTop?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  marginTop?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'auto';
   /** Margin bottom */
-  marginBottom?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  marginBottom?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'auto';
+  /** Margin left */
+  marginLeft?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'auto';
+  /** Margin right */
+  marginRight?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'auto';
   /** Border */
   border?: 'none' | 'top' | 'bottom' | 'left' | 'right' | 'all';
   /** Border color */
   borderColor?: 'default' | 'primary' | 'accent';
+  /** Border radius */
+  rounded?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
   /** Width */
   width?: 'auto' | 'full' | 'fit' | 'screen';
+  /** Height */
+  height?: 'auto' | 'full' | 'screen';
   /** Custom className */
   className?: string;
 }
@@ -45,9 +53,13 @@ export const Box: React.FC<BoxProps> = ({
   margin,
   marginTop,
   marginBottom,
+  marginLeft,
+  marginRight,
   border = 'none',
   borderColor = 'default',
+  rounded,
   width,
+  height,
   className = '',
   ...htmlProps
 }) => {
@@ -58,6 +70,7 @@ export const Box: React.FC<BoxProps> = ({
     md: '4',
     lg: '6',
     xl: '8',
+    auto: 'auto',
   };
 
   const getPaddingClass = () => {
@@ -74,11 +87,13 @@ export const Box: React.FC<BoxProps> = ({
 
   const getMarginClass = () => {
     const classes: string[] = [];
-    
+
     if (margin) classes.push(`m-${spacingMap[margin]}`);
     if (marginTop) classes.push(`mt-${spacingMap[marginTop]}`);
     if (marginBottom) classes.push(`mb-${spacingMap[marginBottom]}`);
-    
+    if (marginLeft) classes.push(`ml-${spacingMap[marginLeft]}`);
+    if (marginRight) classes.push(`mr-${spacingMap[marginRight]}`);
+
     return classes.join(' ');
   };
 
@@ -108,6 +123,29 @@ export const Box: React.FC<BoxProps> = ({
     return widthClasses[width];
   };
 
+  const getHeightClass = () => {
+    if (!height) return '';
+    const heightClasses = {
+      auto: 'h-auto',
+      full: 'h-full',
+      screen: 'h-screen',
+    };
+    return heightClasses[height];
+  };
+
+  const getRoundedClass = () => {
+    if (!rounded) return '';
+    const roundedClasses = {
+      none: 'rounded-none',
+      sm: 'rounded-sm',
+      md: 'rounded-md',
+      lg: 'rounded-lg',
+      xl: 'rounded-xl',
+      full: 'rounded-full',
+    };
+    return roundedClasses[rounded];
+  };
+
   return (
     <div
       {...htmlProps}
@@ -116,7 +154,9 @@ export const Box: React.FC<BoxProps> = ({
         ${getMarginClass()}
         ${borderClasses[border]}
         ${border !== 'none' ? borderColorClasses[borderColor] : ''}
+        ${getRoundedClass()}
         ${getWidthClass()}
+        ${getHeightClass()}
         ${className}
       `}
     >

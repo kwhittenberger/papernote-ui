@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Filter, Search, Settings } from 'lucide-react';
+import { ChevronDown, ChevronUp, Settings } from 'lucide-react';
 
 export interface ToolbarSection {
   id: string;

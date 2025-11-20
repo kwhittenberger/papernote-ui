@@ -34,20 +34,30 @@ export default function Breadcrumbs({ items, showHome = true }: BreadcrumbsProps
 
       {items.map((item, index) => {
         const isLast = index === items.length - 1;
+        const isActive = isLast;
 
         return (
           <React.Fragment key={index}>
-            {item.href && !isLast ? (
+            {item.href && !isActive ? (
               <Link
                 to={item.href}
-                className="flex items-center gap-2 text-ink-500 hover:text-ink-900 transition-colors"
+                className="flex items-center gap-2 text-ink-500 hover:text-ink-900 hover:underline transition-colors"
               >
-                {item.icon && <span>{item.icon}</span>}
+                {item.icon && <span className="flex-shrink-0">{item.icon}</span>}
                 <span>{item.label}</span>
               </Link>
             ) : (
-              <span className="flex items-center gap-2 text-ink-700 font-medium" aria-current={isLast ? 'page' : undefined}>
-                {item.icon && <span>{item.icon}</span>}
+              <span
+                className={`
+                  flex items-center gap-2 px-2 py-1 rounded-md transition-colors
+                  ${isActive
+                    ? 'bg-accent-50 text-accent-900 font-semibold'
+                    : 'text-ink-700 font-medium'
+                  }
+                `}
+                aria-current={isActive ? 'page' : undefined}
+              >
+                {item.icon && <span className="flex-shrink-0">{item.icon}</span>}
                 <span>{item.label}</span>
               </span>
             )}

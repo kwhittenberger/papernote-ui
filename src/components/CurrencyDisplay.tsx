@@ -2,8 +2,6 @@
 // This file is part of the notebook-ui component library.
 // Proprietary and confidential. Unauthorized copying or distribution is prohibited.
 
-import React from 'react';
-
 export interface CurrencyDisplayProps {
   amount: number | null | undefined;
   currency?: string;
@@ -22,11 +20,11 @@ const sizeConfig = {
 };
 
 const colorConfig = {
-  default: 'text-gray-900',
-  success: 'text-green-600',
-  warning: 'text-orange-600',
-  error: 'text-red-600',
-  muted: 'text-gray-500',
+  default: 'text-ink-900',
+  success: 'text-success-600',
+  warning: 'text-warning-600',
+  error: 'text-error-600',
+  muted: 'text-ink-500',
 };
 
 export default function CurrencyDisplay({

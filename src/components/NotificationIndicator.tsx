@@ -25,7 +25,7 @@ export default function NotificationIndicator({
   const variantClasses = {
     default: 'bg-ink-600',
     primary: 'bg-accent-600',
-    danger: 'bg-red-600',
+    danger: 'bg-error-600',
   };
 
   return (

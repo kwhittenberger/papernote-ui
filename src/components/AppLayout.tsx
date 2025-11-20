@@ -22,7 +22,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   onToolbarCollapseChange
 }) => {
   return (
-    <div className={`min-h-screen bg-gray-50 ${className}`}>
+    <div className={`min-h-screen bg-paper-50 ${className}`}>
       {/* Expandable Toolbar */}
       {showToolbar && toolbarSections.length > 0 && (
         <ExpandableToolbar

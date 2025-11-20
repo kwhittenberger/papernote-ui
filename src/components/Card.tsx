@@ -2,6 +2,7 @@
 // This file is part of the Commissions Management System (CMMS).
 // Proprietary and confidential. Unauthorized copying or distribution is prohibited.
 import React from 'react';
+import { Skeleton } from './Loading';
 
 export interface CardProps {
   children: React.ReactNode;
@@ -10,6 +11,8 @@ export interface CardProps {
   className?: string;
   onClick?: () => void;
   hoverable?: boolean;
+  /** Show loading skeleton instead of content */
+  loading?: boolean;
 }
 
 export default function Card({
@@ -19,6 +22,7 @@ export default function Card({
   className = '',
   onClick,
   hoverable = false,
+  loading = false,
 }: CardProps) {
   const baseStyles = 'bg-white bg-subtle-grain border-2 border-paper-300 transition-shadow duration-200';
 
@@ -42,23 +46,42 @@ export default function Card({
   return (
     <div
       className={`${baseStyles} ${variantStyles[variant]} ${widthStyles[width]} ${interactiveStyles} ${className}`}
-      onClick={onClick}
+      onClick={!loading ? onClick : undefined}
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
     >
-      {children}
+      {loading ? (
+        <div className="space-y-4">
+          <Skeleton className="h-6 w-3/4" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-5/6" />
+          <Skeleton className="h-4 w-4/6" />
+        </div>
+      ) : (
+        children
+      )}
     </div>
   );
+}
+
+export interface CardHeaderProps {
+  children: React.ReactNode;
+  className?: string;
+  /** Action element (button, menu, etc.) to display in header */
+  action?: React.ReactNode;
 }
 
 export function CardHeader({
   children,
   className = '',
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return <div className={`mb-6 ${className}`}>{children}</div>;
+  action,
+}: CardHeaderProps) {
+  return (
+    <div className={`mb-6 ${action ? 'flex items-start justify-between gap-4' : ''} ${className}`}>
+      <div className="flex-1">{children}</div>
+      {action && <div className="flex-shrink-0">{action}</div>}
+    </div>
+  );
 }
 
 export function CardTitle({

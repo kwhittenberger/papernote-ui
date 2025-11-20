@@ -75,7 +75,7 @@ export const PageNavigation: React.FC<PageNavigationProps> = ({
       if (externalSections.length > 0) {
         setActiveSection(externalSections[0].id);
       }
-      return;
+      return undefined;
     }
 
     // Scroll spy - listen to the correct scroll container
@@ -123,6 +123,8 @@ export const PageNavigation: React.FC<PageNavigationProps> = ({
       handleScroll();
       return () => scrollContainer.removeEventListener('scroll', handleScroll);
     }
+
+    return undefined;
   }, [sections]);
 
   const scrollToSection = (id: string) => {

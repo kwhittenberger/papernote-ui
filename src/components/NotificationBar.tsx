@@ -15,17 +15,17 @@ interface NotificationBarProps {
 }
 
 const notificationStyles = {
-  warning: 'bg-gradient-to-r from-amber-50 to-orange-50 border-amber-300 text-amber-900 shadow-lg shadow-amber-500/20',
-  error: 'bg-gradient-to-r from-red-50 to-rose-50 border-red-300 text-red-900 shadow-lg shadow-red-500/20',
-  info: 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-300 text-blue-900 shadow-lg shadow-blue-500/20',
-  success: 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-300 text-green-900 shadow-lg shadow-green-500/20'
+  warning: 'bg-gradient-to-r from-warning-50 to-warning-100 border-warning-300 text-warning-900 shadow-lg shadow-warning-500/20',
+  error: 'bg-gradient-to-r from-error-50 to-error-100 border-error-300 text-error-900 shadow-lg shadow-error-500/20',
+  info: 'bg-gradient-to-r from-primary-50 to-primary-100 border-primary-300 text-primary-900 shadow-lg shadow-primary-500/20',
+  success: 'bg-gradient-to-r from-success-50 to-success-100 border-success-300 text-success-900 shadow-lg shadow-success-500/20'
 };
 
 const iconStyles = {
-  warning: 'text-amber-600',
-  error: 'text-red-600',
-  info: 'text-blue-600',
-  success: 'text-green-600'
+  warning: 'text-warning-600',
+  error: 'text-error-600',
+  info: 'text-primary-600',
+  success: 'text-success-600'
 };
 
 const getNotificationIcon = (type: 'warning' | 'error' | 'info' | 'success') => {

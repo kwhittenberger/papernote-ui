@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
+export type ToastPosition = 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center' | 'bottom-center';
 
 export interface ToastProps {
   id: string;
@@ -81,9 +82,26 @@ export default function Toast({ id, type, title, message, duration = 5000, onClo
   );
 }
 
-export function ToastContainer({ toasts, onClose }: { toasts: ToastProps[]; onClose: (id: string) => void }) {
+const positionStyles: Record<ToastPosition, string> = {
+  'top-right': 'top-20 right-6',
+  'top-left': 'top-20 left-6',
+  'bottom-right': 'bottom-6 right-6',
+  'bottom-left': 'bottom-6 left-6',
+  'top-center': 'top-20 left-1/2 -translate-x-1/2',
+  'bottom-center': 'bottom-6 left-1/2 -translate-x-1/2',
+};
+
+export function ToastContainer({
+  toasts,
+  onClose,
+  position = 'top-right'
+}: {
+  toasts: ToastProps[];
+  onClose: (id: string) => void;
+  position?: ToastPosition;
+}) {
   return (
-    <div className="fixed top-20 right-6 z-50 flex flex-col gap-3 pointer-events-none">
+    <div className={`fixed ${positionStyles[position]} z-50 flex flex-col gap-3 pointer-events-none`}>
       {toasts.map((toast) => (
         <div key={toast.id} className="pointer-events-auto">
           <Toast {...toast} onClose={onClose} />

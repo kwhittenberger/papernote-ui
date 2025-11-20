@@ -5,12 +5,14 @@ import React from 'react';
 import { X } from 'lucide-react';
 
 export interface BadgeProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   variant?: 'success' | 'warning' | 'error' | 'info' | 'neutral';
   size?: 'sm' | 'md' | 'lg';
   icon?: React.ReactNode;
   onRemove?: () => void;
   className?: string;
+  /** Show as dot indicator (no text, just a colored dot) */
+  dot?: boolean;
 }
 
 export default function Badge({
@@ -20,6 +22,7 @@ export default function Badge({
   icon,
   onRemove,
   className = '',
+  dot = false,
 }: BadgeProps) {
   const variantStyles = {
     success: 'bg-success-50 text-success-700 border-success-200',
@@ -29,10 +32,24 @@ export default function Badge({
     neutral: 'bg-paper-100 text-ink-700 border-paper-300',
   };
 
+  const dotVariantStyles = {
+    success: 'bg-success-500',
+    warning: 'bg-warning-500',
+    error: 'bg-error-500',
+    info: 'bg-primary-500',
+    neutral: 'bg-ink-400',
+  };
+
   const sizeStyles = {
     sm: 'px-2 py-0.5 text-xs gap-1',
     md: 'px-3 py-1 text-xs gap-1.5',
     lg: 'px-3 py-1.5 text-sm gap-2',
+  };
+
+  const dotSizeStyles = {
+    sm: 'h-1.5 w-1.5',
+    md: 'h-2 w-2',
+    lg: 'h-2.5 w-2.5',
   };
 
   const iconSize = {
@@ -41,6 +58,22 @@ export default function Badge({
     lg: 'h-4 w-4',
   };
 
+  // Dot variant - just a colored circle
+  if (dot) {
+    return (
+      <span
+        className={`
+          inline-block rounded-full
+          ${dotVariantStyles[variant]}
+          ${dotSizeStyles[size]}
+          ${className}
+        `}
+        aria-label={`${variant} indicator`}
+      />
+    );
+  }
+
+  // Regular badge
   return (
     <span
       className={`

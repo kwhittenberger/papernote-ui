@@ -11,6 +11,12 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   icon?: React.ReactNode;
   iconPosition?: 'left' | 'right';
   fullWidth?: boolean;
+  /** Icon-only mode - renders square button with just icon (no text padding) */
+  iconOnly?: boolean;
+  /** Badge content (number or text) displayed in top-right corner */
+  badge?: number | string;
+  /** Badge color variant */
+  badgeVariant?: 'primary' | 'success' | 'warning' | 'error';
 }
 
 export default function Button({
@@ -20,6 +26,9 @@ export default function Button({
   icon,
   iconPosition = 'left',
   fullWidth = false,
+  iconOnly = false,
+  badge,
+  badgeVariant = 'error',
   children,
   disabled,
   className = '',
@@ -35,10 +44,11 @@ export default function Button({
     outline: 'bg-transparent text-ink-700 border-paper-300 hover:bg-paper-50 hover:border-ink-400',
   };
 
+  // Icon-only buttons are square
   const sizeStyles = {
-    sm: 'px-3 py-1.5 text-xs gap-1.5',
-    md: 'px-4 py-2.5 text-sm gap-2',
-    lg: 'px-6 py-3 text-base gap-2.5',
+    sm: iconOnly ? 'p-1.5' : 'px-3 py-1.5 text-xs gap-1.5',
+    md: iconOnly ? 'p-2.5' : 'px-4 py-2.5 text-sm gap-2',
+    lg: iconOnly ? 'p-3' : 'px-6 py-3 text-base gap-2.5',
   };
 
   const iconSize = {
@@ -47,16 +57,30 @@ export default function Button({
     lg: 'h-5 w-5',
   };
 
-  return (
+  const badgeColorStyles = {
+    primary: 'bg-accent-500',
+    success: 'bg-success-500',
+    warning: 'bg-warning-500',
+    error: 'bg-error-500',
+  };
+
+  const badgeSizeStyles = {
+    sm: 'min-w-[16px] h-4 text-[10px] px-1',
+    md: 'min-w-[18px] h-[18px] text-[11px] px-1.5',
+    lg: 'min-w-[20px] h-5 text-xs px-1.5',
+  };
+
+  const buttonElement = (
     <button
       className={`
         ${baseStyles}
         ${variantStyles[variant]}
         ${sizeStyles[size]}
-        ${fullWidth ? 'w-full' : ''}
+        ${fullWidth && !iconOnly ? 'w-full' : ''}
         ${className}
       `}
       disabled={disabled || loading}
+      aria-label={iconOnly && typeof children === 'string' ? children : props['aria-label']}
       {...props}
     >
       {loading && (
@@ -65,10 +89,39 @@ export default function Button({
       {!loading && icon && iconPosition === 'left' && (
         <span className={iconSize[size]}>{icon}</span>
       )}
-      {children}
-      {!loading && icon && iconPosition === 'right' && (
+      {!iconOnly && children}
+      {!loading && icon && iconPosition === 'right' && !iconOnly && (
         <span className={iconSize[size]}>{icon}</span>
       )}
     </button>
+  );
+
+  // If no badge, return button directly
+  if (!badge && badge !== 0) {
+    return buttonElement;
+  }
+
+  // Format badge content (limit to 99+)
+  const badgeContent = typeof badge === 'number' && badge > 99 ? '99+' : String(badge);
+
+  // Wrap button with badge
+  return (
+    <div className="relative inline-block">
+      {buttonElement}
+      <span
+        className={`
+          absolute -top-1 -right-1
+          flex items-center justify-center
+          rounded-full text-white font-semibold
+          ${badgeColorStyles[badgeVariant]}
+          ${badgeSizeStyles[size]}
+          shadow-sm
+          pointer-events-none
+        `}
+        aria-label={`${badgeContent} notifications`}
+      >
+        {badgeContent}
+      </span>
+    </div>
   );
 }

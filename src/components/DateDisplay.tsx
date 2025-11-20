@@ -2,8 +2,6 @@
 // This file is part of the notebook-ui component library.
 // Proprietary and confidential. Unauthorized copying or distribution is prohibited.
 
-import React from 'react';
-
 export interface DateDisplayProps {
   date?: string | Date | null;
   format?: 'short' | 'long' | 'medium' | 'numeric';
@@ -78,7 +76,7 @@ export default function DateDisplay({
   if (showLabel && label) {
     return (
       <div className="space-y-1">
-        <div className="text-xs text-gray-500">{label}:</div>
+        <div className="text-xs text-ink-500">{label}:</div>
         {content}
       </div>
     );

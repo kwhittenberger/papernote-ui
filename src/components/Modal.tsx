@@ -9,8 +9,10 @@ export interface ModalProps {
   onClose: () => void;
   title: string;
   children: React.ReactNode;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
   showCloseButton?: boolean;
+  /** Animation variant for modal entrance (default: 'scale') */
+  animation?: 'scale' | 'slide-up' | 'slide-down' | 'fade' | 'none';
 }
 
 const sizeClasses = {
@@ -18,6 +20,7 @@ const sizeClasses = {
   md: 'max-w-lg',
   lg: 'max-w-2xl',
   xl: 'max-w-4xl',
+  full: 'max-w-7xl',
 };
 
 export default function Modal({
@@ -27,6 +30,7 @@ export default function Modal({
   children,
   size = 'md',
   showCloseButton = true,
+  animation = 'scale',
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -56,6 +60,23 @@ export default function Modal({
     }
   };
 
+  const getAnimationClass = () => {
+    switch (animation) {
+      case 'scale':
+        return 'animate-scale-in';
+      case 'slide-up':
+        return 'animate-slide-in-bottom';
+      case 'slide-down':
+        return 'animate-slide-in-top';
+      case 'fade':
+        return 'animate-fade-in';
+      case 'none':
+        return '';
+      default:
+        return 'animate-scale-in';
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -65,7 +86,7 @@ export default function Modal({
     >
       <div
         ref={modalRef}
-        className={`${sizeClasses[size]} w-full bg-white bg-subtle-grain rounded-xl shadow-2xl border border-paper-200 animate-scale-in`}
+        className={`${sizeClasses[size]} w-full bg-white bg-subtle-grain rounded-xl shadow-2xl border border-paper-200 ${getAnimationClass()}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
