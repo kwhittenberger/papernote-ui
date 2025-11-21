@@ -30,7 +30,8 @@
       "Bash(fi)",
       "Bash(done)",
       "mcp__filesystem__read_multiple_files",
-      "Bash(comm:*)"
+      "Bash(comm:*)",
+      "Bash(npm whoami:*)"
     ],
     "deny": [],
     "ask": []

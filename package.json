@@ -31,6 +31,7 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "prepublishOnly": "npm run build",
+    "prerelease": "bash scripts/pre-publish-check.sh",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },

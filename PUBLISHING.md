@@ -35,42 +35,54 @@ You have two automated publishing options:
 
 This is the easiest and most user-friendly method.
 
-1. **Update version in package.json**
+1. **Run pre-publish validation** (optional but recommended)
+   ```bash
+   npm run prerelease
+   ```
+   This checks for uncommitted changes, runs type check, linting, build, and verifies the version doesn't already exist.
+
+2. **Update version in package.json**
    ```bash
    npm version patch  # 1.0.0 → 1.0.1
    npm version minor  # 1.0.0 → 1.1.0
    npm version major  # 1.0.0 → 2.0.0
    ```
 
-2. **Push the version commit and tag**
+3. **Push the version commit and tag**
    ```bash
    git push && git push --tags
    ```
 
-3. **Create a GitHub Release**
+4. **Create a GitHub Release**
    - Go to https://github.com/kwhittenberger/papernote-ui/releases/new
    - Click "Choose a tag" and select the tag you just pushed (e.g., `v1.0.1`)
    - Title: `v1.0.1` (or whatever version)
    - Description: Write release notes describing what changed
    - Click "Publish release"
 
-4. **Automated Publishing**
+5. **Automated Publishing**
    - The `npm-publish.yml` workflow will automatically trigger
-   - It will run type checks, linting, build, and publish to npm
+   - It will verify versions match, run type checks, linting, build verification, and publish to npm
    - Check the Actions tab to monitor progress: https://github.com/kwhittenberger/papernote-ui/actions
 
 ### Option 2: Git Tag
 
 This method is faster but skips the release notes on GitHub.
 
-1. **Update version and create tag**
+1. **Run pre-publish validation** (optional but recommended)
+   ```bash
+   npm run prerelease
+   ```
+
+2. **Update version and create tag**
    ```bash
    npm version patch  # Creates commit and tag
    git push && git push --tags
    ```
 
-2. **Automated Publishing**
+3. **Automated Publishing**
    - The `npm-publish-tag.yml` workflow will automatically trigger
+   - It includes the same safety checks as the release workflow
    - Check the Actions tab to monitor: https://github.com/kwhittenberger/papernote-ui/actions
 
 ### Option 3: Manual Publishing
@@ -101,10 +113,36 @@ Follow [Semantic Versioning (SemVer)](https://semver.org/):
 - **MINOR** (1.0.0 → 1.1.0): New features, backward compatible
 - **PATCH** (1.0.0 → 1.0.1): Bug fixes, backward compatible
 
+## Workflow Safety Features
+
+Both automated workflows include comprehensive safety checks:
+
+1. **Version Verification**
+   - Ensures package.json version matches the git tag/release version
+   - Prevents publishing mismatched versions
+
+2. **Code Quality Checks**
+   - Type checking with TypeScript
+   - Linting with ESLint
+   - All must pass before publishing
+
+3. **Build Verification**
+   - Verifies all required dist files exist (index.js, index.esm.js, index.d.ts, styles.css)
+   - Ensures the build is complete and valid
+
+4. **Publication Verification**
+   - Confirms the package was successfully published to npm
+   - Provides clear success/failure messages
+
+5. **npm Provenance**
+   - Includes cryptographic provenance for supply chain security
+   - Proves the package was built by GitHub Actions
+
 ## Pre-Release Checklist
 
 Before publishing a new version:
 
+- [ ] Run validation: `npm run prerelease` (recommended)
 - [ ] All tests pass: `npm test`
 - [ ] Type checking passes: `npm run typecheck`
 - [ ] Linting passes: `npm run lint`
@@ -113,6 +151,7 @@ Before publishing a new version:
 - [ ] Update CHANGELOG.md with changes (if you create one)
 - [ ] Update README.md if there are new features or breaking changes
 - [ ] Commit all changes to git
+- [ ] No uncommitted changes in working directory
 
 ## Troubleshooting
 
