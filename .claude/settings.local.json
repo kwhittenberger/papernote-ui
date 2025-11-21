@@ -20,7 +20,9 @@
       "Bash(git pull:*)",
       "Bash(git stash:*)",
       "Bash(python:*)",
-      "Bash(npx storybook@latest info)"
+      "Bash(npx storybook@latest info)",
+      "Bash(npm search:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []
