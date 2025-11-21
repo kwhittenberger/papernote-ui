@@ -47,17 +47,29 @@ export const Default: Story = {
         <Page>
           <div style={{ padding: '2rem' }}>
             <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '1rem' }}>
-              Complete Layout
+              📐 Complete Layout Structure
             </h1>
-            <p style={{ color: '#64748b', marginBottom: '2rem' }}>
-              This layout includes sidebar, gutter with page navigation, main content, and status bar
+            <p style={{ color: '#64748b', marginBottom: '1.5rem' }}>
+              The Layout component provides the complete application shell with all major regions.
             </p>
+            <Card style={{ marginBottom: '1.5rem', backgroundColor: '#fffbeb', border: '2px solid #fbbf24' }}>
+              <CardContent>
+                <h3 style={{ fontWeight: 600, marginBottom: '0.75rem', fontSize: '0.875rem' }}>🎯 Layout Anatomy:</h3>
+                <ul style={{ marginLeft: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.875rem' }}>
+                  <li><strong>Sidebar</strong> - 256px fixed width, notebook binding effect, navigation menu</li>
+                  <li><strong>Gutter</strong> - 32px (w-8) space between sidebar and content with navigation dots</li>
+                  <li><strong>Content area</strong> - Flexible width, independently scrollable main region</li>
+                  <li><strong>Status bar</strong> - Optional fixed bar at bottom for status information</li>
+                </ul>
+              </CardContent>
+            </Card>
             <Card>
               <CardHeader>
                 <CardTitle>Content Area</CardTitle>
               </CardHeader>
               <CardContent>
-                <p>Your page content scrolls independently from the sidebar</p>
+                <p style={{ marginBottom: '0.75rem' }}>This is the main content region that scrolls independently.</p>
+                <p style={{ color: '#64748b', fontSize: '0.875rem' }}>Try resizing the browser to see how the layout adapts - the sidebar stays fixed while content area flexes.</p>
               </CardContent>
             </Card>
           </div>
@@ -128,12 +140,23 @@ export const WithPageSections: Story = {
               <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '1rem' }}>
                 Overview
               </h1>
-              <p style={{ color: '#64748b', marginBottom: '2rem' }}>
-                Page navigation dots appear in the gutter area
+              <p style={{ color: '#64748b', marginBottom: '1.5rem' }}>
+                Page navigation dots appear in the gutter area between sidebar and content.
               </p>
+              <Card style={{ marginBottom: '1.5rem', backgroundColor: '#eff6ff', border: '2px solid #3b82f6' }}>
+                <CardContent>
+                  <h3 style={{ fontWeight: 600, marginBottom: '0.75rem', fontSize: '0.875rem' }}>🔵 Navigation Dots:</h3>
+                  <ul style={{ marginLeft: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.875rem' }}>
+                    <li>Look in the <strong>narrow gutter space</strong> between sidebar and content</li>
+                    <li>Each dot represents a section on this page</li>
+                    <li>The <strong>active dot is highlighted</strong> as you scroll</li>
+                    <li>Click any dot to jump to that section</li>
+                  </ul>
+                </CardContent>
+              </Card>
               <Card>
                 <CardContent>
-                  <p>Scroll down to see page navigation in action</p>
+                  <p>Scroll down to see the active dot change as different sections come into view.</p>
                 </CardContent>
               </Card>
             </section>
