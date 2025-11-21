@@ -142,7 +142,7 @@ const TimePicker = forwardRef<TimePickerHandle, TimePickerProps>(({
 
   // Format TimeValue to string
   function formatTimeValue(tv: TimeValue, is12Hour: boolean, includeSeconds: boolean): string {
-    let hours = tv.hours;
+    const hours = tv.hours;
 
     if (is12Hour) {
       const formatted = `${hours.toString().padStart(2, '0')}:${tv.minutes.toString().padStart(2, '0')}${includeSeconds ? ':' + tv.seconds.toString().padStart(2, '0') : ''} ${tv.period}`;

@@ -36,7 +36,8 @@
       "Bash(npm run docs:dev:*)",
       "Bash(node -e:*)",
       "Bash(npm ls:*)",
-      "Bash(npm ci:*)"
+      "Bash(npm ci:*)",
+      "Bash(npm run lint:*)"
     ],
     "deny": [],
     "ask": []

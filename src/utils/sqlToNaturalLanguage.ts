@@ -415,7 +415,7 @@ function parseCondition(condition: string, friendlyNames: FriendlyNameConfig): s
 function extractFieldName(condition: string, friendlyNames: FriendlyNameConfig): string {
   condition = condition.trim();
 
-  let match = condition.match(/^(?:["']?\w+["']?\.)?["']?(\w+)["']?/);
+  const match = condition.match(/^(?:["']?\w+["']?\.)?["']?(\w+)["']?/);
 
   if (match && match[1]) {
     const fieldName = match[1];
