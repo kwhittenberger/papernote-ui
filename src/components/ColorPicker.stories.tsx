@@ -7,8 +7,69 @@ const meta = {
   component: ColorPicker,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+Color selection component with preset swatches and custom picker.
+
+## Features
+- **Preset swatches**: Grid of predefined colors with quick selection
+- **Hex input**: Manual hex color entry with validation
+- **Native picker**: Browser color picker integration
+- **Visual feedback**: Selected color swatch highlighted
+- **Customizable presets**: Provide custom color palettes
+- **Dropdown interface**: Clean popup picker interface
+
+## Usage
+
+\`\`\`tsx
+import { ColorPicker } from 'notebook-ui';
+
+const [color, setColor] = useState('#3B82F6');
+
+<ColorPicker
+  value={color}
+  onChange={setColor}
+  label="Brand Color"
+  presets={['#EF4444', '#F59E0B', '#10B981', '#3B82F6']}
+  helperText="Choose your primary brand color"
+/>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    value: {
+      control: 'color',
+      description: 'Current color value (hex format: #RRGGBB)',
+      table: { type: { summary: 'string' }, defaultValue: { summary: '#3B82F6' } },
+    },
+    onChange: {
+      description: 'Callback when color changes',
+      table: { type: { summary: '(color: string) => void' } },
+    },
+    presets: {
+      description: 'Array of preset color hex values',
+      table: { type: { summary: 'string[]' } },
+    },
+    label: {
+      control: 'text',
+      description: 'Label text',
+      table: { type: { summary: 'string' } },
+    },
+    helperText: {
+      control: 'text',
+      description: 'Helper text below picker',
+      table: { type: { summary: 'string' } },
+    },
+    disabled: {
+      control: 'boolean',
+      description: 'Disable picker',
+      table: { type: { summary: 'boolean' }, defaultValue: { summary: 'false' } },
+    },
+  },
   decorators: [
     (Story) => (
       <div style={{ minWidth: '400px', padding: '2rem' }}>

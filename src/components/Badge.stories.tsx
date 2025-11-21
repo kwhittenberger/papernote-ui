@@ -7,16 +7,77 @@ const meta = {
   component: Badge,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+Badge component for status indicators, labels, and tags with optional icons and removal.
+
+## Features
+- **Variants**: success, warning, error, info, neutral with semantic colors
+- **Sizes**: sm, md, lg
+- **Icons**: Display icons alongside text
+- **Removable**: Optional X button for dismissible badges
+- **Dot mode**: Minimal colored dot indicator without text
+
+## Usage
+
+\`\`\`tsx
+import { Badge } from 'notebook-ui';
+import { Check } from 'lucide-react';
+
+<Badge variant="success" icon={<Check className="h-3 w-3" />}>
+  Active
+</Badge>
+
+<Badge variant="error" onRemove={handleRemove}>
+  Removable Tag
+</Badge>
+
+<Badge variant="info" dot size="sm" />
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
   argTypes: {
     variant: {
       control: 'select',
-      options: ['default', 'primary', 'success', 'warning', 'error', 'info'],
+      options: ['success', 'warning', 'error', 'info', 'neutral'],
+      description: 'Badge variant with semantic colors',
+      table: {
+        type: { summary: 'success | warning | error | info | neutral' },
+        defaultValue: { summary: 'neutral' },
+      },
     },
     size: {
       control: 'select',
       options: ['sm', 'md', 'lg'],
+      description: 'Badge size',
+      table: {
+        type: { summary: 'sm | md | lg' },
+        defaultValue: { summary: 'md' },
+      },
+    },
+    icon: {
+      description: 'Icon to display alongside text',
+      table: {
+        type: { summary: 'React.ReactNode' },
+      },
+    },
+    dot: {
+      control: 'boolean',
+      description: 'Show as dot indicator (no text, just colored dot)',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    onRemove: {
+      description: 'Callback when remove button is clicked (enables X button)',
+      table: {
+        type: { summary: '() => void' },
+      },
     },
   },
 } satisfies Meta<typeof Badge>;

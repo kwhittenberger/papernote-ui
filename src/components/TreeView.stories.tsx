@@ -8,8 +8,99 @@ const meta = {
   component: TreeView,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+Hierarchical tree navigation for displaying nested data structures with expand/collapse functionality.
+
+## Features
+- **Nested structure**: Support for unlimited nesting levels
+- **Expand/collapse**: Toggle visibility of child nodes
+- **Icons**: Custom icons for each tree node
+- **Selection**: Highlight selected node
+- **Disabled nodes**: Mark specific nodes as non-interactive
+- **Connecting lines**: Optional visual guides showing hierarchy
+- **Default expansion**: Pre-expand specific branches
+- **Custom expand icons**: Customize expand/collapse indicators
+
+## Usage
+
+\`\`\`tsx
+import { TreeView } from 'notebook-ui';
+import { Folder, File } from 'lucide-react';
+
+const data = [
+  {
+    id: '1',
+    label: 'Documents',
+    icon: <Folder />,
+    children: [
+      { id: '1-1', label: 'file1.txt', icon: <File /> },
+      { id: '1-2', label: 'file2.txt', icon: <File /> },
+    ],
+  },
+];
+
+<TreeView
+  data={data}
+  selectedId={selectedId}
+  onSelect={setSelectedId}
+  showLines
+/>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    data: {
+      description: 'Array of tree nodes with optional children',
+      table: {
+        type: { summary: 'TreeNode[]' },
+      },
+    },
+    selectedId: {
+      control: 'text',
+      description: 'ID of the currently selected node',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    onSelect: {
+      description: 'Callback when a node is selected',
+      table: {
+        type: { summary: '(nodeId: string) => void' },
+      },
+    },
+    defaultExpanded: {
+      description: 'Array of node IDs that should be expanded by default',
+      table: {
+        type: { summary: 'string[]' },
+        defaultValue: { summary: '[]' },
+      },
+    },
+    showLines: {
+      control: 'boolean',
+      description: 'Show connecting lines between nodes',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    expandIcon: {
+      description: 'Custom icon for expandable nodes',
+      table: {
+        type: { summary: 'React.ReactNode' },
+      },
+    },
+    collapseIcon: {
+      description: 'Custom icon for collapsible nodes',
+      table: {
+        type: { summary: 'React.ReactNode' },
+      },
+    },
+  },
   decorators: [
     (Story) => (
       <div style={{ minWidth: '400px', padding: '2rem' }}>

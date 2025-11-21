@@ -9,8 +9,87 @@ const meta = {
   component: CommandPalette,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+Keyboard-driven command launcher for power-user workflows.
+
+## Features
+- **Keyboard navigation**: Arrow keys, Enter, Escape for full control
+- **Search & filter**: Instant filtering across all commands
+- **Command grouping**: Organize commands by category
+- **Recent commands**: Auto-tracks last 5 used commands
+- **Portal rendering**: Always on top with backdrop
+- **Global shortcut**: Ctrl+K / Cmd+K activation via hook
+- **Rich commands**: Icons, descriptions, shortcuts, keywords
+
+## Usage
+
+\`\`\`tsx
+import { CommandPalette, useCommandPalette, Command } from 'notebook-ui';
+import { Home, Settings } from 'lucide-react';
+
+const { open, setOpen } = useCommandPalette(); // Adds Ctrl+K listener
+
+const commands: Command[] = [
+  {
+    id: 'home',
+    label: 'Go to Dashboard',
+    description: 'Navigate to main dashboard',
+    icon: <Home />,
+    group: 'Navigation',
+    shortcut: 'Ctrl+H',
+    keywords: ['dashboard', 'main'],
+    onExecute: () => navigate('/dashboard'),
+  },
+];
+
+<CommandPalette
+  commands={commands}
+  open={open}
+  onOpenChange={setOpen}
+  recentCommands={recent}
+  onRecentCommandsChange={setRecent}
+/>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    commands: {
+      description: 'Array of available commands',
+      table: { type: { summary: 'Command[]' } },
+    },
+    open: {
+      control: 'boolean',
+      description: 'Open/close state',
+      table: { type: { summary: 'boolean' } },
+    },
+    onOpenChange: {
+      description: 'Callback when state changes',
+      table: { type: { summary: '(open: boolean) => void' } },
+    },
+    placeholder: {
+      control: 'text',
+      description: 'Search input placeholder',
+      table: { type: { summary: 'string' }, defaultValue: { summary: 'Type a command or search...' } },
+    },
+    trigger: {
+      control: 'text',
+      description: 'Keyboard shortcut display (e.g., Ctrl+K)',
+      table: { type: { summary: 'string' } },
+    },
+    recentCommands: {
+      description: 'Recent command IDs to show first',
+      table: { type: { summary: 'string[]' } },
+    },
+    onRecentCommandsChange: {
+      description: 'Callback to update recent commands',
+      table: { type: { summary: '(commandIds: string[]) => void' } },
+    },
+  },
   decorators: [
     (Story) => (
       <div style={{ minWidth: '600px', padding: '2rem' }}>

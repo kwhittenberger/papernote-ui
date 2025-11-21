@@ -9,16 +9,92 @@ const meta = {
   component: Modal,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+Centered modal dialog with backdrop overlay for focused user interactions.
+
+## Features
+- **Sizes**: sm, md, lg, xl, full for different content needs
+- **Animations**: scale (default), slide-up, slide-down, fade, none
+- **Escape key**: Close on Escape press
+- **Backdrop click**: Close when clicking outside modal
+- **Body scroll lock**: Prevents background scrolling when open
+- **Accessible**: Proper ARIA attributes and focus management
+- **ModalFooter**: Companion component for action buttons
+
+## Usage
+
+\`\`\`tsx
+import { Modal, ModalFooter } from 'notebook-ui';
+import { Button } from 'notebook-ui';
+
+const [isOpen, setIsOpen] = useState(false);
+
+<Modal
+  isOpen={isOpen}
+  onClose={() => setIsOpen(false)}
+  title="Confirm Action"
+  size="md"
+>
+  <p>Are you sure you want to proceed?</p>
+  <ModalFooter>
+    <Button variant="ghost" onClick={() => setIsOpen(false)}>Cancel</Button>
+    <Button variant="primary" onClick={handleConfirm}>Confirm</Button>
+  </ModalFooter>
+</Modal>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
   argTypes: {
+    isOpen: {
+      control: 'boolean',
+      description: 'Controls modal visibility',
+      table: {
+        type: { summary: 'boolean' },
+      },
+    },
+    onClose: {
+      description: 'Callback when modal should close (backdrop click, Escape key, or X button)',
+      table: {
+        type: { summary: '() => void' },
+      },
+    },
+    title: {
+      control: 'text',
+      description: 'Modal title displayed in header',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
     size: {
       control: 'select',
       options: ['sm', 'md', 'lg', 'xl', 'full'],
+      description: 'Modal width (sm: 448px, md: 512px, lg: 672px, xl: 896px, full: 1280px)',
+      table: {
+        type: { summary: 'sm | md | lg | xl | full' },
+        defaultValue: { summary: 'md' },
+      },
     },
     animation: {
       control: 'select',
       options: ['scale', 'slide-up', 'slide-down', 'fade', 'none'],
+      description: 'Animation variant for modal entrance',
+      table: {
+        type: { summary: 'scale | slide-up | slide-down | fade | none' },
+        defaultValue: { summary: 'scale' },
+      },
+    },
+    showCloseButton: {
+      control: 'boolean',
+      description: 'Show X button in header',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
     },
   },
 } satisfies Meta<typeof Modal>;

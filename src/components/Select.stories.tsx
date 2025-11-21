@@ -8,8 +8,149 @@ const meta = {
   component: Select,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+Dropdown select component with search, groups, virtual scrolling, and creation features.
+
+## Features
+- **Search**: Filter options with built-in search
+- **Groups**: Organize options with section headers
+- **Virtual scrolling**: Handle 1000+ options efficiently
+- **Clearable**: X button to reset selection
+- **Creatable**: Allow users to create new options
+- **Loading state**: Spinner for async data loading
+- **Icons**: Display icons alongside option labels
+- **Descriptions**: Show additional context per option
+- **Multiple**: Multi-select support
+- **Keyboard navigation**: Full arrow key and Enter support
+
+## Usage
+
+\`\`\`tsx
+import { Select } from 'notebook-ui';
+
+const options = [
+  { value: '1', label: 'Option 1' },
+  { value: '2', label: 'Option 2' },
+];
+
+<Select
+  label="Choose option"
+  options={options}
+  value={selected}
+  onChange={setSelected}
+  searchable
+  clearable
+/>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    label: {
+      control: 'text',
+      description: 'Label text above select',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    placeholder: {
+      control: 'text',
+      description: 'Placeholder text when no option selected',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    size: {
+      control: 'select',
+      options: ['sm', 'md', 'lg'],
+      description: 'Select size affecting height and padding',
+      table: {
+        type: { summary: 'sm | md | lg' },
+        defaultValue: { summary: 'md' },
+      },
+    },
+    searchable: {
+      control: 'boolean',
+      description: 'Enable search/filter functionality',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    clearable: {
+      control: 'boolean',
+      description: 'Show clear button to reset selection',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    disabled: {
+      control: 'boolean',
+      description: 'Disable the select',
+      table: {
+        type: { summary: 'boolean' },
+      },
+    },
+    loading: {
+      control: 'boolean',
+      description: 'Show loading spinner',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    helperText: {
+      control: 'text',
+      description: 'Helper text below select',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    error: {
+      control: 'text',
+      description: 'Error message (displayed below select in red)',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    creatable: {
+      control: 'boolean',
+      description: 'Allow creating new options (requires searchable=true)',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    virtualized: {
+      control: 'boolean',
+      description: 'Enable virtual scrolling for large option lists (100+ items)',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    virtualHeight: {
+      control: 'text',
+      description: 'Height of dropdown when virtualized',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: '300px' },
+      },
+    },
+    virtualItemHeight: {
+      control: 'number',
+      description: 'Height of each option row in pixels',
+      table: {
+        type: { summary: 'number' },
+        defaultValue: { summary: '42' },
+      },
+    },
+  },
   decorators: [
     (Story) => (
       <div style={{ minWidth: '400px' }}>
@@ -17,12 +158,6 @@ const meta = {
       </div>
     ),
   ],
-  argTypes: {
-    size: {
-      control: 'select',
-      options: ['sm', 'md', 'lg'],
-    },
-  },
 } satisfies Meta<typeof Select>;
 
 export default meta;

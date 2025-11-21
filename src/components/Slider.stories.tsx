@@ -7,8 +7,140 @@ const meta = {
   component: Slider,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+Interactive range slider for numeric value selection with keyboard navigation and custom formatting.
+
+## Features
+- **Keyboard navigation**: Arrow keys, Home, End for precise control
+- **Min/max display**: Optionally show range boundaries
+- **Value display**: Show current value with custom formatting
+- **Color variants**: primary, success, warning, error
+- **Sizes**: sm, md, lg with proportional track/thumb sizing
+- **Custom steps**: Define increment intervals
+- **Helper text**: Additional guidance below slider
+
+## Usage
+
+\`\`\`tsx
+import { Slider } from 'notebook-ui';
+
+<Slider
+  value={volume}
+  onChange={setVolume}
+  min={0}
+  max={100}
+  label="Volume"
+  showValue
+  formatValue={(val) => \`\${val}%\`}
+/>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    value: {
+      control: 'number',
+      description: 'Current slider value',
+      table: {
+        type: { summary: 'number' },
+      },
+    },
+    onChange: {
+      description: 'Callback when value changes',
+      table: {
+        type: { summary: '(value: number) => void' },
+      },
+    },
+    min: {
+      control: 'number',
+      description: 'Minimum value',
+      table: {
+        type: { summary: 'number' },
+        defaultValue: { summary: '0' },
+      },
+    },
+    max: {
+      control: 'number',
+      description: 'Maximum value',
+      table: {
+        type: { summary: 'number' },
+        defaultValue: { summary: '100' },
+      },
+    },
+    step: {
+      control: 'number',
+      description: 'Increment step size',
+      table: {
+        type: { summary: 'number' },
+        defaultValue: { summary: '1' },
+      },
+    },
+    size: {
+      control: 'select',
+      options: ['sm', 'md', 'lg'],
+      description: 'Slider size affecting track height and thumb size',
+      table: {
+        type: { summary: 'sm | md | lg' },
+        defaultValue: { summary: 'md' },
+      },
+    },
+    color: {
+      control: 'select',
+      options: ['primary', 'success', 'warning', 'error'],
+      description: 'Color variant for filled track and thumb',
+      table: {
+        type: { summary: 'primary | success | warning | error' },
+        defaultValue: { summary: 'primary' },
+      },
+    },
+    label: {
+      control: 'text',
+      description: 'Label text displayed above slider',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    showValue: {
+      control: 'boolean',
+      description: 'Display current value',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    showMinMax: {
+      control: 'boolean',
+      description: 'Display min and max values',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    formatValue: {
+      description: 'Function to format displayed value (e.g., add % or $)',
+      table: {
+        type: { summary: '(value: number) => string' },
+      },
+    },
+    helperText: {
+      control: 'text',
+      description: 'Helper text displayed below slider',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    disabled: {
+      control: 'boolean',
+      description: 'Disable the slider',
+      table: {
+        type: { summary: 'boolean' },
+      },
+    },
+  },
   decorators: [
     (Story) => (
       <div style={{ minWidth: '400px', padding: '2rem' }}>
@@ -16,16 +148,6 @@ const meta = {
       </div>
     ),
   ],
-  argTypes: {
-    size: {
-      control: 'select',
-      options: ['sm', 'md', 'lg'],
-    },
-    color: {
-      control: 'select',
-      options: ['primary', 'success', 'warning', 'error'],
-    },
-  },
 } satisfies Meta<typeof Slider>;
 
 export default meta;

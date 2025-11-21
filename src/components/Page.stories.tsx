@@ -8,8 +8,47 @@ const meta = {
   component: Page,
   parameters: {
     layout: 'fullscreen',
+    docs: {
+      description: {
+        component: `
+Core page wrapper with authentic notebook paper styling - the visual foundation of the notebook-ui aesthetic.
+
+## Features
+- **Notebook paper texture**: Subtle grain background for authentic paper feel
+- **Red margin line**: Vertical line 3rem from left edge (classic notebook style)
+- **Ruled lines**: Horizontal guide lines every 2rem for that lined paper effect
+- **Shadow & depth**: Elevated paper appearance with subtle shadow
+- **Binding edge**: 4px left border simulating notebook binding
+- **Max width**: 1400px with centered layout for optimal readability
+- **Proper padding**: Internal spacing for content comfort
+
+## Usage
+
+\`\`\`tsx
+import { Page, Card } from 'notebook-ui';
+
+<Page>
+  <div style={{ padding: '2rem' }}>
+    <h1>Page Title</h1>
+    <Card>
+      <CardContent>Your content here</CardContent>
+    </Card>
+  </div>
+</Page>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    children: {
+      description: 'Page content displayed on the notebook paper',
+      table: {
+        type: { summary: 'React.ReactNode' },
+      },
+    },
+  },
 } satisfies Meta<typeof Page>;
 
 export default meta;

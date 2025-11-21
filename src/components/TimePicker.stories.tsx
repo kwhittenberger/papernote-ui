@@ -7,8 +7,137 @@ const meta = {
   component: TimePicker,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+Time selection input with dropdown picker supporting 12/24-hour formats, time ranges, and custom intervals.
+
+## Features
+- **Format support**: 12-hour (AM/PM) or 24-hour military time
+- **Time ranges**: Set minimum and maximum allowed times
+- **Custom intervals**: Define minute increments (e.g., 15, 30 minutes)
+- **Sizes**: sm, md, lg input sizes
+- **Validation**: Built-in error state and messages
+- **Keyboard input**: Type times directly or use dropdown
+- **Helper text**: Additional context below input
+
+## Usage
+
+\`\`\`tsx
+import { TimePicker } from 'notebook-ui';
+
+<TimePicker
+  value={time}
+  onChange={setTime}
+  label="Meeting Time"
+  format="12"
+  minTime="09:00"
+  maxTime="17:00"
+  interval={15}
+/>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    value: {
+      control: 'text',
+      description: 'Current time value in HH:MM format',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    onChange: {
+      description: 'Callback when time changes',
+      table: {
+        type: { summary: '(value: string) => void' },
+      },
+    },
+    label: {
+      control: 'text',
+      description: 'Label text displayed above input',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    format: {
+      control: 'select',
+      options: ['12', '24'],
+      description: 'Time format - 12-hour with AM/PM or 24-hour military',
+      table: {
+        type: { summary: '12 | 24' },
+        defaultValue: { summary: '12' },
+      },
+    },
+    minTime: {
+      control: 'text',
+      description: 'Minimum selectable time in HH:MM format',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    maxTime: {
+      control: 'text',
+      description: 'Maximum selectable time in HH:MM format',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    interval: {
+      control: 'number',
+      description: 'Minute interval for time options (e.g., 15 = quarters)',
+      table: {
+        type: { summary: 'number' },
+        defaultValue: { summary: '30' },
+      },
+    },
+    size: {
+      control: 'select',
+      options: ['sm', 'md', 'lg'],
+      description: 'Input size',
+      table: {
+        type: { summary: 'sm | md | lg' },
+        defaultValue: { summary: 'md' },
+      },
+    },
+    placeholder: {
+      control: 'text',
+      description: 'Placeholder text',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    helperText: {
+      control: 'text',
+      description: 'Helper text displayed below input',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    error: {
+      control: 'text',
+      description: 'Error message (overrides helperText)',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    required: {
+      control: 'boolean',
+      description: 'Mark as required field',
+      table: {
+        type: { summary: 'boolean' },
+      },
+    },
+    disabled: {
+      control: 'boolean',
+      description: 'Disable the input',
+      table: {
+        type: { summary: 'boolean' },
+      },
+    },
+  },
   decorators: [
     (Story) => (
       <div style={{ minWidth: '400px', padding: '2rem' }}>

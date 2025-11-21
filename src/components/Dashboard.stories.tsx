@@ -10,8 +10,63 @@ const meta = {
   component: Dashboard,
   parameters: {
     layout: 'fullscreen',
+    docs: {
+      description: {
+        component: `
+Structured dashboard layout for notebook-style pages.
+
+## Features
+- **DashboardHeader**: Consistent header with title, subtitle, action buttons
+- **DashboardContent**: Content area with proper spacing
+- **Composable**: Use inside Page or PageLayout for paper aesthetic
+- **Flexible grids**: Supports any grid layout (cards, tables, charts)
+- **Consistent spacing**: Built-in spacing utilities
+
+## Usage
+
+\`\`\`tsx
+import { Dashboard, DashboardHeader, DashboardContent } from 'notebook-ui';
+import { Page, Card, CardContent, Button } from 'notebook-ui';
+import { Plus, Download } from 'lucide-react';
+
+<Page>
+  <Dashboard>
+    <DashboardHeader
+      title="Analytics Dashboard"
+      subtitle="Track key metrics and performance"
+      actions={
+        <>
+          <Button icon={<Download />}>Export</Button>
+          <Button variant="primary" icon={<Plus />}>New Report</Button>
+        </>
+      }
+    />
+    <DashboardContent>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }}>
+        <Card><CardContent>Metric 1</CardContent></Card>
+        <Card><CardContent>Metric 2</CardContent></Card>
+        <Card><CardContent>Metric 3</CardContent></Card>
+      </div>
+    </DashboardContent>
+  </Dashboard>
+</Page>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    children: {
+      description: 'Dashboard content (Header + Content)',
+      table: { type: { summary: 'React.ReactNode' } },
+    },
+    className: {
+      control: 'text',
+      description: 'Additional CSS classes',
+      table: { type: { summary: 'string' } },
+    },
+  },
 } satisfies Meta<typeof Dashboard>;
 
 export default meta;

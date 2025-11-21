@@ -7,12 +7,87 @@ const meta = {
   component: Avatar,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+User avatar component displaying profile pictures or initials.
+
+## Features
+- **Initials**: Automatic generation from firstName/lastName
+- **Images**: Display profile pictures from URL
+- **Sizes**: xs (24px), sm (32px), md (48px), lg (64px), xl (96px)
+- **Fallback**: Graceful fallback to initials when image fails
+- **Customizable**: className prop for additional styling
+
+## Usage
+
+\`\`\`tsx
+import { Avatar } from 'notebook-ui';
+
+{/* Avatar with initials */}
+<Avatar firstName="John" lastName="Doe" size="md" />
+
+{/* Avatar with image */}
+<Avatar
+  firstName="John"
+  lastName="Doe"
+  imageUrl="https://example.com/avatar.jpg"
+  size="lg"
+/>
+
+{/* Custom fallback text */}
+<Avatar fallbackText="Guest" size="sm" />
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
   argTypes: {
+    firstName: {
+      control: 'text',
+      description: 'User\'s first name (used for initials)',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    lastName: {
+      control: 'text',
+      description: 'User\'s last name (used for initials)',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    fallbackText: {
+      control: 'text',
+      description: 'Fallback text when firstName/lastName not provided',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: 'U' },
+      },
+    },
+    imageUrl: {
+      control: 'text',
+      description: 'Avatar image URL (overrides initials when provided)',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
     size: {
       control: 'select',
       options: ['xs', 'sm', 'md', 'lg', 'xl'],
+      description: 'Avatar size (xs: 24px, sm: 32px, md: 48px, lg: 64px, xl: 96px)',
+      table: {
+        type: { summary: 'xs | sm | md | lg | xl' },
+        defaultValue: { summary: 'md' },
+      },
+    },
+    className: {
+      control: 'text',
+      description: 'Additional CSS classes for customization',
+      table: {
+        type: { summary: 'string' },
+      },
     },
   },
 } satisfies Meta<typeof Avatar>;

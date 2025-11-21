@@ -25,8 +25,152 @@ const meta = {
   component: DataTable,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component: `
+Feature-rich data table component with sorting, filtering, selection, row expansion, and virtual scrolling.
+
+## Features
+- **Sorting**: Click column headers to sort ascending/descending
+- **Selection**: Single or multi-select rows with checkboxes
+- **Row actions**: Sticky actions column with Edit/Delete/Custom buttons
+- **Expansion modes**: Edit, details view, add/manage related records
+- **Virtual scrolling**: Handle 10,000+ rows efficiently
+- **Loading states**: Skeleton loading and empty states
+- **Column width control**: Fixed, flex, min/max width constraints
+- **Custom rendering**: Per-column custom cell content
+- **Double-click triggers**: Open edit mode on row double-click
+- **Responsive**: Horizontal scroll for wide tables
+
+## Usage
+
+\`\`\`tsx
+import { DataTable } from 'notebook-ui';
+import { Edit, Trash } from 'lucide-react';
+
+const columns = [
+  { key: 'name', header: 'Name', sortable: true },
+  { key: 'email', header: 'Email', sortable: true },
+  { 
+    key: 'status', 
+    header: 'Status',
+    render: (user) => <Badge variant={user.status === 'active' ? 'success' : 'error'}>{user.status}</Badge>
+  },
+];
+
+const actions = [
+  { label: 'Edit', icon: <Edit />, onClick: (row) => handleEdit(row) },
+  { label: 'Delete', icon: <Trash />, onClick: (row) => handleDelete(row), variant: 'danger' },
+];
+
+<DataTable
+  data={users}
+  columns={columns}
+  actions={actions}
+  selectable
+  onSelectionChange={setSelected}
+  expandedRow={{
+    edit: {
+      render: (item, onSave, onCancel) => <EditForm item={item} onSave={onSave} onCancel={onCancel} />,
+      triggerOnDoubleClick: true
+    }
+  }}
+/>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    data: {
+      description: 'Array of data items to display (must have id property)',
+      table: {
+        type: { summary: 'T[]' },
+      },
+    },
+    columns: {
+      description: 'Column definitions with headers, keys, and optional custom rendering',
+      table: {
+        type: { summary: 'DataTableColumn<T>[]' },
+      },
+    },
+    loading: {
+      control: 'boolean',
+      description: 'Show loading skeleton',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    error: {
+      control: 'text',
+      description: 'Error message to display',
+      table: {
+        type: { summary: 'string | null' },
+      },
+    },
+    emptyMessage: {
+      control: 'text',
+      description: 'Message shown when data array is empty',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: 'No data available' },
+      },
+    },
+    selectable: {
+      control: 'boolean',
+      description: 'Enable row selection with checkboxes',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    multiSelect: {
+      control: 'boolean',
+      description: 'Allow multiple row selection (requires selectable=true)',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    actions: {
+      description: 'Row actions displayed in sticky actions column',
+      table: {
+        type: { summary: 'DataTableAction<T>[]' },
+      },
+    },
+    expandedRow: {
+      description: 'Configuration for row expansion modes (edit, details, addRelated, manageRelated)',
+      table: {
+        type: { summary: 'ExpandedRowConfig<T>' },
+      },
+    },
+    virtualized: {
+      control: 'boolean',
+      description: 'Enable virtual scrolling for large datasets (10,000+ rows)',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    virtualHeight: {
+      control: 'text',
+      description: 'Container height for virtual scrolling',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: '600px' },
+      },
+    },
+    virtualRowHeight: {
+      control: 'number',
+      description: 'Fixed row height in pixels for virtual scrolling',
+      table: {
+        type: { summary: 'number' },
+        defaultValue: { summary: '60' },
+      },
+    },
+  },
 } satisfies Meta<typeof DataTable>;
 
 export default meta;

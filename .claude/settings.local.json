@@ -22,7 +22,14 @@
       "Bash(python:*)",
       "Bash(npx storybook@latest info)",
       "Bash(npm search:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(for:*)",
+      "Bash(do if grep -q \"parameters\\.docs\\.description\\.component\" \"$file\")",
+      "Bash(then echo \"✓ $file\")",
+      "Bash(else echo \"✗ $file\")",
+      "Bash(fi)",
+      "Bash(done)",
+      "mcp__filesystem__read_multiple_files"
     ],
     "deny": [],
     "ask": []

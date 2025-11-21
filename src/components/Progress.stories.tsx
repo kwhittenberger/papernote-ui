@@ -7,20 +7,104 @@ const meta = {
   component: Progress,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+Progress indicator component with linear and circular variants for displaying task completion.
+
+## Features
+- **Variants**: linear (bar) or circular (radial)
+- **Sizes**: sm, md, lg for different contexts
+- **Colors**: primary, success, warning, error
+- **Label support**: Show percentage or custom text
+- **Striped**: Optional striped pattern
+- **Animated**: Animated stripes for active operations
+- **Value clamping**: Automatically clamps to 0-100 range
+
+## Usage
+
+\`\`\`tsx
+import { Progress } from 'notebook-ui';
+
+// Linear progress
+<Progress value={75} color="success" showLabel />
+
+// Circular progress
+<Progress value={60} variant="circular" size="lg" showLabel />
+
+// Striped animated
+<Progress value={45} striped animated color="primary" />
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
   argTypes: {
+    value: {
+      control: { type: 'range', min: 0, max: 100, step: 1 },
+      description: 'Progress value (0-100)',
+      table: {
+        type: { summary: 'number' },
+      },
+    },
     variant: {
       control: 'select',
       options: ['linear', 'circular'],
+      description: 'Progress bar style',
+      table: {
+        type: { summary: 'linear | circular' },
+        defaultValue: { summary: 'linear' },
+      },
     },
     size: {
       control: 'select',
       options: ['sm', 'md', 'lg'],
+      description: 'Progress bar size',
+      table: {
+        type: { summary: 'sm | md | lg' },
+        defaultValue: { summary: 'md' },
+      },
     },
     color: {
       control: 'select',
       options: ['primary', 'success', 'warning', 'error'],
+      description: 'Progress bar color variant',
+      table: {
+        type: { summary: 'primary | success | warning | error' },
+        defaultValue: { summary: 'primary' },
+      },
+    },
+    showLabel: {
+      control: 'boolean',
+      description: 'Show percentage label',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    label: {
+      control: 'text',
+      description: 'Custom label text (overrides percentage)',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    striped: {
+      control: 'boolean',
+      description: 'Add striped pattern to linear progress',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    animated: {
+      control: 'boolean',
+      description: 'Animate stripes (requires striped=true)',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
     },
   },
   decorators: [

@@ -8,8 +8,81 @@ const meta = {
   component: Tabs,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component: `
+Tab navigation component for organizing content into separate views with multiple style variants.
+
+## Features
+- **Variants**: underline, pill styling options
+- **Orientation**: horizontal or vertical layout
+- **Icons**: Support for icons alongside tab labels
+- **Badges**: Show notification counts on tabs
+- **Disabled tabs**: Prevent interaction with specific tabs
+- **Controlled state**: Manage active tab externally
+- **Content management**: Automatic content switching
+
+## Usage
+
+\`\`\`tsx
+import { Tabs } from 'notebook-ui';
+
+const tabs = [
+  { id: 'profile', label: 'Profile', content: <ProfileContent /> },
+  { id: 'settings', label: 'Settings', content: <SettingsContent />, badge: 3 },
+];
+
+<Tabs
+  tabs={tabs}
+  activeTab={activeTab}
+  onChange={setActiveTab}
+  variant="underline"
+/>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    tabs: {
+      description: 'Array of tab configurations with id, label, content, and optional icons/badges',
+      table: {
+        type: { summary: 'TabConfig[]' },
+      },
+    },
+    activeTab: {
+      control: 'text',
+      description: 'ID of the currently active tab',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    onChange: {
+      description: 'Callback when active tab changes',
+      table: {
+        type: { summary: '(tabId: string) => void' },
+      },
+    },
+    variant: {
+      control: 'select',
+      options: ['underline', 'pill'],
+      description: 'Visual style variant',
+      table: {
+        type: { summary: 'underline | pill' },
+        defaultValue: { summary: 'underline' },
+      },
+    },
+    orientation: {
+      control: 'select',
+      options: ['horizontal', 'vertical'],
+      description: 'Layout orientation',
+      table: {
+        type: { summary: 'horizontal | vertical' },
+        defaultValue: { summary: 'horizontal' },
+      },
+    },
+  },
   decorators: [
     (Story) => (
       <div style={{ minWidth: '600px' }}>

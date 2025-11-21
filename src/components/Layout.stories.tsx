@@ -12,8 +12,74 @@ const meta = {
   component: Layout,
   parameters: {
     layout: 'fullscreen',
+    docs: {
+      description: {
+        component: `
+Complete application shell combining sidebar, gutter navigation, content area, and optional status bar.
+
+## Features
+- **Sidebar**: 256px fixed width navigation (passed as component)
+- **Gutter**: 32px space between sidebar and content with page section navigation dots
+- **Content area**: Flexible width, independently scrollable main region
+- **Status bar**: Optional fixed bar at bottom for status information
+- **Section navigation**: Dots in gutter track and navigate between page sections
+- **Scroll sync**: Active section highlights automatically as user scrolls
+- **Independent scrolling**: Content scrolls while sidebar/gutter remain fixed
+
+## Usage
+
+\`\`\`tsx
+import { Layout, Sidebar, StatusBar, PageLayout } from 'notebook-ui';
+
+const sections = [
+  { id: 'overview', label: 'Overview' },
+  { id: 'metrics', label: 'Metrics' },
+  { id: 'activity', label: 'Activity' },
+];
+
+<Layout
+  sidebar={<Sidebar items={sidebarItems} />}
+  statusBar={<StatusBar />}
+  sections={sections}
+>
+  <PageLayout title="Dashboard">
+    <section id="overview">Content</section>
+    <section id="metrics">More content</section>
+    <section id="activity">Even more</section>
+  </PageLayout>
+</Layout>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    sidebar: {
+      description: 'Sidebar component (typically Sidebar) for navigation',
+      table: {
+        type: { summary: 'React.ReactNode' },
+      },
+    },
+    statusBar: {
+      description: 'Optional status bar component displayed at bottom',
+      table: {
+        type: { summary: 'React.ReactNode' },
+      },
+    },
+    sections: {
+      description: 'Array of page sections for gutter navigation dots',
+      table: {
+        type: { summary: '{ id: string; label: string }[]' },
+      },
+    },
+    children: {
+      description: 'Main content area (typically PageLayout or Page)',
+      table: {
+        type: { summary: 'React.ReactNode' },
+      },
+    },
+  },
 } satisfies Meta<typeof Layout>;
 
 export default meta;

@@ -8,8 +8,128 @@ const meta = {
   component: ButtonGroup,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+Toggle button group for single or multiple selection.
+
+## Features
+- **Selection modes**: Single (radio) or multiple (checkbox) selection
+- **Icons**: Optional icon support for each button
+- **Sizes**: sm, md, lg with consistent spacing
+- **Full width**: Stretch buttons to container width
+- **Disabled states**: Disable individual buttons or entire group
+- **Tooltips**: Hover tooltips for additional context
+- **Accessible**: Proper ARIA roles and keyboard navigation
+
+## Usage
+
+\`\`\`tsx
+import { ButtonGroup, ButtonGroupOption } from 'notebook-ui';
+import { AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
+
+{/* Single select */}
+const alignmentOptions: ButtonGroupOption[] = [
+  { value: 'left', label: 'Left', icon: AlignLeft },
+  { value: 'center', label: 'Center', icon: AlignCenter },
+  { value: 'right', label: 'Right', icon: AlignRight },
+];
+
+<ButtonGroup
+  label="Text Alignment"
+  options={alignmentOptions}
+  value={alignment}
+  onChange={setAlignment}
+  size="md"
+/>
+
+{/* Multiple select */}
+<ButtonGroup
+  label="Features"
+  options={features}
+  values={selectedFeatures}
+  onChangeMultiple={setSelectedFeatures}
+  multiple
+/>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    options: {
+      description: 'Array of button options with value, label, optional icon, disabled state, and tooltip',
+      table: {
+        type: { summary: 'ButtonGroupOption[]' },
+      },
+    },
+    value: {
+      control: 'text',
+      description: 'Selected value for single-select mode',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    values: {
+      description: 'Selected values array for multi-select mode',
+      table: {
+        type: { summary: 'string[]' },
+      },
+    },
+    onChange: {
+      description: 'Callback fired when selection changes (single-select)',
+      table: {
+        type: { summary: '(value: string) => void' },
+      },
+    },
+    onChangeMultiple: {
+      description: 'Callback fired when selection changes (multi-select)',
+      table: {
+        type: { summary: '(values: string[]) => void' },
+      },
+    },
+    multiple: {
+      control: 'boolean',
+      description: 'Enable multiple selection mode',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    label: {
+      control: 'text',
+      description: 'Label displayed above button group',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    size: {
+      control: 'select',
+      options: ['sm', 'md', 'lg'],
+      description: 'Button size',
+      table: {
+        type: { summary: 'sm | md | lg' },
+        defaultValue: { summary: 'md' },
+      },
+    },
+    fullWidth: {
+      control: 'boolean',
+      description: 'Make buttons stretch to full container width',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    disabled: {
+      control: 'boolean',
+      description: 'Disable the entire button group',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+  },
 } satisfies Meta<typeof ButtonGroup>;
 
 export default meta;

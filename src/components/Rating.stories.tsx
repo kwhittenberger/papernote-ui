@@ -7,16 +7,118 @@ const meta = {
   component: Rating,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+Star rating component for reviews and feedback with interactive and read-only modes.
+
+## Features
+- **Interactive**: Click to set rating with hover preview
+- **Read-only**: Display-only mode for showing ratings
+- **Half stars**: Optional half-star precision
+- **Sizes**: sm, md, lg
+- **Colors**: primary, warning (default), error
+- **Custom max**: Configurable number of stars (default 5)
+- **Label**: Optional display of rating value
+- **Disabled state**: Non-interactive disabled mode
+
+## Usage
+
+\`\`\`tsx
+import { Rating } from 'notebook-ui';
+
+// Interactive rating
+<Rating value={rating} onChange={setRating} allowHalf showLabel />
+
+// Read-only display
+<Rating value={4.5} readOnly showLabel />
+
+// Custom color and size
+<Rating value={3} onChange={setRating} color="error" size="lg" max={10} />
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
   argTypes: {
+    value: {
+      control: { type: 'range', min: 0, max: 5, step: 0.5 },
+      description: 'Current rating value',
+      table: {
+        type: { summary: 'number' },
+      },
+    },
+    onChange: {
+      description: 'Callback when rating changes',
+      table: {
+        type: { summary: '(value: number) => void' },
+      },
+    },
+    max: {
+      control: 'number',
+      description: 'Maximum rating (number of stars)',
+      table: {
+        type: { summary: 'number' },
+        defaultValue: { summary: '5' },
+      },
+    },
     size: {
       control: 'select',
       options: ['sm', 'md', 'lg'],
+      description: 'Star size',
+      table: {
+        type: { summary: 'sm | md | lg' },
+        defaultValue: { summary: 'md' },
+      },
+    },
+    readOnly: {
+      control: 'boolean',
+      description: 'Read-only mode (non-interactive)',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    allowHalf: {
+      control: 'boolean',
+      description: 'Enable half-star ratings',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
     },
     color: {
       control: 'select',
       options: ['primary', 'warning', 'error'],
+      description: 'Star color variant',
+      table: {
+        type: { summary: 'primary | warning | error' },
+        defaultValue: { summary: 'warning' },
+      },
+    },
+    showLabel: {
+      control: 'boolean',
+      description: 'Show rating value as text',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    label: {
+      control: 'text',
+      description: 'Custom label text',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    disabled: {
+      control: 'boolean',
+      description: 'Disabled state',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
     },
   },
 } satisfies Meta<typeof Rating>;

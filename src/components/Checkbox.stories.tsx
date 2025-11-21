@@ -8,8 +8,104 @@ const meta = {
   component: Checkbox,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+Checkbox input component for binary selection with optional labels, descriptions, and icons.
+
+## Features
+- **Sizes**: sm, md, lg with consistent scaling
+- **Label & Description**: Optional text content
+- **Icons**: Display icons next to label
+- **Indeterminate state**: Partial selection indicator
+- **Keyboard navigation**: Space key support
+- **Disabled state**: Visual and functional disabling
+- **Accessible**: Proper ARIA attributes and focus management
+
+## Usage
+
+\`\`\`tsx
+import { Checkbox } from 'notebook-ui';
+import { FileText } from 'lucide-react';
+
+<Checkbox
+  checked={agreed}
+  onChange={setAgreed}
+  label="I agree to the terms and conditions"
+  icon={<FileText className="h-4 w-4" />}
+/>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    checked: {
+      control: 'boolean',
+      description: 'Checkbox checked state',
+      table: {
+        type: { summary: 'boolean' },
+      },
+    },
+    onChange: {
+      description: 'Callback when checkbox state changes',
+      table: {
+        type: { summary: '(checked: boolean) => void' },
+      },
+    },
+    label: {
+      control: 'text',
+      description: 'Label text next to checkbox',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    description: {
+      control: 'text',
+      description: 'Additional description text below label',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    icon: {
+      description: 'Icon to display next to label',
+      table: {
+        type: { summary: 'React.ReactNode' },
+      },
+    },
+    size: {
+      control: 'select',
+      options: ['sm', 'md', 'lg'],
+      description: 'Checkbox size',
+      table: {
+        type: { summary: 'sm | md | lg' },
+        defaultValue: { summary: 'md' },
+      },
+    },
+    indeterminate: {
+      control: 'boolean',
+      description: 'Show indeterminate/partial selection state',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    disabled: {
+      control: 'boolean',
+      description: 'Disable the checkbox',
+      table: {
+        type: { summary: 'boolean' },
+      },
+    },
+    name: {
+      control: 'text',
+      description: 'HTML name attribute for form submission',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+  },
   decorators: [
     (Story) => (
       <div style={{ minWidth: '400px' }}>
@@ -17,12 +113,6 @@ const meta = {
       </div>
     ),
   ],
-  argTypes: {
-    size: {
-      control: 'select',
-      options: ['sm', 'md', 'lg'],
-    },
-  },
 } satisfies Meta<typeof Checkbox>;
 
 export default meta;

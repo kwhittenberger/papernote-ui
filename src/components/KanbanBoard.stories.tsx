@@ -8,8 +8,105 @@ const meta = {
   component: KanbanBoard,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component: `
+Drag-and-drop kanban board for task management and workflow visualization with column limits and custom card rendering.
+
+## Features
+- **HTML5 drag-and-drop**: Smooth drag-and-drop between columns
+- **Column limits**: Set maximum cards per column with visual feedback
+- **Color coding**: Assign colors to columns for visual organization
+- **Priority badges**: High/medium/low priority indicators
+- **Tags**: Categorize cards with colored tags
+- **Assignees**: Display assignee information on cards
+- **Add card button**: Optional button to create new cards per column
+- **Column menu**: Optional menu for column actions
+- **Custom rendering**: Override default card appearance
+- **Click handlers**: Callbacks for card and column interactions
+
+## Usage
+
+\`\`\`tsx
+import { KanbanBoard } from 'notebook-ui';
+
+const [columns, setColumns] = useState([
+  {
+    id: 'todo',
+    title: 'To Do',
+    color: '#94a3b8',
+    cards: [
+      {
+        id: '1',
+        title: 'Task 1',
+        description: 'Description',
+        tags: ['bug', 'urgent'],
+        assignee: 'John Doe',
+        priority: 'high',
+      },
+    ],
+  },
+  { id: 'done', title: 'Done', color: '#10b981', cards: [] },
+]);
+
+<KanbanBoard
+  columns={columns}
+  onChange={setColumns}
+  onCardClick={(card) => console.log('Edit', card)}
+  showAddButton
+/>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    columns: {
+      description: 'Array of kanban columns with cards',
+      table: {
+        type: { summary: 'KanbanColumn[]' },
+      },
+    },
+    onChange: {
+      description: 'Callback when columns/cards change (after drag-and-drop)',
+      table: {
+        type: { summary: '(columns: KanbanColumn[]) => void' },
+      },
+    },
+    onCardClick: {
+      description: 'Callback when a card is clicked',
+      table: {
+        type: { summary: '(card: KanbanCard, columnId: string) => void' },
+      },
+    },
+    onAddCard: {
+      description: 'Callback when add card button is clicked (requires showAddButton)',
+      table: {
+        type: { summary: '(columnId: string) => void' },
+      },
+    },
+    onColumnMenu: {
+      description: 'Callback for column menu button (shows menu button when provided)',
+      table: {
+        type: { summary: '(columnId: string) => void' },
+      },
+    },
+    showAddButton: {
+      control: 'boolean',
+      description: 'Show add card button at bottom of each column',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    renderCard: {
+      description: 'Custom card renderer function for full control over card appearance',
+      table: {
+        type: { summary: '(card: KanbanCard) => React.ReactNode' },
+      },
+    },
+  },
   decorators: [
     (Story) => (
       <div style={{ minHeight: '600px', padding: '2rem' }}>

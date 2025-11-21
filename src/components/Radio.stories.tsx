@@ -8,8 +8,112 @@ const meta = {
   component: Radio,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+Radio button group component for single selection from multiple options.
+
+## Features
+- **Orientation**: vertical or horizontal layout
+- **Icons**: Display icons next to option labels
+- **Descriptions**: Additional context text per option
+- **Keyboard navigation**: Arrow keys to navigate options
+- **Disabled state**: Per-option or entire group disabling
+- **Accessible**: Proper ARIA attributes and focus management
+
+## Usage
+
+\`\`\`tsx
+import { Radio } from 'notebook-ui';
+import { CreditCard, Building } from 'lucide-react';
+
+const options = [
+  { 
+    value: 'card', 
+    label: 'Credit Card',
+    icon: <CreditCard className="h-4 w-4" />,
+    description: 'Pay with credit or debit card'
+  },
+  { 
+    value: 'bank', 
+    label: 'Bank Transfer',
+    icon: <Building className="h-4 w-4" />,
+    description: 'Direct bank account transfer'
+  },
+];
+
+<Radio
+  name="payment"
+  value={paymentMethod}
+  onChange={setPaymentMethod}
+  options={options}
+  label="Payment Method"
+  helperText="Choose your preferred payment method"
+/>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    name: {
+      control: 'text',
+      description: 'HTML name attribute for the radio group',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    value: {
+      control: 'text',
+      description: 'Currently selected option value',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    onChange: {
+      description: 'Callback when selection changes',
+      table: {
+        type: { summary: '(value: string) => void' },
+      },
+    },
+    options: {
+      description: 'Array of radio options with value, label, and optional icon/description',
+      table: {
+        type: { summary: 'RadioOption[]' },
+      },
+    },
+    orientation: {
+      control: 'select',
+      options: ['horizontal', 'vertical'],
+      description: 'Layout direction of radio options',
+      table: {
+        type: { summary: 'horizontal | vertical' },
+        defaultValue: { summary: 'vertical' },
+      },
+    },
+    label: {
+      control: 'text',
+      description: 'Group label text above radio options',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    helperText: {
+      control: 'text',
+      description: 'Helper text displayed below radio group',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    disabled: {
+      control: 'boolean',
+      description: 'Disable the entire radio group',
+      table: {
+        type: { summary: 'boolean' },
+      },
+    },
+  },
   decorators: [
     (Story) => (
       <div style={{ minWidth: '400px' }}>

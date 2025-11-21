@@ -7,8 +7,72 @@ const meta = {
   component: Sidebar,
   parameters: {
     layout: 'fullscreen',
+    docs: {
+      description: {
+        component: `
+Vertical navigation sidebar with support for nesting, badges, and custom header/footer content.
+
+## Features
+- **Nested navigation**: Support for parent items with expandable children
+- **Badge indicators**: Show notification counts or status badges
+- **Active state**: Highlights current page based on path matching
+- **Custom slots**: Optional header and footer content areas
+- **Icons**: Support for icons alongside navigation labels
+- **Separators**: Visual dividers between navigation groups
+- **Click handling**: Custom navigation handler or standard href links
+
+## Usage
+
+\`\`\`tsx
+import { Sidebar } from 'notebook-ui';
+import { Home, Users, Settings } from 'lucide-react';
+
+const items = [
+  { id: '1', label: 'Dashboard', icon: <Home />, href: '/dashboard' },
+  { id: '2', label: 'Users', icon: <Users />, href: '/users', badge: 5 },
+  { id: '3', label: 'Settings', icon: <Settings />, href: '/settings' },
+];
+
+<Sidebar items={items} currentPath="/dashboard" />
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    items: {
+      description: 'Array of navigation items with optional nesting, icons, badges, and children',
+      table: {
+        type: { summary: 'SidebarItem[]' },
+      },
+    },
+    currentPath: {
+      control: 'text',
+      description: 'Current route path for highlighting active item',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    header: {
+      description: 'Optional header content displayed at top of sidebar',
+      table: {
+        type: { summary: 'React.ReactNode' },
+      },
+    },
+    footer: {
+      description: 'Optional footer content displayed at bottom of sidebar',
+      table: {
+        type: { summary: 'React.ReactNode' },
+      },
+    },
+    onNavigate: {
+      description: 'Custom navigation handler - if not provided, uses standard link navigation',
+      table: {
+        type: { summary: '(href: string, external?: boolean) => void' },
+      },
+    },
+  },
   decorators: [
     (Story) => (
       <div style={{ display: 'flex', height: '600px', border: '1px solid #e5e5e5' }}>

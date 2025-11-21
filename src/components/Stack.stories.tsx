@@ -8,24 +8,83 @@ const meta = {
   component: Stack,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component: `
+Flexbox layout primitive for arranging children in horizontal or vertical stacks with consistent spacing.
+
+## Features
+- **Direction**: horizontal or vertical layout
+- **Spacing**: none, xs, sm, md, lg, xl preset gaps
+- **Alignment**: start, center, end, stretch (cross-axis)
+- **Justification**: start, center, end, between, around (main-axis)
+- **Composable**: Nest stacks for complex layouts
+- **Responsive**: Works seamlessly with flex wrapping
+
+## Usage
+
+\`\`\`tsx
+import { Stack, Button } from 'notebook-ui';
+
+<Stack direction="horizontal" spacing="md" align="center">
+  <Button variant="primary">Save</Button>
+  <Button variant="ghost">Cancel</Button>
+</Stack>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
   argTypes: {
     direction: {
       control: 'select',
       options: ['horizontal', 'vertical'],
+      description: 'Flex direction - horizontal (row) or vertical (column)',
+      table: {
+        type: { summary: 'horizontal | vertical' },
+        defaultValue: { summary: 'vertical' },
+      },
     },
     spacing: {
       control: 'select',
       options: ['none', 'xs', 'sm', 'md', 'lg', 'xl'],
+      description: 'Gap spacing between children (none: 0, xs: 0.25rem, sm: 0.5rem, md: 1rem, lg: 1.5rem, xl: 2rem)',
+      table: {
+        type: { summary: 'none | xs | sm | md | lg | xl' },
+        defaultValue: { summary: 'md' },
+      },
     },
     align: {
       control: 'select',
       options: ['start', 'center', 'end', 'stretch'],
+      description: 'Cross-axis alignment (align-items)',
+      table: {
+        type: { summary: 'start | center | end | stretch' },
+        defaultValue: { summary: 'start' },
+      },
     },
     justify: {
       control: 'select',
       options: ['start', 'center', 'end', 'between', 'around'],
+      description: 'Main-axis justification (justify-content)',
+      table: {
+        type: { summary: 'start | center | end | between | around' },
+        defaultValue: { summary: 'start' },
+      },
+    },
+    className: {
+      control: 'text',
+      description: 'Additional CSS classes',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    style: {
+      description: 'Additional inline styles',
+      table: {
+        type: { summary: 'React.CSSProperties' },
+      },
     },
   },
 } satisfies Meta<typeof Stack>;

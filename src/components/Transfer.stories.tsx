@@ -7,8 +7,99 @@ const meta = {
   component: Transfer,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+Dual-list component for moving items between available and selected lists with search and bulk operations.
+
+## Features
+- **Dual lists**: Source and target lists side-by-side
+- **Search/filter**: Built-in search for both lists
+- **Item descriptions**: Support for label + description
+- **Disabled items**: Mark specific items as non-transferable
+- **Bulk operations**: Move all or selected items at once
+- **Item counts**: Display total and selected counts
+- **Custom height**: Configurable list height
+- **Custom titles**: Label each list appropriately
+
+## Usage
+
+\`\`\`tsx
+import { Transfer } from 'notebook-ui';
+
+const [source, setSource] = useState([
+  { id: '1', label: 'User 1', description: 'admin@example.com' },
+  { id: '2', label: 'User 2', description: 'user@example.com' },
+]);
+const [target, setTarget] = useState([]);
+
+<Transfer
+  sourceItems={source}
+  targetItems={target}
+  onChange={(newSource, newTarget) => {
+    setSource(newSource);
+    setTarget(newTarget);
+  }}
+  titles={{ source: 'Available', target: 'Selected' }}
+  showSearch
+/>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    sourceItems: {
+      description: 'Array of available items',
+      table: {
+        type: { summary: 'TransferItem[]' },
+      },
+    },
+    targetItems: {
+      description: 'Array of selected items',
+      table: {
+        type: { summary: 'TransferItem[]' },
+      },
+    },
+    onChange: {
+      description: 'Callback when items are moved between lists',
+      table: {
+        type: { summary: '(newSource: TransferItem[], newTarget: TransferItem[]) => void' },
+      },
+    },
+    titles: {
+      description: 'Custom titles for source and target lists',
+      table: {
+        type: { summary: '{ source?: string; target?: string }' },
+        defaultValue: { summary: '{ source: "Available", target: "Selected" }' },
+      },
+    },
+    showSearch: {
+      control: 'boolean',
+      description: 'Show search input for filtering items',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    showCounts: {
+      control: 'boolean',
+      description: 'Show item counts in list headers',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    height: {
+      control: 'text',
+      description: 'List container height',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: '400px' },
+      },
+    },
+  },
   decorators: [
     (Story) => (
       <div style={{ minWidth: '800px', padding: '2rem' }}>

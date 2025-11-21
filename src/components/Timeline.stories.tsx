@@ -7,8 +7,107 @@ const meta = {
   component: Timeline,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component: `
+Vertical or horizontal timeline for displaying chronological events with timestamps and custom content.
+
+## Features
+- **Orientation**: vertical or horizontal layout
+- **Position control**: left, right, or alternating content placement
+- **Color coding**: Assign colors to different event types
+- **Icons**: Custom icons for each timeline item
+- **Timestamps**: Display formatted dates/times
+- **Dot sizes**: sm, md, lg indicator dots
+- **Custom content**: Rich content areas beyond title/description
+- **Interactive**: Optional click handlers for timeline items
+
+## Usage
+
+\`\`\`tsx
+import { Timeline } from 'notebook-ui';
+import { CheckCircle, Clock } from 'lucide-react';
+
+const items = [
+  {
+    id: '1',
+    title: 'Order Placed',
+    description: 'Your order has been received',
+    timestamp: new Date(),
+    icon: <CheckCircle />,
+    color: 'success',
+  },
+  {
+    id: '2',
+    title: 'Processing',
+    timestamp: new Date(),
+    icon: <Clock />,
+    color: 'primary',
+  },
+];
+
+<Timeline items={items} orientation="vertical" />
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    items: {
+      description: 'Array of timeline events with title, description, timestamp, and optional icon/color',
+      table: {
+        type: { summary: 'TimelineItem[]' },
+      },
+    },
+    orientation: {
+      control: 'select',
+      options: ['vertical', 'horizontal'],
+      description: 'Timeline layout orientation',
+      table: {
+        type: { summary: 'vertical | horizontal' },
+        defaultValue: { summary: 'vertical' },
+      },
+    },
+    position: {
+      control: 'select',
+      options: ['left', 'right', 'alternate'],
+      description: 'Content position relative to timeline (vertical only)',
+      table: {
+        type: { summary: 'left | right | alternate' },
+        defaultValue: { summary: 'right' },
+      },
+    },
+    showLine: {
+      control: 'boolean',
+      description: 'Show connecting line between items',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    dotSize: {
+      control: 'select',
+      options: ['sm', 'md', 'lg'],
+      description: 'Size of timeline dot indicators',
+      table: {
+        type: { summary: 'sm | md | lg' },
+        defaultValue: { summary: 'md' },
+      },
+    },
+    onItemClick: {
+      description: 'Callback when timeline item is clicked',
+      table: {
+        type: { summary: '(item: TimelineItem) => void' },
+      },
+    },
+    formatTimestamp: {
+      description: 'Function to format timestamp display',
+      table: {
+        type: { summary: '(date: Date | string) => string' },
+      },
+    },
+  },
   decorators: [
     (Story) => (
       <div style={{ padding: '2rem', minHeight: '400px' }}>

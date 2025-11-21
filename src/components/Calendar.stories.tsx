@@ -7,8 +7,136 @@ const meta = {
   component: Calendar,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+Full-featured calendar component for date selection and event display.
+
+## Features
+- **Single date selection**: Pick individual dates
+- **Range selection**: Select date ranges (check-in/check-out, vacation planning)
+- **Event markers**: Display events with colored indicators
+- **Min/Max dates**: Restrict selectable date range
+- **Disabled dates**: Block specific dates from selection
+- **Week numbers**: Optional ISO week number display
+- **First day of week**: Configurable (Sunday or Monday)
+- **Today button**: Quick navigation to current date
+- **Year/Month navigation**: Fast navigation with double chevrons
+
+## Usage
+
+\`\`\`tsx
+import { Calendar, CalendarEvent } from 'notebook-ui';
+
+{/* Single date selection */}
+<Calendar value={date} onChange={setDate} />
+
+{/* Date range selection */}
+<Calendar
+  rangeMode
+  rangeValue={range}
+  onRangeChange={setRange}
+/>
+
+{/* With events */}
+const events: CalendarEvent[] = [
+  { date: new Date(2025, 10, 15), title: 'Meeting', color: 'primary' },
+  { date: new Date(2025, 10, 20), title: 'Deadline', color: 'error' },
+];
+
+<Calendar
+  value={date}
+  onChange={setDate}
+  events={events}
+  onEventClick={(event) => console.log(event)}
+/>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    value: {
+      description: 'Selected date (single-select mode)',
+      table: {
+        type: { summary: 'Date' },
+      },
+    },
+    onChange: {
+      description: 'Callback when date is selected',
+      table: {
+        type: { summary: '(date: Date) => void' },
+      },
+    },
+    events: {
+      description: 'Array of events to display with colored markers',
+      table: {
+        type: { summary: 'CalendarEvent[]' },
+      },
+    },
+    onEventClick: {
+      description: 'Callback when event marker is clicked',
+      table: {
+        type: { summary: '(event: CalendarEvent) => void' },
+      },
+    },
+    rangeMode: {
+      control: 'boolean',
+      description: 'Enable date range selection mode',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    rangeValue: {
+      description: 'Selected date range with start and end dates',
+      table: {
+        type: { summary: '{ start: Date | null; end: Date | null }' },
+      },
+    },
+    onRangeChange: {
+      description: 'Callback when range selection changes',
+      table: {
+        type: { summary: '(range: { start: Date | null; end: Date | null }) => void' },
+      },
+    },
+    minDate: {
+      description: 'Minimum selectable date',
+      table: {
+        type: { summary: 'Date' },
+      },
+    },
+    maxDate: {
+      description: 'Maximum selectable date',
+      table: {
+        type: { summary: 'Date' },
+      },
+    },
+    disabledDates: {
+      description: 'Array of dates that cannot be selected',
+      table: {
+        type: { summary: 'Date[]' },
+      },
+    },
+    showWeekNumbers: {
+      control: 'boolean',
+      description: 'Show ISO week numbers',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    firstDayOfWeek: {
+      control: 'select',
+      options: [0, 1],
+      description: 'First day of week (0 = Sunday, 1 = Monday)',
+      table: {
+        type: { summary: '0 | 1' },
+        defaultValue: { summary: '0' },
+      },
+    },
+  },
   decorators: [
     (Story) => (
       <div style={{ minWidth: '600px', padding: '2rem' }}>

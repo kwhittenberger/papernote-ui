@@ -9,16 +9,128 @@ const meta = {
   component: Drawer,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+Side-sliding panel component for forms, filters, and contextual content. Alternative to centered modals.
+
+## Features
+- **Placement**: Slide from left, right, top, or bottom
+- **Sizes**: sm (256px), md (384px), lg (512px), full (100%)
+- **Overlay backdrop**: Optional with click-to-close behavior
+- **Footer support**: Action buttons in bottom section
+- **Custom header**: Replace title with custom content
+- **Keyboard control**: Escape key to close
+- **Body scroll lock**: Prevents background scrolling when open
+
+## Usage
+
+\`\`\`tsx
+import { Drawer } from 'notebook-ui';
+
+<Drawer
+  isOpen={isOpen}
+  onClose={handleClose}
+  title="Edit User"
+  placement="right"
+  size="md"
+  footer={
+    <>
+      <Button variant="ghost" onClick={handleClose}>Cancel</Button>
+      <Button variant="primary" onClick={handleSave}>Save</Button>
+    </>
+  }
+>
+  {/* Form content */}
+</Drawer>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
   argTypes: {
+    isOpen: {
+      control: 'boolean',
+      description: 'Controls drawer open/closed state',
+      table: {
+        type: { summary: 'boolean' },
+      },
+    },
+    onClose: {
+      description: 'Callback fired when drawer should close',
+      table: {
+        type: { summary: '() => void' },
+      },
+    },
+    title: {
+      control: 'text',
+      description: 'Drawer title displayed in header',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
     placement: {
       control: 'select',
       options: ['left', 'right', 'top', 'bottom'],
+      description: 'Side from which drawer slides in',
+      table: {
+        type: { summary: 'left | right | top | bottom' },
+        defaultValue: { summary: 'right' },
+      },
     },
     size: {
       control: 'select',
       options: ['sm', 'md', 'lg', 'full'],
+      description: 'Drawer size (sm: 256px, md: 384px, lg: 512px, full: 100%)',
+      table: {
+        type: { summary: 'sm | md | lg | full' },
+        defaultValue: { summary: 'md' },
+      },
+    },
+    showCloseButton: {
+      control: 'boolean',
+      description: 'Show X button in header to close drawer',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    showOverlay: {
+      control: 'boolean',
+      description: 'Show backdrop overlay behind drawer',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    closeOnOverlayClick: {
+      control: 'boolean',
+      description: 'Close drawer when clicking on overlay',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    closeOnEscape: {
+      control: 'boolean',
+      description: 'Close drawer when pressing Escape key',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    header: {
+      description: 'Custom header content (replaces title)',
+      table: {
+        type: { summary: 'React.ReactNode' },
+      },
+    },
+    footer: {
+      description: 'Footer content area for action buttons',
+      table: {
+        type: { summary: 'React.ReactNode' },
+      },
     },
   },
 } satisfies Meta<typeof Drawer>;

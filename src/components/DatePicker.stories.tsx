@@ -7,8 +7,167 @@ const meta = {
   component: DatePicker,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+Date picker component with calendar dropdown, date constraints, and validation.
+
+## Features
+- **Calendar popup**: Month/year navigation with visual date selection
+- **Date constraints**: Min/max date ranges to restrict selectable dates
+- **Disabled dates**: Support array or function to disable specific dates
+- **Locale-aware**: Configurable locale and format (short, medium, long)
+- **Validation states**: error, success, warning with colored borders
+- **Quick actions**: Today and clear buttons for convenience
+- **Keyboard navigation**: Escape to close, Enter to open
+- **Sizes**: sm, md, lg with consistent height scaling
+
+## Usage
+
+\`\`\`tsx
+import { DatePicker } from 'notebook-ui';
+
+<DatePicker
+  label="Start Date"
+  value={startDate}
+  onChange={setStartDate}
+  minDate={new Date()}
+  required
+  helperText="Select a date from today onwards"
+/>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    label: {
+      control: 'text',
+      description: 'Label text displayed above the input',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    value: {
+      description: 'Selected date value',
+      table: {
+        type: { summary: 'Date | null' },
+      },
+    },
+    onChange: {
+      description: 'Callback fired when date changes',
+      table: {
+        type: { summary: '(date: Date | null) => void' },
+      },
+    },
+    placeholder: {
+      control: 'text',
+      description: 'Placeholder text when no date selected',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: '"Select date"' },
+      },
+    },
+    minDate: {
+      description: 'Minimum selectable date (dates before this are disabled)',
+      table: {
+        type: { summary: 'Date' },
+      },
+    },
+    maxDate: {
+      description: 'Maximum selectable date (dates after this are disabled)',
+      table: {
+        type: { summary: 'Date' },
+      },
+    },
+    disabledDates: {
+      description: 'Disabled dates - can be array of dates or function returning boolean',
+      table: {
+        type: { summary: 'Date[] | ((date: Date) => boolean)' },
+      },
+    },
+    locale: {
+      control: 'text',
+      description: 'Locale string for date formatting (e.g., "en-US", "fr-FR")',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: '"en-US"' },
+      },
+    },
+    format: {
+      control: 'select',
+      options: ['short', 'medium', 'long'],
+      description: 'Date display format style',
+      table: {
+        type: { summary: 'short | medium | long' },
+        defaultValue: { summary: '"medium"' },
+      },
+    },
+    validationState: {
+      control: 'select',
+      options: ['error', 'success', 'warning', null],
+      description: 'Visual validation state with colored border',
+      table: {
+        type: { summary: 'error | success | warning | null' },
+      },
+    },
+    validationMessage: {
+      control: 'text',
+      description: 'Validation message shown below input',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    helperText: {
+      control: 'text',
+      description: 'Helper text displayed below input',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    required: {
+      control: 'boolean',
+      description: 'Mark field as required with red asterisk',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    disabled: {
+      control: 'boolean',
+      description: 'Disable the date picker',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    showTodayButton: {
+      control: 'boolean',
+      description: 'Show "Today" button in calendar footer',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    showClearButton: {
+      control: 'boolean',
+      description: 'Show clear button to reset date',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    size: {
+      control: 'select',
+      options: ['sm', 'md', 'lg'],
+      description: 'Input size affecting height and padding',
+      table: {
+        type: { summary: 'sm | md | lg' },
+        defaultValue: { summary: 'md' },
+      },
+    },
+  },
   decorators: [
     (Story) => (
       <div style={{ minWidth: '400px', padding: '2rem' }}>

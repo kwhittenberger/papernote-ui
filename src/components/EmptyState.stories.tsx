@@ -8,8 +8,78 @@ const meta = {
   component: EmptyState,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+Empty state component for displaying helpful messages when no content is available.
+
+## Features
+- **Icon support**: Optional icon for visual context
+- **Title and description**: Clear messaging about empty state
+- **Primary action**: Main CTA button
+- **Secondary action**: Optional additional action
+- **Centered layout**: Vertically and horizontally centered
+- **Responsive**: Adapts to container width
+
+## Usage
+
+\`\`\`tsx
+import { EmptyState } from 'notebook-ui';
+import { Inbox } from 'lucide-react';
+
+<EmptyState
+  icon={<Inbox className="h-12 w-12" />}
+  title="No messages"
+  description="Your inbox is empty. Check back later for new messages."
+  action={{
+    label: 'Compose Message',
+    onClick: handleCompose,
+  }}
+  secondaryAction={{
+    label: 'View Archive',
+    onClick: handleArchive,
+  }}
+/>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    icon: {
+      description: 'Icon element displayed above title',
+      table: {
+        type: { summary: 'React.ReactNode' },
+      },
+    },
+    title: {
+      control: 'text',
+      description: 'Main heading text',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    description: {
+      control: 'text',
+      description: 'Descriptive text explaining the empty state',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    action: {
+      description: 'Primary action button configuration',
+      table: {
+        type: { summary: '{ label: string; onClick: () => void }' },
+      },
+    },
+    secondaryAction: {
+      description: 'Secondary action button configuration',
+      table: {
+        type: { summary: '{ label: string; onClick: () => void }' },
+      },
+    },
+  },
   decorators: [
     (Story) => (
       <div style={{ minWidth: '500px', minHeight: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

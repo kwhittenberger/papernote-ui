@@ -9,8 +9,76 @@ const meta = {
   component: Dropdown,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+Dropdown menu component with portal rendering and smart positioning.
+
+## Features
+- **Portal rendering**: Renders to document.body with proper z-index
+- **Smart positioning**: Auto-adjusts to stay within viewport
+- **Alignment**: Left or right alignment options
+- **Placement**: Top or bottom placement
+- **Item variants**: default, danger for destructive actions
+- **Dividers**: Visual separators between groups
+- **Icon support**: Icons alongside item labels
+- **Disabled items**: Non-clickable items with visual feedback
+
+## Usage
+
+\`\`\`tsx
+import { Dropdown } from 'notebook-ui';
+import { User, Settings, LogOut } from 'lucide-react';
+
+const items = [
+  { id: '1', label: 'Profile', icon: <User className="h-4 w-4" />, onClick: () => {} },
+  { id: '2', label: 'Settings', icon: <Settings className="h-4 w-4" />, onClick: () => {} },
+  { id: '3', divider: true },
+  { id: '4', label: 'Sign Out', icon: <LogOut className="h-4 w-4" />, onClick: () => {}, variant: 'danger' },
+];
+
+<Dropdown
+  trigger={<Button>Menu</Button>}
+  items={items}
+/>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    trigger: {
+      description: 'Element that triggers the dropdown (button, avatar, etc.)',
+      table: {
+        type: { summary: 'React.ReactNode' },
+      },
+    },
+    items: {
+      description: 'Array of dropdown menu items',
+      table: {
+        type: { summary: 'DropdownItem[]' },
+      },
+    },
+    align: {
+      control: 'select',
+      options: ['left', 'right'],
+      description: 'Horizontal alignment of menu relative to trigger',
+      table: {
+        type: { summary: 'left | right' },
+        defaultValue: { summary: 'right' },
+      },
+    },
+    placement: {
+      control: 'select',
+      options: ['top', 'bottom'],
+      description: 'Vertical placement of menu relative to trigger',
+      table: {
+        type: { summary: 'top | bottom' },
+        defaultValue: { summary: 'bottom' },
+      },
+    },
+  },
 } satisfies Meta<typeof Dropdown>;
 
 export default meta;

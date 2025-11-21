@@ -11,8 +11,64 @@ const meta = {
   component: TwoColumnContent,
   parameters: {
     layout: 'fullscreen',
+    docs: {
+      description: {
+        component: `
+Two-column layout primitive with 1/3 sidebar and 2/3 main content areas.
+
+## Features
+- **Fixed proportions**: 1/3 sidebar width, 2/3 main content width
+- **Responsive**: Maintains aspect ratio across screen sizes
+- **Gap spacing**: Consistent 1.5rem gap between columns
+- **Flexible content**: Place any components in either column
+- **Composable**: Works inside Page or other layout components
+
+## Usage
+
+\`\`\`tsx
+import { TwoColumnContent, Card } from 'notebook-ui';
+
+<TwoColumnContent
+  sidebar={
+    <Card>
+      <CardHeader>
+        <CardTitle>Sidebar Content</CardTitle>
+      </CardHeader>
+      <CardContent>
+        Narrow column for secondary content
+      </CardContent>
+    </Card>
+  }
+>
+  <Card>
+    <CardHeader>
+      <CardTitle>Main Content</CardTitle>
+    </CardHeader>
+    <CardContent>
+      Wide column for primary content
+    </CardContent>
+  </Card>
+</TwoColumnContent>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    sidebar: {
+      description: 'Content for narrow sidebar column (1/3 width)',
+      table: {
+        type: { summary: 'React.ReactNode' },
+      },
+    },
+    children: {
+      description: 'Content for main column (2/3 width)',
+      table: {
+        type: { summary: 'React.ReactNode' },
+      },
+    },
+  },
 } satisfies Meta<typeof TwoColumnContent>;
 
 export default meta;

@@ -8,12 +8,63 @@ const meta = {
   component: Tooltip,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+Simple hover tooltip for providing contextual help and additional information.
+
+## Features
+- **Positioning**: top, bottom, left, right relative to trigger
+- **Hover activation**: Appears on mouse enter, hides on exit
+- **Custom delay**: Configurable show delay in milliseconds
+- **Text-only**: Designed for simple text content (use Popover for rich content)
+- **Auto-positioning**: Arrow points to trigger element
+- **Portal rendering**: Proper z-index handling
+
+## Usage
+
+\`\`\`tsx
+import { Tooltip, Button } from 'notebook-ui';
+
+<Tooltip content="Click to save changes" position="top">
+  <Button>Save</Button>
+</Tooltip>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
   argTypes: {
+    content: {
+      control: 'text',
+      description: 'Tooltip text content',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
     position: {
       control: 'select',
       options: ['top', 'bottom', 'left', 'right'],
+      description: 'Tooltip position relative to trigger',
+      table: {
+        type: { summary: 'top | bottom | left | right' },
+        defaultValue: { summary: 'top' },
+      },
+    },
+    delay: {
+      control: 'number',
+      description: 'Show delay in milliseconds',
+      table: {
+        type: { summary: 'number' },
+        defaultValue: { summary: '200' },
+      },
+    },
+    children: {
+      description: 'Trigger element that shows tooltip on hover',
+      table: {
+        type: { summary: 'React.ReactElement' },
+      },
     },
   },
 } satisfies Meta<typeof Tooltip>;

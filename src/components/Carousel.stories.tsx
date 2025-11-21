@@ -7,8 +7,116 @@ const meta = {
   component: Carousel,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component: `
+Image/content carousel with auto-play, touch swipe, and keyboard navigation.
+
+## Features
+- **Auto-play**: Automatic slide progression with configurable interval
+- **Touch swipe**: Mobile-friendly swipe gestures
+- **Keyboard navigation**: Arrow keys for slide control
+- **Navigation arrows**: Optional previous/next buttons
+- **Dot indicators**: Visual slide position indicators
+- **Infinite loop**: Optional continuous looping
+- **Multi-item view**: Display multiple slides at once
+- **Custom gap**: Configurable spacing between slides
+- **Pause on hover**: Auto-play pauses when hovering
+
+## Usage
+
+\`\`\`tsx
+import { Carousel, CarouselItem } from 'notebook-ui';
+
+const slides: CarouselItem[] = [
+  { id: '1', content: <img src="slide1.jpg" /> },
+  { id: '2', content: <img src="slide2.jpg" /> },
+  { id: '3', content: <img src="slide3.jpg" /> },
+];
+
+{/* Auto-play carousel */}
+<Carousel
+  items={slides}
+  autoPlay={3000}
+  loop={true}
+/>
+
+{/* Multi-item carousel */}
+<Carousel
+  items={products}
+  itemsPerView={3}
+  gap={24}
+  showArrows={true}
+  showDots={true}
+/>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    items: {
+      description: 'Array of carousel items with id and content',
+      table: {
+        type: { summary: 'CarouselItem[]' },
+      },
+    },
+    autoPlay: {
+      control: 'number',
+      description: 'Auto-play interval in milliseconds (0 to disable)',
+      table: {
+        type: { summary: 'number' },
+        defaultValue: { summary: '0' },
+      },
+    },
+    showArrows: {
+      control: 'boolean',
+      description: 'Show navigation arrows',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    showDots: {
+      control: 'boolean',
+      description: 'Show dot indicators',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    loop: {
+      control: 'boolean',
+      description: 'Enable infinite loop',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    onSlideChange: {
+      description: 'Callback when slide changes',
+      table: {
+        type: { summary: '(index: number) => void' },
+      },
+    },
+    itemsPerView: {
+      control: 'number',
+      description: 'Number of items to display simultaneously',
+      table: {
+        type: { summary: 'number' },
+        defaultValue: { summary: '1' },
+      },
+    },
+    gap: {
+      control: 'number',
+      description: 'Gap between items in pixels',
+      table: {
+        type: { summary: 'number' },
+        defaultValue: { summary: '16' },
+      },
+    },
+  },
   decorators: [
     (Story) => (
       <div style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem' }}>

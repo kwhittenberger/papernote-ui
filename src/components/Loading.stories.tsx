@@ -6,16 +6,60 @@ const meta = {
   component: Loading,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+Loading indicator component with multiple variants for displaying async operations.
+
+## Features
+- **Variants**: spinner, dots, bar for different loading styles
+- **Sizes**: sm, md, lg with consistent scaling
+- **Text support**: Optional loading message
+- **Skeleton loaders**: SkeletonCard, SkeletonTable for content placeholders
+- **Smooth animations**: Built-in spinning/bouncing/shimmer effects
+
+## Usage
+
+\`\`\`tsx
+import { Loading, Skeleton, SkeletonCard } from 'notebook-ui';
+
+// Spinner
+<Loading variant="spinner" size="md" text="Loading..." />
+
+// Skeleton placeholder
+<Skeleton className="h-4 w-48 mb-2" />
+<SkeletonCard />
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
   argTypes: {
     variant: {
       control: 'select',
-      options: ['spinner', 'dots', 'pulse'],
+      options: ['spinner', 'dots', 'bar'],
+      description: 'Loading animation style',
+      table: {
+        type: { summary: 'spinner | dots | bar' },
+        defaultValue: { summary: 'spinner' },
+      },
     },
     size: {
       control: 'select',
       options: ['sm', 'md', 'lg'],
+      description: 'Loading indicator size',
+      table: {
+        type: { summary: 'sm | md | lg' },
+        defaultValue: { summary: 'md' },
+      },
+    },
+    text: {
+      control: 'text',
+      description: 'Optional loading text displayed below indicator',
+      table: {
+        type: { summary: 'string' },
+      },
     },
   },
 } satisfies Meta<typeof Loading>;

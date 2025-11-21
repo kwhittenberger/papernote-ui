@@ -11,8 +11,108 @@ const meta = {
   component: AppLayout,
   parameters: {
     layout: 'fullscreen',
+    docs: {
+      description: {
+        component: `
+Full application layout with expandable toolbar and status bar.
+
+## Features
+- **Expandable Toolbar**: Collapsible toolbar with multiple sections
+- **Status Bar**: Global status bar at bottom of viewport
+- **Optional Elements**: Toggle toolbar and status bar visibility
+- **Controlled State**: External toolbar collapse control
+- **Toolbar Sections**: Organize actions into logical groups
+- **Keyboard Shortcuts**: Display shortcuts for toolbar actions
+
+## Usage
+
+\`\`\`tsx
+import { AppLayout } from 'notebook-ui';
+import { ToolbarSection } from 'notebook-ui';
+import { Save, Download, Copy } from 'lucide-react';
+
+const toolbarSections: ToolbarSection[] = [
+  {
+    id: 'file',
+    label: 'File',
+    items: [
+      { id: 'save', label: 'Save', icon: <Save />, onClick: handleSave, shortcut: 'Ctrl+S' },
+      { id: 'download', label: 'Download', icon: <Download />, onClick: handleDownload },
+    ],
+  },
+  {
+    id: 'edit',
+    label: 'Edit',
+    items: [
+      { id: 'copy', label: 'Copy', icon: <Copy />, onClick: handleCopy },
+    ],
+  },
+];
+
+<AppLayout
+  toolbarSections={toolbarSections}
+  showToolbar={true}
+  showStatusBar={true}
+>
+  {/* Your app content */}
+</AppLayout>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    children: {
+      description: 'Main application content',
+      table: {
+        type: { summary: 'React.ReactNode' },
+      },
+    },
+    toolbarSections: {
+      description: 'Array of toolbar sections with grouped action items',
+      table: {
+        type: { summary: 'ToolbarSection[]' },
+      },
+    },
+    showToolbar: {
+      control: 'boolean',
+      description: 'Show expandable toolbar',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    showStatusBar: {
+      control: 'boolean',
+      description: 'Show status bar at bottom',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    toolbarCollapsed: {
+      control: 'boolean',
+      description: 'Control toolbar collapsed state',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    onToolbarCollapseChange: {
+      description: 'Callback when toolbar collapse state changes',
+      table: {
+        type: { summary: '(collapsed: boolean) => void' },
+      },
+    },
+    className: {
+      control: 'text',
+      description: 'Additional CSS classes',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+  },
 } satisfies Meta<typeof AppLayout>;
 
 export default meta;

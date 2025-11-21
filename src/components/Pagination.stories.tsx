@@ -7,12 +7,82 @@ const meta = {
   component: Pagination,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+Pagination component for navigating through paginated data with page numbers and jump functionality.
+
+## Features
+- **Page numbers**: Configurable number of visible page buttons
+- **Smart ellipsis**: Automatic ... insertion for large page counts
+- **Previous/Next**: Navigation buttons with disabled states
+- **Page jump**: Optional input to jump to specific page
+- **Responsive**: Hides text labels on small screens
+- **ARIA support**: Proper labeling for accessibility
+
+## Usage
+
+\`\`\`tsx
+import { Pagination } from 'notebook-ui';
+
+<Pagination
+  currentPage={currentPage}
+  totalPages={50}
+  onPageChange={setCurrentPage}
+  showPageNumbers
+  maxPageNumbers={5}
+  showPageJump
+/>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
   argTypes: {
-    variant: {
-      control: 'select',
-      options: ['default', 'simple'],
+    currentPage: {
+      control: 'number',
+      description: 'Current active page (1-indexed)',
+      table: {
+        type: { summary: 'number' },
+      },
+    },
+    totalPages: {
+      control: 'number',
+      description: 'Total number of pages',
+      table: {
+        type: { summary: 'number' },
+      },
+    },
+    onPageChange: {
+      description: 'Callback fired when page changes',
+      table: {
+        type: { summary: '(page: number) => void' },
+      },
+    },
+    showPageNumbers: {
+      control: 'boolean',
+      description: 'Show individual page number buttons',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    maxPageNumbers: {
+      control: 'number',
+      description: 'Maximum number of page buttons to display',
+      table: {
+        type: { summary: 'number' },
+        defaultValue: { summary: '5' },
+      },
+    },
+    showPageJump: {
+      control: 'boolean',
+      description: 'Show "Go to page" input field',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
     },
   },
 } satisfies Meta<typeof Pagination>;

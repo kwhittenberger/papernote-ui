@@ -8,8 +8,101 @@ const meta = {
   component: Accordion,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component: `
+Expandable/collapsible content panels with single or multiple expansion modes.
+
+## Features
+- **Expansion modes**: Single accordion (one open at a time) or multiple (many open)
+- **Default state**: Control which items are initially expanded
+- **Custom icons**: Override expand/collapse indicators
+- **Step numbers**: Display numbered sequence instead of icons
+- **Rich content**: Support for any React content in panels
+- **Disabled items**: Prevent interaction with specific panels
+- **Controlled mode**: External state management support
+
+## Usage
+
+\`\`\`tsx
+import { Accordion, AccordionItem } from 'notebook-ui';
+import { Plus, Minus } from 'lucide-react';
+
+const items: AccordionItem[] = [
+  {
+    id: '1',
+    title: 'What is your return policy?',
+    content: 'We offer a 30-day return policy on all items.',
+  },
+  {
+    id: '2',
+    title: 'How long does shipping take?',
+    content: 'Standard shipping takes 5-7 business days.',
+  },
+];
+
+<Accordion
+  items={items}
+  defaultOpen={['1']}
+  allowMultiple={false}
+  expandIcon={<Plus />}
+  collapseIcon={<Minus />}
+/>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    items: {
+      description: 'Array of accordion items with id, title, content, optional icon and disabled state',
+      table: {
+        type: { summary: 'AccordionItem[]' },
+      },
+    },
+    allowMultiple: {
+      control: 'boolean',
+      description: 'Allow multiple panels to be open simultaneously',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    defaultOpen: {
+      description: 'Array of item IDs that should be initially expanded',
+      table: {
+        type: { summary: 'string[]' },
+        defaultValue: { summary: '[]' },
+      },
+    },
+    onChange: {
+      description: 'Callback fired when expansion state changes',
+      table: {
+        type: { summary: '(openItems: string[]) => void' },
+      },
+    },
+    expandIcon: {
+      description: 'Custom icon for collapsed state (replaces default ChevronDown)',
+      table: {
+        type: { summary: 'React.ReactNode' },
+      },
+    },
+    collapseIcon: {
+      description: 'Custom icon for expanded state (replaces rotated ChevronDown)',
+      table: {
+        type: { summary: 'React.ReactNode' },
+      },
+    },
+    showStepNumbers: {
+      control: 'boolean',
+      description: 'Show numbered sequence (1, 2, 3...) instead of icons',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+  },
   decorators: [
     (Story) => (
       <div style={{ maxWidth: '600px' }}>

@@ -12,8 +12,67 @@ const meta = {
   component: PageLayout,
   parameters: {
     layout: 'fullscreen',
+    docs: {
+      description: {
+        component: `
+Standardized page layout with title, description, and optional header content - wraps content in the Page component.
+
+## Features
+- **Consistent structure**: Title + description + content pattern
+- **Page wrapper**: Automatically includes notebook paper styling
+- **Header content**: Optional area above title for controls/breadcrumbs
+- **Typography**: Pre-styled title (2rem) and description (muted)
+- **Spacing**: Proper margins and padding throughout
+- **Composable**: Works inside Layout for complete app structure
+
+## Usage
+
+\`\`\`tsx
+import { PageLayout, Card } from 'notebook-ui';
+
+<PageLayout
+  title="Dashboard"
+  description="Overview of your data"
+  headerContent={<Button>Add Item</Button>}
+>
+  <Card>
+    <CardContent>Your content here</CardContent>
+  </Card>
+</PageLayout>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    title: {
+      control: 'text',
+      description: 'Page title displayed prominently at top',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    description: {
+      control: 'text',
+      description: 'Optional subtitle/description below title',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    headerContent: {
+      description: 'Optional content above title (breadcrumbs, actions, etc.)',
+      table: {
+        type: { summary: 'React.ReactNode' },
+      },
+    },
+    children: {
+      description: 'Main page content',
+      table: {
+        type: { summary: 'React.ReactNode' },
+      },
+    },
+  },
 } satisfies Meta<typeof PageLayout>;
 
 export default meta;

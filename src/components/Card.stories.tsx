@@ -9,8 +9,90 @@ const meta = {
   component: Card,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+Container component with paper aesthetic and subtle shadow for grouping related content.
+
+## Features
+- **Variants**: default (full padding/shadow), compact (reduced padding), flat (no shadow)
+- **Width presets**: sm, md, lg, xl, auto, full
+- **Interactive**: Optional onClick handler with hover effect
+- **Loading state**: Built-in skeleton loading display
+- **Composition**: Use with CardHeader, CardTitle, CardDescription, CardContent, CardFooter
+- **Paper texture**: Subtle grain background with border styling
+
+## Usage
+
+\`\`\`tsx
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from 'notebook-ui';
+import { Button } from 'notebook-ui';
+
+<Card variant="default" width="md">
+  <CardHeader>
+    <CardTitle>User Profile</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <p>Personal information and settings</p>
+  </CardContent>
+  <CardFooter>
+    <Button variant="primary">Save Changes</Button>
+  </CardFooter>
+</Card>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    variant: {
+      control: 'select',
+      options: ['default', 'compact', 'flat'],
+      description: 'Visual style variant affecting padding and shadow',
+      table: {
+        type: { summary: 'default | compact | flat' },
+        defaultValue: { summary: 'default' },
+      },
+    },
+    width: {
+      control: 'select',
+      options: ['sm', 'md', 'lg', 'xl', 'auto', 'full'],
+      description: 'Predefined width constraint (sm: 256px, md: 320px, lg: 384px, xl: 512px)',
+      table: {
+        type: { summary: 'sm | md | lg | xl | auto | full' },
+        defaultValue: { summary: 'auto' },
+      },
+    },
+    onClick: {
+      description: 'Click handler - makes card interactive with cursor pointer',
+      table: {
+        type: { summary: '() => void' },
+      },
+    },
+    hoverable: {
+      control: 'boolean',
+      description: 'Show hover effect without onClick handler',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    loading: {
+      control: 'boolean',
+      description: 'Show loading skeleton instead of content',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    className: {
+      description: 'Additional CSS classes',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+  },
   decorators: [
     (Story) => (
       <div style={{ minWidth: '400px' }}>

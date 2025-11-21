@@ -7,8 +7,155 @@ const meta = {
   component: Textarea,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+Multi-line text input component with validation, character counting, and auto-expansion.
+
+## Features
+- **Auto-expand**: Automatically grow height based on content
+- **Resize control**: none, vertical, horizontal, both
+- **Character counter**: Display current/max length
+- **Validation states**: error, success, warning with icons
+- **Helper text**: Additional context below textarea
+- **Custom rows**: Control initial height
+- **Min/Max rows**: Constrain auto-expansion bounds
+
+## Usage
+
+\`\`\`tsx
+import { Textarea } from 'notebook-ui';
+
+<Textarea
+  label="Description"
+  value={description}
+  onChange={(e) => setDescription(e.target.value)}
+  autoExpand
+  maxLength={500}
+  showCharCount
+  helperText="Provide a detailed description"
+/>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    label: {
+      control: 'text',
+      description: 'Label text above textarea',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    placeholder: {
+      control: 'text',
+      description: 'Placeholder text when textarea is empty',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    rows: {
+      control: 'number',
+      description: 'Initial number of visible text rows',
+      table: {
+        type: { summary: 'number' },
+        defaultValue: { summary: '4' },
+      },
+    },
+    helperText: {
+      control: 'text',
+      description: 'Helper text displayed below textarea',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    validationState: {
+      control: 'select',
+      options: ['error', 'success', 'warning', null],
+      description: 'Visual validation state with colored border',
+      table: {
+        type: { summary: 'error | success | warning | null' },
+      },
+    },
+    validationMessage: {
+      control: 'text',
+      description: 'Validation message (overrides helperText when present)',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    maxLength: {
+      control: 'number',
+      description: 'Maximum character length',
+      table: {
+        type: { summary: 'number' },
+      },
+    },
+    showCharCount: {
+      control: 'boolean',
+      description: 'Show character counter',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    autoExpand: {
+      control: 'boolean',
+      description: 'Auto-expand textarea height based on content',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    minRows: {
+      control: 'number',
+      description: 'Minimum rows when auto-expanding',
+      table: {
+        type: { summary: 'number' },
+        defaultValue: { summary: '2' },
+      },
+    },
+    maxRows: {
+      control: 'number',
+      description: 'Maximum rows when auto-expanding',
+      table: {
+        type: { summary: 'number' },
+        defaultValue: { summary: '10' },
+      },
+    },
+    resize: {
+      control: 'select',
+      options: ['none', 'vertical', 'horizontal', 'both'],
+      description: 'Resize behavior (overridden to none when autoExpand is true)',
+      table: {
+        type: { summary: 'none | vertical | horizontal | both' },
+        defaultValue: { summary: 'vertical' },
+      },
+    },
+    required: {
+      control: 'boolean',
+      description: 'Mark textarea as required with red asterisk',
+      table: {
+        type: { summary: 'boolean' },
+      },
+    },
+    disabled: {
+      control: 'boolean',
+      description: 'Disable the textarea',
+      table: {
+        type: { summary: 'boolean' },
+      },
+    },
+    readOnly: {
+      control: 'boolean',
+      description: 'Make textarea read-only',
+      table: {
+        type: { summary: 'boolean' },
+      },
+    },
+  },
   decorators: [
     (Story) => (
       <div style={{ minWidth: '500px' }}>
@@ -16,12 +163,6 @@ const meta = {
       </div>
     ),
   ],
-  argTypes: {
-    resize: {
-      control: 'select',
-      options: ['none', 'vertical', 'horizontal', 'both'],
-    },
-  },
 } satisfies Meta<typeof Textarea>;
 
 export default meta;

@@ -8,16 +8,174 @@ const meta = {
   component: Input,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+Text input component with validation, icons, prefixes/suffixes, and advanced features.
+
+## Features
+- **Sizes**: sm, md, lg with consistent height scaling
+- **Validation states**: error, success, warning with icons and messages
+- **Icons**: prefixIcon and suffixIcon support
+- **Prefixes/Suffixes**: Text prefixes (https://) and suffixes (.com)
+- **Password toggle**: Built-in show/hide password button
+- **Character counter**: Display current/max length
+- **Clearable**: X button to clear input value
+- **Loading state**: Spinner indicator for async operations
+- **Helper text**: Additional context below input
+
+## Usage
+
+\`\`\`tsx
+import { Input } from 'notebook-ui';
+import { Mail } from 'lucide-react';
+
+<Input
+  label="Email"
+  type="email"
+  prefixIcon={<Mail className="h-5 w-5" />}
+  placeholder="you@example.com"
+  required
+  helperText="We'll never share your email"
+/>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
   argTypes: {
-    size: {
-      control: 'select',
-      options: ['sm', 'md', 'lg'],
+    label: {
+      control: 'text',
+      description: 'Input label text displayed above the input',
+      table: {
+        type: { summary: 'string' },
+      },
     },
     type: {
       control: 'select',
       options: ['text', 'email', 'password', 'number', 'tel', 'url'],
+      description: 'HTML input type',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: 'text' },
+      },
+    },
+    size: {
+      control: 'select',
+      options: ['sm', 'md', 'lg'],
+      description: 'Input size affecting height and padding',
+      table: {
+        type: { summary: 'sm | md | lg' },
+        defaultValue: { summary: 'md' },
+      },
+    },
+    placeholder: {
+      control: 'text',
+      description: 'Placeholder text shown when input is empty',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    helperText: {
+      control: 'text',
+      description: 'Helper text displayed below input',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    validationState: {
+      control: 'select',
+      options: ['error', 'success', 'warning', null],
+      description: 'Visual validation state with colored border and icon',
+      table: {
+        type: { summary: 'error | success | warning | null' },
+      },
+    },
+    validationMessage: {
+      control: 'text',
+      description: 'Validation message (overrides helperText when present)',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    prefixIcon: {
+      description: 'Icon displayed inside input before value',
+      table: {
+        type: { summary: 'React.ReactNode' },
+      },
+    },
+    suffixIcon: {
+      description: 'Icon displayed inside input after value',
+      table: {
+        type: { summary: 'React.ReactNode' },
+      },
+    },
+    prefix: {
+      control: 'text',
+      description: 'Text prefix displayed inside input before value (e.g., "https://")',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    suffix: {
+      control: 'text',
+      description: 'Text suffix displayed inside input after value (e.g., ".com")',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    showPasswordToggle: {
+      control: 'boolean',
+      description: 'Show password visibility toggle (only for type="password")',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    clearable: {
+      control: 'boolean',
+      description: 'Show clearable button to clear input value',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    showCount: {
+      control: 'boolean',
+      description: 'Show character counter (requires maxLength prop)',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    maxLength: {
+      control: 'number',
+      description: 'Maximum character length',
+      table: {
+        type: { summary: 'number' },
+      },
+    },
+    required: {
+      control: 'boolean',
+      description: 'Mark input as required with red asterisk',
+      table: {
+        type: { summary: 'boolean' },
+      },
+    },
+    disabled: {
+      control: 'boolean',
+      description: 'Disable the input',
+      table: {
+        type: { summary: 'boolean' },
+      },
+    },
+    readOnly: {
+      control: 'boolean',
+      description: 'Make input read-only',
+      table: {
+        type: { summary: 'boolean' },
+      },
     },
   },
   decorators: [

@@ -7,8 +7,77 @@ const meta = {
   component: Alert,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component: `
+Alert banner for displaying important messages with contextual styling and actions.
+
+## Features
+- **Variants**: info, success, warning, error with semantic colors
+- **Icons**: Automatic variant-specific icons
+- **Title & Message**: Optional title with message content
+- **Dismissible**: Optional close button
+- **Action buttons**: Primary and secondary action buttons
+- **Accessible**: Proper ARIA role and semantic markup
+
+## Usage
+
+\`\`\`tsx
+import { Alert } from 'notebook-ui';
+
+<Alert
+  variant="warning"
+  title="Unsaved Changes"
+  onClose={handleDismiss}
+  actions={[
+    { label: 'Save', onClick: handleSave, variant: 'primary' },
+    { label: 'Discard', onClick: handleDiscard, variant: 'secondary' }
+  ]}
+>
+  You have unsaved changes that will be lost.
+</Alert>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
+  argTypes: {
+    variant: {
+      control: 'select',
+      options: ['info', 'success', 'warning', 'error'],
+      description: 'Alert variant with semantic colors and icons',
+      table: {
+        type: { summary: 'info | success | warning | error' },
+        defaultValue: { summary: 'info' },
+      },
+    },
+    title: {
+      control: 'text',
+      description: 'Alert title (optional)',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    children: {
+      description: 'Alert message content',
+      table: {
+        type: { summary: 'React.ReactNode' },
+      },
+    },
+    onClose: {
+      description: 'Callback when close button is clicked (enables dismiss button)',
+      table: {
+        type: { summary: '() => void' },
+      },
+    },
+    actions: {
+      description: 'Action buttons to display at the bottom of the alert',
+      table: {
+        type: { summary: 'AlertAction[]' },
+      },
+    },
+  },
   decorators: [
     (Story) => (
       <div style={{ minWidth: '600px' }}>
@@ -16,12 +85,6 @@ const meta = {
       </div>
     ),
   ],
-  argTypes: {
-    variant: {
-      control: 'select',
-      options: ['info', 'success', 'warning', 'error'],
-    },
-  },
 } satisfies Meta<typeof Alert>;
 
 export default meta;

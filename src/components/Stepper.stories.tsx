@@ -7,12 +7,86 @@ const meta = {
   component: Stepper,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component: `
+Multi-step process indicator for wizards and sequential workflows with progress tracking.
+
+## Features
+- **Orientation**: horizontal or vertical layout
+- **Progress tracking**: Visual indicators for completed steps
+- **Active step highlighting**: Clearly shows current step
+- **Step descriptions**: Optional subtitle text for each step
+- **Clickable navigation**: Allow users to jump between steps
+- **Customizable**: Control which steps are clickable based on completion
+
+## Usage
+
+\`\`\`tsx
+import { Stepper } from 'notebook-ui';
+
+const steps = [
+  { id: '1', label: 'Account', description: 'Create your account' },
+  { id: '2', label: 'Profile', description: 'Complete your profile' },
+  { id: '3', label: 'Complete', description: 'All done!' },
+];
+
+<Stepper
+  steps={steps}
+  activeStep="2"
+  completedSteps={['1']}
+  clickable
+  onStepClick={setActiveStep}
+/>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
   argTypes: {
+    steps: {
+      description: 'Array of step configurations with id, label, and optional description',
+      table: {
+        type: { summary: 'StepConfig[]' },
+      },
+    },
+    activeStep: {
+      control: 'text',
+      description: 'ID of the currently active step',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    completedSteps: {
+      description: 'Array of completed step IDs',
+      table: {
+        type: { summary: 'string[]' },
+        defaultValue: { summary: '[]' },
+      },
+    },
     orientation: {
       control: 'select',
       options: ['horizontal', 'vertical'],
+      description: 'Layout orientation',
+      table: {
+        type: { summary: 'horizontal | vertical' },
+        defaultValue: { summary: 'horizontal' },
+      },
+    },
+    clickable: {
+      control: 'boolean',
+      description: 'Allow clicking steps to navigate',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    onStepClick: {
+      description: 'Callback when a step is clicked (requires clickable=true)',
+      table: {
+        type: { summary: '(stepId: string) => void' },
+      },
     },
   },
   decorators: [
