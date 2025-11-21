@@ -7,7 +7,17 @@
 
 A modern React component library with a paper notebook aesthetic - minimal, professional, and expressive. Built with TypeScript, Tailwind CSS, and designed for production use.
 
-**[📖 Live Demo (Storybook)](https://691fcf89b3393605ea470e93-rzwuumklem.chromatic.com/)** • **[📦 npm Package](https://www.npmjs.com/package/@papernote/ui)** • **[💬 GitHub](https://github.com/kwhittenberger/papernote-ui)**
+## 📖 Documentation
+
+**[📚 View Full Documentation →](https://kwhittenberger.github.io/papernote-ui/)**
+
+- **[🚀 Getting Started](https://kwhittenberger.github.io/papernote-ui/getting-started)** - Installation and setup guide
+- **[📦 Components](https://kwhittenberger.github.io/papernote-ui/components/)** - Browse all 115+ components
+- **[🎨 Design System](https://kwhittenberger.github.io/papernote-ui/design-system)** - Colors, typography, and design tokens
+- **[🧪 Testing Guide](https://kwhittenberger.github.io/papernote-ui/development/testing-guide)** - Writing tests for components
+- **[🤝 Contributing](https://kwhittenberger.github.io/papernote-ui/development/contributing)** - How to contribute
+
+> **Quick Links:** **[🎨 Storybook](https://691fcf89b3393605ea470e93-rzwuumklem.chromatic.com/)** • **[📦 npm](https://www.npmjs.com/package/@papernote/ui)**
 
 ## ✨ Features
 
