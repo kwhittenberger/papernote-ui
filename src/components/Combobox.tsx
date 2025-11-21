@@ -2,7 +2,7 @@
 // This file is part of the notebook-ui component library.
 // Proprietary and confidential. Unauthorized copying or distribution is prohibited.
 
-import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle, useId } from 'react';
 import { Check, ChevronDown, Search, X, Plus } from 'lucide-react';
 
 export interface ComboboxHandle {
@@ -105,6 +105,11 @@ const Combobox = forwardRef<ComboboxHandle, ComboboxProps>(({
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
+  
+  // Generate unique IDs for ARIA
+  const labelId = useId();
+  const listboxId = useId();
+  const descriptionId = useId();
 
   // Expose methods via ref
   useImperativeHandle(ref, () => ({
@@ -276,7 +281,7 @@ const Combobox = forwardRef<ComboboxHandle, ComboboxProps>(({
     <div className={`relative ${className}`} ref={containerRef}>
       {/* Label */}
       {label && (
-        <label className="block text-sm font-medium text-ink-700 mb-1">
+        <label id={labelId} className="block text-sm font-medium text-ink-700 mb-1">
           {label}
           {required && <span className="text-error-500 ml-1">*</span>}
         </label>
@@ -302,11 +307,14 @@ const Combobox = forwardRef<ComboboxHandle, ComboboxProps>(({
               focus:outline-none focus:ring-2
               pr-20
             `}
-            aria-label={label || 'Combobox'}
+            aria-labelledby={label ? labelId : undefined}
+            aria-label={!label ? 'Combobox' : undefined}
             aria-expanded={isOpen}
             aria-autocomplete="list"
-            aria-controls="combobox-options"
-            aria-activedescendant={isOpen ? `option-${highlightedIndex}` : undefined}
+            aria-controls={listboxId}
+            aria-activedescendant={isOpen && filteredOptions.length > 0 ? `option-${highlightedIndex}` : undefined}
+            aria-invalid={validationState === 'error' ? 'true' : undefined}
+            aria-describedby={validationMessage ? descriptionId : undefined}
             role="combobox"
           />
 
@@ -336,9 +344,14 @@ const Combobox = forwardRef<ComboboxHandle, ComboboxProps>(({
       </div>
 
       {/* Helper text or validation message */}
-      {(helperText || validationMessage) && (
-        <p className={`mt-1 text-xs ${validationState ? validationMessageColors[validationState] : 'text-ink-500'}`}>
-          {validationMessage || helperText}
+      {validationMessage && (
+        <p id={descriptionId} className={`mt-1 text-xs ${validationState ? validationMessageColors[validationState] : 'text-ink-500'}`} role="alert" aria-live="polite">
+          {validationMessage}
+        </p>
+      )}
+      {helperText && !validationMessage && (
+        <p className="mt-1 text-xs text-ink-500">
+          {helperText}
         </p>
       )}
 
@@ -347,14 +360,15 @@ const Combobox = forwardRef<ComboboxHandle, ComboboxProps>(({
         <div
           className="absolute z-50 mt-1 w-full bg-white rounded-md shadow-lg border border-paper-200 max-h-60 overflow-auto"
           role="listbox"
-          id="combobox-options"
+          id={listboxId}
+          aria-label="Available options"
         >
           {loading ? (
-            <div className="px-4 py-8 text-center text-ink-500 text-sm">
+            <div className="px-4 py-8 text-center text-ink-500 text-sm" role="status" aria-live="polite">
               Loading...
             </div>
           ) : filteredOptions.length === 0 && !canCreateOption ? (
-            <div className="px-4 py-8 text-center text-ink-500 text-sm">
+            <div className="px-4 py-8 text-center text-ink-500 text-sm" role="status" aria-live="polite">
               No options found
             </div>
           ) : (

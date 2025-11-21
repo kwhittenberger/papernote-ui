@@ -2,7 +2,7 @@
 // This file is part of the notebook-ui component library.
 // Proprietary and confidential. Unauthorized copying or distribution is prohibited.
 
-import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { useState, useRef, useEffect, forwardRef, useImperativeHandle, useId } from 'react';
 import { Clock, ChevronUp, ChevronDown, X } from 'lucide-react';
 
 export interface TimePickerHandle {
@@ -99,6 +99,11 @@ const TimePicker = forwardRef<TimePickerHandle, TimePickerProps>(({
   const [timeValue, setTimeValue] = useState<TimeValue>(() => parseTimeString(value, use12Hour));
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  // Generate unique IDs for ARIA
+  const labelId = useId();
+  const dropdownId = useId();
+  const descriptionId = useId();
 
   // Expose methods via ref
   useImperativeHandle(ref, () => ({
@@ -258,7 +263,7 @@ const TimePicker = forwardRef<TimePickerHandle, TimePickerProps>(({
     <div className={`relative ${className}`} ref={containerRef}>
       {/* Label */}
       {label && (
-        <label className="block text-sm font-medium text-ink-700 mb-1">
+        <label id={labelId} className="block text-sm font-medium text-ink-700 mb-1">
           {label}
           {required && <span className="text-error-500 ml-1">*</span>}
         </label>
@@ -283,9 +288,14 @@ const TimePicker = forwardRef<TimePickerHandle, TimePickerProps>(({
             focus:outline-none focus:ring-2
             pr-20
           `}
-          aria-label={label || 'Time picker'}
+          aria-labelledby={label ? labelId : undefined}
+          aria-label={!label ? 'Time picker' : undefined}
           aria-expanded={isOpen}
-          role="button"
+          aria-haspopup="dialog"
+          aria-controls={dropdownId}
+          aria-invalid={validationState === 'error' ? 'true' : undefined}
+          aria-describedby={validationMessage ? descriptionId : undefined}
+          role="combobox"
         />
 
         {/* Icons */}
@@ -309,15 +319,20 @@ const TimePicker = forwardRef<TimePickerHandle, TimePickerProps>(({
       </div>
 
       {/* Helper text or validation message */}
-      {(helperText || validationMessage) && (
-        <p className={`mt-1 text-xs ${validationState ? validationMessageColors[validationState] : 'text-ink-500'}`}>
-          {validationMessage || helperText}
+      {validationMessage && (
+        <p id={descriptionId} className={`mt-1 text-xs ${validationState ? validationMessageColors[validationState] : 'text-ink-500'}`} role="alert" aria-live="polite">
+          {validationMessage}
+        </p>
+      )}
+      {helperText && !validationMessage && (
+        <p className="mt-1 text-xs text-ink-500">
+          {helperText}
         </p>
       )}
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute z-50 mt-1 bg-white rounded-md shadow-lg border border-paper-200">
+        <div id={dropdownId} className="absolute z-50 mt-1 bg-white rounded-md shadow-lg border border-paper-200" role="dialog" aria-modal="true" aria-label="Time selection">
           <div className="p-4 flex items-center gap-4">
             {/* Hours */}
             <TimeSpinner

@@ -317,7 +317,8 @@ function ActionMenu<T>({
           e.stopPropagation();
           setIsOpen(!isOpen);
         }}
-        className="flex items-center justify-center w-8 h-8 text-ink-600 hover:text-ink-900 hover:bg-paper-100 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-accent-400"
+        className="flex items-center justify-center w-7 h-7 text-ink-600 hover:text-ink-900 hover:bg-paper-100 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-accent-400"
+        style={{ padding: 0 }}
         aria-label="Actions"
       >
         <MoreVertical className="h-5 w-5" />
@@ -1013,12 +1014,18 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
             </td>
           )}
         {allActions.length > 0 && (
-          <td 
-            className="sticky left-0 px-0 py-1.5 whitespace-nowrap shadow-[4px_0_6px_-2px_rgba(0,0,0,0.1)] z-10"
-            style={{ width: '28px', backgroundColor: 'inherit' }}
+          <td
+            className="sticky left-0 whitespace-nowrap shadow-[4px_0_6px_-2px_rgba(0,0,0,0.1)] z-10"
+            style={{
+              width: '28px',
+              padding: '0',
+              backgroundColor: 'inherit',
+              verticalAlign: 'middle'
+            }}
             onClick={(e) => e.stopPropagation()}
+            rowSpan={visibleColumns.some(col => !!col.renderSecondary) ? 2 : 1}
           >
-            <div className="flex items-center justify-center">
+            <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '28px' }}>
               <ActionMenu actions={allActions} item={item} />
             </div>
           </td>
@@ -1049,7 +1056,7 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
               <tr className={`secondary-row ${hoverClass} border-b ${borderColor}`}>
                 {selectable && <td className={`sticky left-0 bg-white ${currentDensity.cell} py-0.5 z-10 ${bordered ? `border ${borderColor}` : ''}`}></td>}
                 {((expandable || expandedRowConfig) && showExpandChevron) && <td className={`sticky left-0 bg-white px-2 py-0.5 z-10 ${bordered ? `border ${borderColor}` : ''}`}></td>}
-                {allActions.length > 0 && <td className={`sticky left-0 px-0.5 py-0.5 z-10 ${bordered ? `border ${borderColor}` : ''}`} style={{ width: '28px', backgroundColor: 'inherit' }}></td>}
+                {/* Actions column uses rowspan from primary row, no cell needed here */}
                 {visibleColumns.map((column) => {
                   const columnKey = String(column.key);
                   const dynamicWidth = columnWidths[columnKey];

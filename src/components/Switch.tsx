@@ -1,7 +1,7 @@
 // Copyright (c) 2025 kwhittenberger. All rights reserved.
 // This file is part of the Commissions Management System (CMMS).
 // Proprietary and confidential. Unauthorized copying or distribution is prohibited.
-import { forwardRef } from 'react';
+import { forwardRef, useId } from 'react';
 import { Loader2 } from 'lucide-react';
 
 export interface SwitchProps {
@@ -24,6 +24,11 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(({
   size = 'md',
   loading = false,
 }, ref) => {
+  // Generate unique IDs for ARIA
+  const switchId = useId();
+  const labelId = label ? `${switchId}-label` : undefined;
+  const descId = description ? `${switchId}-desc` : undefined;
+  
   const sizeStyles = {
     sm: {
       switch: 'w-9 h-5',
@@ -55,15 +60,22 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(({
   };
 
   return (
-    <label className={`flex items-center gap-3 ${isDisabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}>
+    <label htmlFor={switchId} className={`flex items-center gap-3 ${isDisabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}>
       {/* Switch */}
       <div className="relative inline-block flex-shrink-0">
         <input
           ref={ref}
+          id={switchId}
           type="checkbox"
+          role="switch"
           checked={checked}
           onChange={handleChange}
           disabled={isDisabled}
+          aria-checked={checked}
+          aria-labelledby={labelId}
+          aria-describedby={descId}
+          aria-disabled={isDisabled}
+          aria-busy={loading}
           className="sr-only"
         />
         <div
@@ -89,8 +101,8 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(({
       {/* Label */}
       {(label || description) && (
         <div className="flex-1">
-          {label && <p className="text-sm font-medium text-ink-900">{label}</p>}
-          {description && <p className="text-xs text-ink-600 mt-0.5">{description}</p>}
+          {label && <p id={labelId} className="text-sm font-medium text-ink-900">{label}</p>}
+          {description && <p id={descId} className="text-xs text-ink-600 mt-0.5">{description}</p>}
         </div>
       )}
     </label>

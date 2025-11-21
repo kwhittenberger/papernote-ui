@@ -1,7 +1,7 @@
 // Copyright (c) 2025 kwhittenberger. All rights reserved.
 // This file is part of the Commissions Management System (CMMS).
 // Proprietary and confidential. Unauthorized copying or distribution is prohibited.
-import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle, useId } from 'react';
 import { Check, ChevronDown, Search, Loader2, X } from 'lucide-react';
 
 export interface SelectOption {
@@ -52,32 +52,41 @@ export interface SelectProps {
   virtualItemHeight?: number;
 }
 
-const Select = forwardRef<SelectHandle, SelectProps>(({
-  options = [],
-  groups = [],
-  value,
-  onChange,
-  placeholder = 'Select an option',
-  searchable = false,
-  disabled = false,
-  label,
-  helperText,
-  error,
-  loading = false,
-  clearable = false,
-  creatable = false,
-  onCreateOption,
-  virtualized = false,
-  virtualHeight = '300px',
-  virtualItemHeight = 42,
-}, ref) {
+const Select = forwardRef<SelectHandle, SelectProps>(
+  (props, ref) => {
+  const {
+    options = [],
+    groups = [],
+    value,
+    onChange,
+    placeholder = 'Select an option',
+    searchable = false,
+    disabled = false,
+    label,
+    helperText,
+    error,
+    loading = false,
+    clearable = false,
+    creatable = false,
+    onCreateOption,
+    virtualized = false,
+    virtualHeight = '300px',
+    virtualItemHeight = 42,
+  } = props;
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [scrollTop, setScrollTop] = useState(0);
+  const [activeDescendant] = useState<string | undefined>(undefined);
   const selectRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  
+  // Generate unique IDs for ARIA
+  const labelId = useId();
+  const listboxId = useId();
+  const errorId = useId();
+  const helperTextId = useId();
 
   // Expose methods via ref
   useImperativeHandle(ref, () => ({
@@ -207,7 +216,7 @@ const Select = forwardRef<SelectHandle, SelectProps>(({
     <div className="w-full">
       {/* Label */}
       {label && (
-        <label className="label">
+        <label id={labelId} className="label">
           {label}
         </label>
       )}
@@ -225,8 +234,16 @@ const Select = forwardRef<SelectHandle, SelectProps>(({
             ${error ? 'border-error-400 focus:border-error-400 focus:ring-error-400' : ''}
             ${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}
           `}
+          role="combobox"
           aria-haspopup="listbox"
           aria-expanded={isOpen}
+          aria-controls={listboxId}
+          aria-labelledby={label ? labelId : undefined}
+          aria-label={!label ? placeholder : undefined}
+          aria-activedescendant={activeDescendant}
+          aria-invalid={error ? 'true' : undefined}
+          aria-describedby={error ? errorId : (helperText ? helperTextId : undefined)}
+          aria-disabled={disabled}
         >
           <span className={`flex items-center gap-2 ${selectedOption ? 'text-ink-800' : 'text-ink-400'}`}>
             {loading && <Loader2 className="h-4 w-4 animate-spin text-ink-500" />}
@@ -267,6 +284,10 @@ const Select = forwardRef<SelectHandle, SelectProps>(({
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search..."
                     className="w-full pl-9 pr-3 py-2 text-sm border border-paper-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-accent-400"
+                    role="searchbox"
+                    aria-label="Search options"
+                    aria-autocomplete="list"
+                    aria-controls={listboxId}
                   />
                 </div>
               </div>
@@ -275,18 +296,21 @@ const Select = forwardRef<SelectHandle, SelectProps>(({
             {/* Options List */}
             <div
               ref={listRef}
+              id={listboxId}
               className="overflow-y-auto"
               style={{ maxHeight: useVirtualScrolling ? virtualHeight : '12rem' }}
               onScroll={(e) => useVirtualScrolling && setScrollTop(e.currentTarget.scrollTop)}
               role="listbox"
+              aria-label="Available options"
+              aria-multiselectable="false"
             >
               {loading ? (
-                <div className="px-4 py-8 flex items-center justify-center">
+                <div className="px-4 py-8 flex items-center justify-center" role="status" aria-live="polite">
                   <Loader2 className="h-5 w-5 animate-spin text-ink-500" />
                   <span className="ml-2 text-sm text-ink-500">Loading...</span>
                 </div>
               ) : filteredOptions.length === 0 && filteredGroups.length === 0 && !showCreateOption ? (
-                <div className="px-4 py-3 text-sm text-ink-500 text-center">
+                <div className="px-4 py-3 text-sm text-ink-500 text-center" role="status" aria-live="polite">
                   No options found
                 </div>
               ) : (
@@ -411,9 +435,14 @@ const Select = forwardRef<SelectHandle, SelectProps>(({
       </div>
 
       {/* Helper Text or Error */}
-      {(helperText || error) && (
-        <p className={`mt-2 text-xs ${error ? 'text-error-600' : 'text-ink-600'}`}>
-          {error || helperText}
+      {error && (
+        <p id={errorId} className="mt-2 text-xs text-error-600" role="alert" aria-live="assertive">
+          {error}
+        </p>
+      )}
+      {helperText && !error && (
+        <p id={helperTextId} className="mt-2 text-xs text-ink-600">
+          {helperText}
         </p>
       )}
     </div>

@@ -6,7 +6,11 @@
       "Bash(npm run build:*)",
       "mcp__filesystem__write_file",
       "mcp__filesystem__edit_file",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git push)",
+      "Bash(cat:*)",
+      "Bash(npm run lint)",
+      "Bash(npm install:*)"
     ],
     "deny": [],
     "ask": []

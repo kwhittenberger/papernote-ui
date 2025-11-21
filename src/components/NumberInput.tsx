@@ -1,4 +1,4 @@
-import { useState, useEffect, forwardRef } from 'react';
+import { useState, useEffect, forwardRef, useId } from 'react';
 import { Plus, Minus } from 'lucide-react';
 
 export interface NumberInputProps {
@@ -43,30 +43,38 @@ const sizeClasses = {
   },
 };
 
-const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(({
-  value = 0,
-  onChange,
-  min,
-  max,
-  step = 1,
-  disabled = false,
-  readOnly = false,
-  label,
-  helperText,
-  error,
-  required = false,
-  size = 'md',
-  className = '',
-  placeholder,
-  id,
-  name,
-  precision,
-  formatValue,
-}, ref) {
+const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
+  (props, ref) => {
+  const {
+    value = 0,
+    onChange,
+    min,
+    max,
+    step = 1,
+    disabled = false,
+    readOnly = false,
+    label,
+    helperText,
+    error,
+    required = false,
+    size = 'md',
+    className = '',
+    placeholder,
+    id,
+    name,
+    precision,
+    formatValue,
+  } = props;
   const [internalValue, setInternalValue] = useState<string>(String(value));
   const [isFocused, setIsFocused] = useState(false);
 
   const sizeStyle = sizeClasses[size];
+  
+  // Generate unique IDs for ARIA
+  const uniqueId = useId();
+  const inputId = id || uniqueId;
+  const errorId = `${inputId}-error`;
+  const helperId = `${inputId}-helper`;
 
   useEffect(() => {
     setInternalValue(String(value));
@@ -178,6 +186,8 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(({
             ${error ? 'border-error-500' : ''}
           `}
           aria-label="Decrease value"
+          aria-controls={inputId}
+          tabIndex={-1}
         >
           <Minus className={sizeStyle.icon} />
         </button>
@@ -207,8 +217,13 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(({
             read-only:bg-ink-50 read-only:cursor-default
             ${error ? 'border-error-500 focus:ring-error-500 focus:border-error-500' : ''}
           `}
+          role="spinbutton"
+          aria-valuemin={min}
+          aria-valuemax={max}
+          aria-valuenow={value}
           aria-invalid={!!error}
-          aria-describedby={error ? `${id}-error` : helperText ? `${id}-helper` : undefined}
+          aria-describedby={error ? errorId : helperText ? helperId : undefined}
+          aria-required={required}
         />
 
         {/* Increment Button */}
@@ -230,6 +245,8 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(({
             ${error ? 'border-error-500' : ''}
           `}
           aria-label="Increase value"
+          aria-controls={inputId}
+          tabIndex={-1}
         >
           <Plus className={sizeStyle.icon} />
         </button>
@@ -238,9 +255,10 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(({
       {/* Helper Text / Error */}
       {(error || helperText) && (
         <span
-          id={error ? `${id}-error` : `${id}-helper`}
+          id={error ? errorId : helperId}
           className={`text-xs ${error ? 'text-error-600' : 'text-ink-600'}`}
           role={error ? 'alert' : undefined}
+          aria-live={error ? 'polite' : undefined}
         >
           {error || helperText}
         </span>

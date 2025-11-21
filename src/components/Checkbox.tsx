@@ -1,7 +1,7 @@
 // Copyright (c) 2025 kwhittenberger. All rights reserved.
 // This file is part of the Commissions Management System (CMMS).
 // Proprietary and confidential. Unauthorized copying or distribution is prohibited.
-import { forwardRef } from 'react';
+import { forwardRef, useId } from 'react';
 import { Check, Minus } from 'lucide-react';
 
 export interface CheckboxProps {
@@ -30,7 +30,9 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
   name,
   icon,
 }, ref) => {
-  const checkboxId = id || `checkbox-${Math.random().toString(36).substring(2, 9)}`;
+  const generatedId = useId();
+  const checkboxId = id || generatedId;
+  const descId = description ? `${checkboxId}-desc` : undefined;
 
   const handleChange = () => {
     if (!disabled) {
@@ -65,6 +67,8 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
           disabled={disabled}
           className="sr-only"
           aria-checked={indeterminate ? 'mixed' : checked}
+          aria-describedby={descId}
+          aria-disabled={disabled}
         />
         <div
           className={`
@@ -96,7 +100,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
             </div>
           )}
           {description && (
-            <p className="text-xs text-ink-600 mt-0.5">{description}</p>
+            <p id={descId} className="text-xs text-ink-600 mt-0.5">{description}</p>
           )}
         </div>
       )}

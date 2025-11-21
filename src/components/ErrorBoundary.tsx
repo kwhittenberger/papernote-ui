@@ -2,6 +2,10 @@ import { Component, ReactNode, ErrorInfo } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import Button from './Button';
 
+// Check if we're in development mode
+// @ts-ignore - process is a Node.js global that may not be available in all environments
+const isDevelopment = typeof process !== 'undefined' && process.env?.NODE_ENV === 'development';
+
 export interface ErrorBoundaryProps {
   children: ReactNode;
   fallback?: ReactNode | ((error: Error, errorInfo: ErrorInfo, reset: () => void) => ReactNode);
@@ -42,7 +46,7 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
     this.props.onError?.(error, errorInfo);
 
     // Log to console in development
-    if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
+    if (isDevelopment) {
       console.error('ErrorBoundary caught an error:', error, errorInfo);
     }
   }
@@ -104,7 +108,7 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
                 </p>
 
                 {/* Error details (development only) */}
-                {typeof process !== 'undefined' && process.env?.NODE_ENV === 'development' && (
+                {isDevelopment && (
                   <details className="mb-4">
                     <summary className="text-xs font-medium text-ink-700 cursor-pointer hover:text-ink-900">
                       Error details

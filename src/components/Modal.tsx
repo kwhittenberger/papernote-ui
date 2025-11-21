@@ -1,7 +1,7 @@
 // Copyright (c) 2025 kwhittenberger. All rights reserved.
 // This file is part of the Commissions Management System (CMMS).
 // Proprietary and confidential. Unauthorized copying or distribution is prohibited.
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useId } from 'react';
 import { X } from 'lucide-react';
 
 export interface ModalProps {
@@ -33,6 +33,7 @@ export default function Modal({
   animation = 'scale',
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
 
   // Handle escape key
   useEffect(() => {
@@ -89,11 +90,11 @@ export default function Modal({
         className={`${sizeClasses[size]} w-full bg-white bg-subtle-grain rounded-xl shadow-2xl border border-paper-200 ${getAnimationClass()}`}
         role="dialog"
         aria-modal="true"
-        aria-labelledby="modal-title"
+        aria-labelledby={titleId}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-paper-200">
-          <h3 id="modal-title" className="text-lg font-medium text-ink-900">
+          <h3 id={titleId} className="text-lg font-medium text-ink-900">
             {title}
           </h3>
           {showCloseButton && (

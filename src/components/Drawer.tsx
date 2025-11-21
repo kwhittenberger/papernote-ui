@@ -1,7 +1,7 @@
 // Copyright (c) 2025 kwhittenberger. All rights reserved.
 // This file is part of the Commissions Management System (CMMS).
 // Proprietary and confidential. Unauthorized copying or distribution is prohibited.
-import React, { useEffect } from 'react';
+import React, { useEffect, useId } from 'react';
 import { X } from 'lucide-react';
 
 export interface DrawerProps {
@@ -97,6 +97,8 @@ export default function Drawer({
   footer,
   className = '',
 }: DrawerProps) {
+  const titleId = useId();
+  
   // Handle escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -151,13 +153,13 @@ export default function Drawer({
         `}
         role="dialog"
         aria-modal="true"
-        aria-labelledby={title ? "drawer-title" : undefined}
+        aria-labelledby={title ? titleId : undefined}
       >
         {/* Header */}
         {(title || header) && (
           <div className="flex items-center justify-between px-6 py-4 border-b border-paper-200 flex-shrink-0">
             {header || (
-              <h3 id="drawer-title" className="text-lg font-medium text-ink-900">
+              <h3 id={titleId} className="text-lg font-medium text-ink-900">
                 {title}
               </h3>
             )}

@@ -2,7 +2,7 @@
 // This file is part of the notebook-ui component library.
 // Proprietary and confidential. Unauthorized copying or distribution is prohibited.
 
-import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle, useId } from 'react';
 import { Calendar, ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 export interface DatePickerHandle {
@@ -104,6 +104,11 @@ const DatePicker = forwardRef<DatePickerHandle, DatePickerProps>(({
   const [viewDate, setViewDate] = useState(value || new Date());
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  // Generate unique IDs for ARIA
+  const labelId = useId();
+  const dialogId = useId();
+  const descriptionId = useId();
 
   // Expose methods via ref
   useImperativeHandle(ref, () => ({
@@ -315,7 +320,7 @@ const DatePicker = forwardRef<DatePickerHandle, DatePickerProps>(({
     <div className={`relative ${className}`} ref={containerRef}>
       {/* Label */}
       {label && (
-        <label className="block text-sm font-medium text-ink-700 mb-1">
+        <label id={labelId} className="block text-sm font-medium text-ink-700 mb-1">
           {label}
           {required && <span className="text-error-500 ml-1">*</span>}
         </label>
@@ -340,9 +345,14 @@ const DatePicker = forwardRef<DatePickerHandle, DatePickerProps>(({
             focus:outline-none focus:ring-2
             pr-10
           `}
-          aria-label={label || 'Date picker'}
+          aria-labelledby={label ? labelId : undefined}
+          aria-label={!label ? 'Date picker' : undefined}
           aria-expanded={isOpen}
           aria-haspopup="dialog"
+          aria-controls={dialogId}
+          aria-invalid={validationState === 'error' ? 'true' : undefined}
+          aria-describedby={validationMessage ? descriptionId : undefined}
+          role="combobox"
         />
 
         {/* Icons */}
@@ -365,17 +375,24 @@ const DatePicker = forwardRef<DatePickerHandle, DatePickerProps>(({
       </div>
 
       {/* Helper text or validation message */}
-      {(helperText || validationMessage) && (
-        <p className={`mt-1 text-xs ${validationState ? validationMessageColors[validationState] : 'text-ink-500'}`}>
-          {validationMessage || helperText}
+      {validationMessage && (
+        <p id={descriptionId} className={`mt-1 text-xs ${validationState ? validationMessageColors[validationState] : 'text-ink-500'}`} role="alert" aria-live="polite">
+          {validationMessage}
+        </p>
+      )}
+      {helperText && !validationMessage && (
+        <p className="mt-1 text-xs text-ink-500">
+          {helperText}
         </p>
       )}
 
       {/* Calendar dropdown */}
       {isOpen && (
         <div
+          id={dialogId}
           className="absolute z-50 mt-1 bg-white rounded-lg shadow-lg border border-paper-200 p-3 w-72"
           role="dialog"
+          aria-modal="true"
           aria-label="Date picker calendar"
         >
           {/* Header */}
@@ -433,6 +450,8 @@ const DatePicker = forwardRef<DatePickerHandle, DatePickerProps>(({
                   aria-label={date.toLocaleDateString(locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                   aria-selected={isSelected}
                   aria-disabled={isDisabled}
+                  aria-current={isTodayDate ? 'date' : undefined}
+                  role="gridcell"
                 >
                   {date.getDate()}
                 </button>

@@ -2,7 +2,7 @@
 // This file is part of the notebook-ui component library.
 // Proprietary and confidential. Unauthorized copying or distribution is prohibited.
 
-import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { useState, useRef, useEffect, forwardRef, useImperativeHandle, useId } from 'react';
 import { Calendar, ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 export interface DateRange {
@@ -101,6 +101,12 @@ const DateRangePicker = forwardRef<DateRangePickerHandle, DateRangePickerProps>(
   const [selectingStart, setSelectingStart] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  // Generate unique IDs for ARIA
+  const labelId = useId();
+  const dialogId = useId();
+  const descriptionId = useId();
+  const hintId = useId();
 
   // Expose methods via ref
   useImperativeHandle(ref, () => ({
@@ -307,7 +313,7 @@ const DateRangePicker = forwardRef<DateRangePickerHandle, DateRangePickerProps>(
     <div className={`relative ${className}`} ref={containerRef}>
       {/* Label */}
       {label && (
-        <label className="block text-sm font-medium text-ink-700 mb-1">
+        <label id={labelId} className="block text-sm font-medium text-ink-700 mb-1">
           {label}
           {required && <span className="text-error-500 ml-1">*</span>}
         </label>
@@ -332,9 +338,14 @@ const DateRangePicker = forwardRef<DateRangePickerHandle, DateRangePickerProps>(
             focus:outline-none focus:ring-2
             pr-20
           `}
-          aria-label={label || 'Date range picker'}
+          aria-labelledby={label ? labelId : undefined}
+          aria-label={!label ? 'Date range picker' : undefined}
           aria-expanded={isOpen}
-          role="button"
+          aria-haspopup="dialog"
+          aria-controls={dialogId}
+          aria-invalid={validationState === 'error' ? 'true' : undefined}
+          aria-describedby={validationMessage ? descriptionId : (isOpen ? hintId : undefined)}
+          role="combobox"
         />
 
         {/* Icons */}
@@ -358,15 +369,20 @@ const DateRangePicker = forwardRef<DateRangePickerHandle, DateRangePickerProps>(
       </div>
 
       {/* Helper text or validation message */}
-      {(helperText || validationMessage) && (
-        <p className={`mt-1 text-xs ${validationState ? validationMessageColors[validationState] : 'text-ink-500'}`}>
-          {validationMessage || helperText}
+      {validationMessage && (
+        <p id={descriptionId} className={`mt-1 text-xs ${validationState ? validationMessageColors[validationState] : 'text-ink-500'}`} role="alert" aria-live="polite">
+          {validationMessage}
+        </p>
+      )}
+      {helperText && !validationMessage && (
+        <p className="mt-1 text-xs text-ink-500">
+          {helperText}
         </p>
       )}
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute z-50 mt-1 bg-white rounded-md shadow-lg border border-paper-200 p-4">
+        <div id={dialogId} className="absolute z-50 mt-1 bg-white rounded-md shadow-lg border border-paper-200 p-4" role="dialog" aria-modal="true" aria-label="Date range selection">
           <div className="flex gap-4">
             {/* Presets */}
             {showPresets && (
@@ -477,6 +493,8 @@ const DateRangePicker = forwardRef<DateRangePickerHandle, DateRangePickerProps>(
                         ${disabled ? 'text-ink-300 cursor-not-allowed line-through' : 'hover:bg-primary-50 cursor-pointer'}
                       `}
                       aria-label={formatDate(date)}
+                      aria-selected={isStart || isEnd ? 'true' : 'false'}
+                      role="gridcell"
                     >
                       {date.getDate()}
                     </button>
@@ -485,7 +503,7 @@ const DateRangePicker = forwardRef<DateRangePickerHandle, DateRangePickerProps>(
               </div>
 
               {/* Selection hint */}
-              <div className="mt-4 text-xs text-ink-500 text-center">
+              <div id={hintId} className="mt-4 text-xs text-ink-500 text-center" role="status" aria-live="polite">
                 {selectingStart || !value.start ? 'Select start date' : 'Select end date'}
               </div>
             </div>

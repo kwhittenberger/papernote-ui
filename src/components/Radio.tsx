@@ -1,7 +1,7 @@
 // Copyright (c) 2025 kwhittenberger. All rights reserved.
 // This file is part of the Commissions Management System (CMMS).
 // Proprietary and confidential. Unauthorized copying or distribution is prohibited.
-import { forwardRef } from 'react';
+import { forwardRef, useId } from 'react';
 
 export interface RadioOption {
   value: string;
@@ -23,7 +23,7 @@ export interface RadioGroupProps {
   className?: string;
 }
 
-const RadioGroup = forwardRef<HTMLFieldSetElement, RadioGroupProps>(({
+const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(({
   name,
   value,
   onChange,
@@ -34,7 +34,9 @@ const RadioGroup = forwardRef<HTMLFieldSetElement, RadioGroupProps>(({
   disabled = false,
   className = '',
 }, ref) => {
-  const groupId = `radio-group-${Math.random().toString(36).substring(2, 9)}`;
+  const generatedId = useId();
+  const groupId = generatedId;
+  const helperId = `${groupId}-help`;
 
   const handleKeyDown = (e: React.KeyboardEvent, currentValue: string) => {
     if (disabled) return;
@@ -78,7 +80,8 @@ const RadioGroup = forwardRef<HTMLFieldSetElement, RadioGroupProps>(({
         ref={ref}
         role="radiogroup"
         aria-labelledby={label ? groupId : undefined}
-        aria-describedby={helperText ? `${groupId}-help` : undefined}
+        aria-describedby={helperText ? helperId : undefined}
+        aria-disabled={disabled}
         className={
           orientation === 'vertical'
             ? 'space-y-3'
@@ -112,6 +115,8 @@ const RadioGroup = forwardRef<HTMLFieldSetElement, RadioGroupProps>(({
                   className="sr-only"
                   role="radio"
                   aria-checked={isSelected}
+                  aria-disabled={isDisabled}
+                  aria-describedby={option.description ? `${optionId}-desc` : undefined}
                 />
                 <div
                   className={`
@@ -138,7 +143,7 @@ const RadioGroup = forwardRef<HTMLFieldSetElement, RadioGroupProps>(({
                   <p className="text-sm font-medium text-ink-900">{option.label}</p>
                 </div>
                 {option.description && (
-                  <p className="text-xs text-ink-600 mt-0.5">{option.description}</p>
+                  <p id={`${optionId}-desc`} className="text-xs text-ink-600 mt-0.5">{option.description}</p>
                 )}
               </div>
             </label>
@@ -148,7 +153,7 @@ const RadioGroup = forwardRef<HTMLFieldSetElement, RadioGroupProps>(({
 
       {/* Helper Text */}
       {helperText && (
-        <p id={`${groupId}-help`} className="mt-2 text-xs text-ink-600">
+        <p id={helperId} className="mt-2 text-xs text-ink-600">
           {helperText}
         </p>
       )}

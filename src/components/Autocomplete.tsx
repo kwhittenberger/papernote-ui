@@ -2,7 +2,7 @@
 // This file is part of the Commissions Management System (CMMS).
 // Proprietary and confidential. Unauthorized copying or distribution is prohibited.
 
-import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle, useId } from 'react';
 import { Search, X, Loader2 } from 'lucide-react';
 
 export interface AutocompleteHandle {
@@ -59,6 +59,11 @@ const Autocomplete = forwardRef<AutocompleteHandle, AutocompleteProps>(({
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  
+  // Generate unique IDs for ARIA
+  const labelId = useId();
+  const listboxId = useId();
+  const errorId = useId();
 
   // Expose methods via ref
   useImperativeHandle(ref, () => ({
@@ -208,7 +213,7 @@ const Autocomplete = forwardRef<AutocompleteHandle, AutocompleteProps>(({
     <div className={`relative ${className}`}>
       {/* Label */}
       {label && (
-        <label className="block text-sm font-medium text-ink-900 mb-1.5">
+        <label id={labelId} className="block text-sm font-medium text-ink-900 mb-1.5">
           {label}
           {required && <span className="text-error-500 ml-1">*</span>}
         </label>
@@ -245,6 +250,16 @@ const Autocomplete = forwardRef<AutocompleteHandle, AutocompleteProps>(({
               : 'border-paper-300'
             }
           `}
+          role="combobox"
+          aria-labelledby={label ? labelId : undefined}
+          aria-label={!label ? 'Search' : undefined}
+          aria-autocomplete="list"
+          aria-expanded={isOpen}
+          aria-controls={listboxId}
+          aria-activedescendant={highlightedIndex >= 0 ? `autocomplete-option-${highlightedIndex}` : undefined}
+          aria-invalid={error ? 'true' : undefined}
+          aria-describedby={error ? errorId : undefined}
+          aria-busy={loading}
         />
 
         {/* Clear Button */}
@@ -264,14 +279,20 @@ const Autocomplete = forwardRef<AutocompleteHandle, AutocompleteProps>(({
       {isOpen && filteredOptions.length > 0 && (
         <div
           ref={dropdownRef}
+          id={listboxId}
           className="absolute z-50 w-full mt-1 bg-white border border-paper-200 rounded-lg shadow-lg max-h-60 overflow-y-auto"
+          role="listbox"
+          aria-label="Search results"
         >
           {filteredOptions.map((option, index) => (
             <button
               key={option.value}
+              id={`autocomplete-option-${index}`}
               type="button"
               onClick={() => handleSelect(option)}
               onMouseEnter={() => setHighlightedIndex(index)}
+              role="option"
+              aria-selected={highlightedIndex === index}
               className={`
                 w-full text-left px-3 py-2 transition-colors
                 ${highlightedIndex === index
@@ -291,14 +312,14 @@ const Autocomplete = forwardRef<AutocompleteHandle, AutocompleteProps>(({
 
       {/* No results */}
       {isOpen && !loading && filteredOptions.length === 0 && value.length >= minChars && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-paper-200 rounded-lg shadow-lg p-3">
+        <div className="absolute z-50 w-full mt-1 bg-white border border-paper-200 rounded-lg shadow-lg p-3" role="status" aria-live="polite">
           <p className="text-sm text-ink-500 text-center">No results found</p>
         </div>
       )}
 
       {/* Error Message */}
       {error && (
-        <p className="mt-1.5 text-xs text-error-600">{error}</p>
+        <p id={errorId} className="mt-1.5 text-xs text-error-600" role="alert" aria-live="assertive">{error}</p>
       )}
 
       {/* Helper Text */}

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, ReactNode } from 'react';
+import { useEffect, useRef, useState, ReactNode, useId } from 'react';
 import { X } from 'lucide-react';
 
 export interface BottomSheetProps {
@@ -35,6 +35,7 @@ export default function BottomSheet({
 
   className = '',
 }: BottomSheetProps) {
+  const titleId = useId();
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
   const [currentHeight] = useState<string>(
@@ -156,7 +157,7 @@ export default function BottomSheet({
         }}
         role="dialog"
         aria-modal="true"
-        aria-labelledby={title ? 'bottom-sheet-title' : undefined}
+        aria-labelledby={title ? titleId : undefined}
       >
         {/* Handle */}
         {showHandle && (
@@ -173,7 +174,7 @@ export default function BottomSheet({
         {(title || showCloseButton) && (
           <div className="px-6 py-4 border-b border-ink-200 flex items-center justify-between">
             {title && (
-              <h2 id="bottom-sheet-title" className="text-lg font-semibold text-ink-900">
+              <h2 id={titleId} className="text-lg font-semibold text-ink-900">
                 {title}
               </h2>
             )}
