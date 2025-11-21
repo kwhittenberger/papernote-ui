@@ -38,7 +38,7 @@ export interface CardProps {
  *     <CardDescription>Personal information</CardDescription>
  *   </CardHeader>
  *   <CardContent>
- *     {/* Content here */}
+ *     <p>Content here</p>
  *   </CardContent>
  * </Card>
  * ```
@@ -50,7 +50,7 @@ export interface CardProps {
  *   onClick={handleClick} 
  *   loading={isLoading}
  * >
- *   {/* Content */}
+ *   <p>Content</p>
  * </Card>
  * ```
  */
