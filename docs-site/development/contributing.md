@@ -4,7 +4,7 @@ Thank you for your interest in contributing to @papernote/ui! We welcome contrib
 
 ## Code of Conduct
 
-This project adheres to a [Code of Conduct](./CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
+This project adheres to a [Code of Conduct](./code-of-conduct). By participating, you are expected to uphold this code.
 
 ## How to Contribute
 
@@ -230,7 +230,7 @@ Releases are managed by maintainers:
 ## Questions?
 
 - 💬 [Open an issue](https://github.com/kwhittenberger/papernote-ui/issues)
-- 📖 [Read the docs](./docs/INDEX.md)
+- 📖 [Read the docs](/)
 - 🎨 [View Storybook](https://papernote-ui.chromatic.com)
 
 ## License
