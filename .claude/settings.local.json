@@ -14,7 +14,9 @@
       "Bash(npm view:*)",
       "Bash(npm org:*)",
       "Bash(npm run build-storybook:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(gh run list:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

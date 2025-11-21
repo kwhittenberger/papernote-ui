@@ -1,5 +1,3 @@
-// Copyright (c) 2025 kwhittenberger. All rights reserved.
-// Proprietary and confidential. Unauthorized copying or distribution is prohibited.
 
 import { AlertCircle, Calendar, FileText, TrendingUp } from 'lucide-react';
 import type { ReactNode } from 'react';

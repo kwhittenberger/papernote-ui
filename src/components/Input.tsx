@@ -1,6 +1,3 @@
-// Copyright (c) 2025 kwhittenberger. All rights reserved.
-// This file is part of the Commissions Management System (CMMS).
-// Proprietary and confidential. Unauthorized copying or distribution is prohibited.
 import React, { forwardRef, useState } from 'react';
 import { AlertCircle, CheckCircle, AlertTriangle, Eye, EyeOff, X } from 'lucide-react';
 

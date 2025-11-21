@@ -1,6 +1,3 @@
-// Copyright (c) 2025 kwhittenberger. All rights reserved.
-// This file is part of the Notebook UI library.
-// Proprietary and confidential. Unauthorized copying or distribution is prohibited.
 
 /**
  * Format types for statistics values

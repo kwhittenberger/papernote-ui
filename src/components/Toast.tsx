@@ -1,6 +1,3 @@
-// Copyright (c) 2025 kwhittenberger. All rights reserved.
-// This file is part of the Commissions Management System (CMMS).
-// Proprietary and confidential. Unauthorized copying or distribution is prohibited.
 import React, { useEffect, useState } from 'react';
 import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react';
 

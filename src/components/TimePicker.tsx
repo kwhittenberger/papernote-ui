@@ -1,6 +1,3 @@
-// Copyright (c) 2025 kwhittenberger. All rights reserved.
-// This file is part of the notebook-ui component library.
-// Proprietary and confidential. Unauthorized copying or distribution is prohibited.
 
 import { useState, useRef, useEffect, forwardRef, useImperativeHandle, useId } from 'react';
 import { Clock, ChevronUp, ChevronDown, X } from 'lucide-react';

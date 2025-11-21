@@ -1,6 +1,3 @@
-// Copyright (c) 2025 kwhittenberger. All rights reserved.
-// This file is part of the Commissions Management System (CMMS).
-// Proprietary and confidential. Unauthorized copying or distribution is prohibited.
 
 import { useState, useMemo, useRef, forwardRef, useImperativeHandle } from 'react';
 import { Eye, EyeOff, Check, X } from 'lucide-react';
