@@ -16,8 +16,9 @@ Welcome to the @papernote/ui component library documentation.
 
 ### 🔧 Development
 - **[Developer Guide](./DEVELOPER-GUIDE.md)** - Development workflow and best practices
-- **[Publishing Guide](../PUBLISHING.md)** - How to publish new versions to npm
-- **[Contributing](../CONTRIBUTING.md)** - Contribution guidelines
+- **[Testing Guide](./TESTING-GUIDE.md)** - Testing standards and examples
+- **[Publishing Guide](./PUBLISHING.md)** - How to publish new versions to npm
+- **[Contributing](./CONTRIBUTING.md)** - Contribution guidelines
 
 ---
 
@@ -145,14 +146,15 @@ Accordion, Transfer, Carousel, Stepper, Popover, ButtonGroup, Autocomplete, Comb
 - [Live Storybook](https://691fcf89b3393605ea470e93-rzwuumklem.chromatic.com/) - Interactive demos
 
 ### Publishing
-- [Publishing Guide](../PUBLISHING.md) - Automated npm publishing
+- [Publishing Guide](./PUBLISHING.md) - Automated npm publishing
 - [GitHub Actions Workflows](../.github/workflows/) - CI/CD pipelines
 - [npm Package](https://www.npmjs.com/package/@papernote/ui) - Published package
 
 ### Development
+- [Testing Guide](./TESTING-GUIDE.md) - Unit testing with Jest
 - [Chromatic Setup](./CHROMATIC-SETUP.md) - Visual testing
-- [Contributing Guide](../CONTRIBUTING.md) - How to contribute
-- [Code of Conduct](../CODE_OF_CONDUCT.md) - Community standards
+- [Contributing Guide](./CONTRIBUTING.md) - How to contribute
+- [Code of Conduct](./CODE_OF_CONDUCT.md) - Community standards
 
 ---
 
