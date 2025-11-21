@@ -210,10 +210,8 @@ export const DashboardLayout: Story = {
       <Layout
         sidebar={
           <Sidebar
-            menuItems={menuItems}
-            activeItem={activeItem}
-            onItemClick={setActiveItem}
-            title="Analytics Dashboard"
+            items={sidebarItems}
+            currentPath={`#${activeItem}`}
           />
         }
         statusBar={<StatusBar />}
@@ -327,11 +325,8 @@ export const CollapsedSidebar: Story = {
       <Layout
         sidebar={
           <Sidebar
-            menuItems={menuItems}
-            activeItem={activeItem}
-            onItemClick={setActiveItem}
-            title="My Application"
-            defaultCollapsed
+            items={sidebarItems}
+            currentPath={`#${activeItem}`}
           />
         }
         statusBar={<StatusBar />}
@@ -364,10 +359,8 @@ export const UserManagementApp: Story = {
       <Layout
         sidebar={
           <Sidebar
-            menuItems={menuItems}
-            activeItem={activeItem}
-            onItemClick={setActiveItem}
-            title="Admin Panel"
+            items={sidebarItems}
+            currentPath={`#${activeItem}`}
           />
         }
         statusBar={<StatusBar />}
