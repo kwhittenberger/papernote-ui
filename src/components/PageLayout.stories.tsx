@@ -1,8 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { PageLayout } from './PageLayout';
+import Layout from './Layout';
+import Sidebar from './Sidebar';
+import { StatusBar } from './StatusBar';
 import Card, { CardHeader, CardTitle, CardContent } from './Card';
 import Button from './Button';
-import { Plus, Download, Settings } from 'lucide-react';
+import { Plus, Download, Settings, Home, Users, FileText } from 'lucide-react';
 
 const meta = {
   title: 'Layout/PageLayout',
@@ -22,6 +25,18 @@ export const Default: Story = {
     description: 'This is a standard page layout with notebook styling - notice the red margin line on the left, subtle ruled lines, and paper texture',
     children: (
       <div>
+        <Card style={{ marginBottom: '1.5rem', backgroundColor: '#eff6ff', border: '1px solid #3b82f6' }}>
+          <CardContent>
+            <h3 style={{ fontWeight: 600, marginBottom: '0.75rem', fontSize: '0.875rem', color: '#1e40af' }}>
+              ℹ️ Note: No Sidebar or Gutter Here
+            </h3>
+            <p style={{ fontSize: '0.875rem', marginBottom: '0.5rem' }}>
+              PageLayout shows just the paper content with title/description. For the complete app layout
+              with <strong>sidebar and gutter navigation</strong>, see the "With Sidebar And Gutter" story below
+              or check out the <strong>Layout</strong> component stories.
+            </p>
+          </CardContent>
+        </Card>
         <Card>
           <CardHeader>
             <CardTitle>Content Section</CardTitle>
@@ -404,4 +419,77 @@ export const FormPage: Story = {
       </Card>
     </PageLayout>
   ),
+};
+
+export const WithSidebarAndGutter: Story = {
+  render: () => {
+    const sidebarItems = [
+      { id: 'dashboard', label: 'Dashboard', icon: <Home className="h-5 w-5" />, href: '#dashboard' },
+      { id: 'users', label: 'Users', icon: <Users className="h-5 w-5" />, href: '#users' },
+      { id: 'documents', label: 'Documents', icon: <FileText className="h-5 w-5" />, href: '#documents' },
+      { id: 'settings', label: 'Settings', icon: <Settings className="h-5 w-5" />, href: '#settings' },
+    ];
+
+    return (
+      <Layout
+        sidebar={
+          <Sidebar
+            items={sidebarItems}
+            currentPath="#dashboard"
+          />
+        }
+        statusBar={<StatusBar />}
+      >
+        <PageLayout
+          title="Dashboard with Complete Layout"
+          description="This shows PageLayout inside Layout - notice the sidebar on the left and the gutter between sidebar and content"
+        >
+          <Card style={{ marginBottom: '1.5rem', backgroundColor: '#d1fae5', border: '1px solid #10b981' }}>
+            <CardContent>
+              <h3 style={{ fontWeight: 600, marginBottom: '0.75rem', fontSize: '0.875rem', color: '#065f46' }}>
+                ✅ Complete Layout with Sidebar & Gutter
+              </h3>
+              <p style={{ fontSize: '0.875rem', marginBottom: '0.5rem' }}>
+                Now you can see the <strong>gutter</strong> (the narrow space between the sidebar and content).
+                This is where navigation dots would appear if you had page sections defined.
+              </p>
+              <p style={{ fontSize: '0.875rem' }}>
+                Check out the <strong>Layout</strong> component stories to see the gutter navigation in action with scrollable sections.
+              </p>
+            </CardContent>
+          </Card>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }}>
+            <Card>
+              <CardHeader>
+                <CardTitle>Total Users</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div style={{ fontSize: '2rem', fontWeight: 700, color: '#3b82f6' }}>1,234</div>
+                <div style={{ fontSize: '0.875rem', color: '#10b981', marginTop: '0.5rem' }}>↑ 12% from last month</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Revenue</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div style={{ fontSize: '2rem', fontWeight: 700, color: '#10b981' }}>$45,678</div>
+                <div style={{ fontSize: '0.875rem', color: '#10b981', marginTop: '0.5rem' }}>↑ 8% from last month</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Active Orders</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div style={{ fontSize: '2rem', fontWeight: 700, color: '#f59e0b' }}>89</div>
+                <div style={{ fontSize: '0.875rem', color: '#64748b', marginTop: '0.5rem' }}>Pending fulfillment</div>
+              </CardContent>
+            </Card>
+          </div>
+        </PageLayout>
+      </Layout>
+    );
+  },
 };

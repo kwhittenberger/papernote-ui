@@ -21,7 +21,15 @@ export interface PageLayoutProps {
  * Wraps content in the Page component to include notebook styling (paper texture, ruled lines,
  * red margin line).
  *
- * @example
+ * **Note**: PageLayout does NOT include the sidebar or gutter. For a complete app layout with
+ * sidebar and gutter navigation, use the Layout component instead and wrap this inside it.
+ *
+ * **Component Hierarchy**:
+ * - **Page** - Just paper with notebook styling (lowest level)
+ * - **PageLayout** - Page + title + description (this component)
+ * - **Layout** - Sidebar + gutter + content area (includes PageLayout or Page inside)
+ *
+ * @example Basic page with title
  * ```tsx
  * <PageLayout
  *   title="Dashboard"
@@ -32,6 +40,15 @@ export interface PageLayoutProps {
  *     <CardContent>Your dashboard content</CardContent>
  *   </Card>
  * </PageLayout>
+ * ```
+ *
+ * @example With Layout for sidebar and gutter
+ * ```tsx
+ * <Layout sidebar={<Sidebar items={items} />}>
+ *   <PageLayout title="Dashboard" description="Overview">
+ *     <Card>Content</Card>
+ *   </PageLayout>
+ * </Layout>
  * ```
  */
 export function PageLayout({ 
