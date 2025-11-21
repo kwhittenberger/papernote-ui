@@ -295,4 +295,4 @@ Exclude unnecessary files in `.npmignore`.
 ## Support
 
 Questions? Open an issue or discussion on GitHub:
-- 💬 [GitHub Issues](https://github.com/kwhittenberger/notebook-ui/issues)
+- 💬 [GitHub Issues](https://github.com/kwhittenberger/papernote-ui/issues)

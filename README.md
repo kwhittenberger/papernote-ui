@@ -6,7 +6,7 @@
 
 A modern React component library with a paper notebook aesthetic - minimal, professional, and expressive.
 
-**[📖 Live Demo (Storybook)](https://papernote-ui.chromatic.com)** • **[📦 npm Package](https://www.npmjs.com/package/@papernote/ui)** • **[💬 GitHub Issues](https://github.com/kwhittenberger/notebook-ui/issues)**
+**[📖 Live Demo (Storybook)](https://papernote-ui.chromatic.com)** • **[📦 npm Package](https://www.npmjs.com/package/@papernote/ui)** • **[💬 GitHub Issues](https://github.com/kwhittenberger/papernote-ui/issues)**
 
 ## Features
 

@@ -21,13 +21,13 @@ Chromatic is a cloud service for Storybook that provides:
 ### 2. Add Your Project
 
 1. After signing in, click **"Add project"**
-2. Select the **`notebook-ui`** repository
+2. Select the **`papernote-ui`** repository
 3. Chromatic will generate a **project token**
 4. **Copy the project token** (you'll need it in the next step)
 
 ### 3. Add Token to GitHub Secrets
 
-1. Go to your GitHub repository: `https://github.com/kwhittenberger/notebook-ui`
+1. Go to your GitHub repository: `https://github.com/kwhittenberger/papernote-ui`
 2. Click **Settings** → **Secrets and variables** → **Actions**
 3. Click **"New repository secret"**
 4. Name: `CHROMATIC_PROJECT_TOKEN`

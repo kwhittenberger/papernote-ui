@@ -56,8 +56,8 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
 
 ```bash
 # Clone your fork
-git clone https://github.com/YOUR-USERNAME/notebook-ui.git
-cd notebook-ui
+git clone https://github.com/YOUR-USERNAME/papernote-ui.git
+cd papernote-ui
 
 # Install dependencies
 npm install
@@ -75,7 +75,7 @@ npm run build
 ## Project Structure
 
 ```
-notebook-ui/
+papernote-ui/
 ├── src/
 │   ├── components/       # All React components
 │   ├── types/            # TypeScript types
@@ -229,7 +229,7 @@ Releases are managed by maintainers:
 
 ## Questions?
 
-- 💬 [Open an issue](https://github.com/kwhittenberger/notebook-ui/issues)
+- 💬 [Open an issue](https://github.com/kwhittenberger/papernote-ui/issues)
 - 📖 [Read the docs](./docs/INDEX.md)
 - 🎨 [View Storybook](https://papernote-ui.chromatic.com)
 
