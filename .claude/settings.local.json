@@ -29,7 +29,8 @@
       "Bash(else echo \"✗ $file\")",
       "Bash(fi)",
       "Bash(done)",
-      "mcp__filesystem__read_multiple_files"
+      "mcp__filesystem__read_multiple_files",
+      "Bash(comm:*)"
     ],
     "deny": [],
     "ask": []
