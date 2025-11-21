@@ -1,12 +1,21 @@
 import React from 'react';
 import { Loader2 } from 'lucide-react';
 
+/**
+ * Button component props
+ */
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  /** Visual style variant of the button */
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline';
+  /** Button size */
   size?: 'sm' | 'md' | 'lg';
+  /** Show loading spinner and disable interaction */
   loading?: boolean;
+  /** Icon to display alongside button text */
   icon?: React.ReactNode;
+  /** Position of the icon relative to text */
   iconPosition?: 'left' | 'right';
+  /** Make button take full width of container */
   fullWidth?: boolean;
   /** Icon-only mode - renders square button with just icon (no text padding) */
   iconOnly?: boolean;
@@ -16,6 +25,39 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   badgeVariant?: 'primary' | 'success' | 'warning' | 'error';
 }
 
+/**
+ * Button - Interactive button component with variants, sizes, and loading states
+ *
+ * A versatile button component that supports multiple visual styles, sizes, icons,
+ * loading states, and notification badges.
+ *
+ * @example Basic usage
+ * ```tsx
+ * <Button variant="primary">Click me</Button>
+ * ```
+ *
+ * @example With icon and loading
+ * ```tsx
+ * <Button 
+ *   variant="secondary" 
+ *   icon={<Save />} 
+ *   loading={isSaving}
+ * >
+ *   Save Changes
+ * </Button>
+ * ```
+ *
+ * @example Icon-only with badge
+ * ```tsx
+ * <Button 
+ *   iconOnly 
+ *   badge={5} 
+ *   badgeVariant="error"
+ * >
+ *   <Bell />
+ * </Button>
+ * ```
+ */
 export default function Button({
   variant = 'primary',
   size = 'md',

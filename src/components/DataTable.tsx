@@ -5,35 +5,59 @@ import { ChevronDown, ChevronRight, MoreVertical, Edit, Trash } from 'lucide-rea
 
 /**
  * Base data item interface - all data items must have an id
+ * 
+ * All data passed to DataTable must implement this interface to ensure
+ * proper row identification and selection handling.
  */
 export interface BaseDataItem {
+  /** Unique identifier for the data item */
   id: string | number;
+  /** Additional properties specific to your data type */
   [key: string]: unknown;
 }
 
 /**
  * Column configuration for DataTable
+ * 
+ * Defines how each column should be displayed, including width constraints,
+ * custom rendering, sorting behavior, and alignment.
  */
 export interface DataTableColumn<T> {
+  /** Property key from data item to display in this column */
   key: keyof T | string;
+  /** Column header text */
   header: string;
-  width?: string | number;      // '120px', '15%', '1fr', 120
-  minWidth?: string | number;   // '100px', 100
-  maxWidth?: string | number;   // '300px', 300
-  flex?: number;                // flex-grow value
+  /** Fixed width - supports CSS values ('120px', '15%', '1fr') or numbers (120) */
+  width?: string | number;
+  /** Minimum width constraint */
+  minWidth?: string | number;
+  /** Maximum width constraint */
+  maxWidth?: string | number;
+  /** Flex-grow value for flexible width columns */
+  flex?: number;
+  /** Custom render function for cell content */
   render?: (item: T, value: any) => React.ReactNode;
-  renderSecondary?: (item: T, value: any) => React.ReactNode; // Secondary line content (smaller, muted)
+  /** Secondary line content (smaller, muted text below primary) */
+  renderSecondary?: (item: T, value: any) => React.ReactNode;
+  /** Enable sorting for this column */
   sortable?: boolean;
+  /** Additional CSS classes for column cells */
   className?: string;
+  /** Text alignment in column */
   align?: 'left' | 'center' | 'right';
 }
 
 /**
  * Sort configuration
+ * 
+ * Describes the current sort state for the table.
  */
 export interface SortConfig {
+  /** Column key being sorted */
   key: string;
+  /** Sort direction */
   direction: 'asc' | 'desc';
+  /** Optional display label for sort indicator */
   label?: string;
 }
 
@@ -109,15 +133,30 @@ interface ExpansionState {
   mode: ExpansionMode;
 }
 
+/**
+ * DataTable component props
+ * 
+ * Feature-rich data table with sorting, filtering, selection, expansion,
+ * row actions, and virtual scrolling support.
+ */
 interface DataTableProps<T extends BaseDataItem = BaseDataItem> {
+  /** Array of data items to display */
   data: T[];
+  /** Column definitions */
   columns: DataTableColumn<T>[];
+  /** Show loading skeleton */
   loading?: boolean;
+  /** Error message to display */
   error?: string | null;
+  /** Message shown when data array is empty */
   emptyMessage?: string;
+  /** Number of skeleton rows to show while loading */
   loadingRows?: number;
+  /** Additional CSS classes */
   className?: string;
+  /** Callback when sort changes */
   onSortChange?: (sort: SortConfig | null) => void;
+  /** Current sort configuration */
   currentSort?: SortConfig | null;
   /** Built-in edit handler - adds Edit action to menu */
   onEdit?: (item: T) => void | Promise<void>;

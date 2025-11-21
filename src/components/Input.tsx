@@ -1,14 +1,26 @@
 import React, { forwardRef, useState } from 'react';
 import { AlertCircle, CheckCircle, AlertTriangle, Eye, EyeOff, X } from 'lucide-react';
 
+/**
+ * Validation state for input components
+ */
 export type ValidationState = 'error' | 'success' | 'warning' | null;
 
+/**
+ * Input component props
+ */
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  /** Input label text */
   label?: string;
+  /** Helper text displayed below input */
   helperText?: string;
+  /** Visual validation state */
   validationState?: ValidationState;
+  /** Validation message (overrides helperText when present) */
   validationMessage?: string;
+  /** Icon to display in input (legacy - use prefixIcon/suffixIcon) */
   icon?: React.ReactNode;
+  /** Position of icon (legacy - use prefixIcon/suffixIcon) */
   iconPosition?: 'left' | 'right';
   /** Show character counter (requires maxLength prop) */
   showCount?: boolean;
@@ -28,6 +40,54 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   onClear?: () => void;
 }
 
+/**
+ * Input - Text input component with validation, icons, and prefixes/suffixes
+ *
+ * A feature-rich text input with support for validation states, character counting,
+ * password visibility toggle, prefix/suffix text and icons, and clearable functionality.
+ *
+ * @example Basic input with label
+ * ```tsx
+ * <Input 
+ *   label="Email" 
+ *   type="email" 
+ *   placeholder="Enter your email"
+ * />
+ * ```
+ *
+ * @example With validation
+ * ```tsx
+ * <Input
+ *   label="Username"
+ *   value={username}
+ *   onChange={(e) => setUsername(e.target.value)}
+ *   validationState={error ? 'error' : 'success'}
+ *   validationMessage={error || 'Username is available'}
+ * />
+ * ```
+ *
+ * @example Password with toggle and character count
+ * ```tsx
+ * <Input
+ *   type="password"
+ *   label="Password"
+ *   showPasswordToggle
+ *   showCount
+ *   maxLength={50}
+ * />
+ * ```
+ *
+ * @example With prefix/suffix
+ * ```tsx
+ * <Input
+ *   label="Amount"
+ *   type="number"
+ *   prefixIcon={<DollarSign />}
+ *   suffix="USD"
+ *   clearable
+ * />
+ * ```
+ */
 const Input = forwardRef<HTMLInputElement, InputProps>(
   (
     {

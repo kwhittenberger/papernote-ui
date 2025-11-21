@@ -1,17 +1,59 @@
 import React from 'react';
 import { Skeleton } from './Loading';
 
+/**
+ * Card component props
+ */
 export interface CardProps {
+  /** Card content */
   children: React.ReactNode;
+  /** Visual style variant affecting padding and shadow */
   variant?: 'default' | 'compact' | 'flat';
+  /** Predefined width constraint */
   width?: 'sm' | 'md' | 'lg' | 'xl' | 'auto' | 'full';
+  /** Additional CSS classes */
   className?: string;
+  /** Click handler - makes card interactive */
   onClick?: () => void;
+  /** Show hover effect without onClick handler */
   hoverable?: boolean;
   /** Show loading skeleton instead of content */
   loading?: boolean;
 }
 
+/**
+ * Card - Container component with paper aesthetic and subtle shadow
+ *
+ * A content container with paper texture, border, and shadow effects. Supports
+ * different sizes, variants (padding/shadow levels), and loading states.
+ *
+ * Compose with CardHeader, CardTitle, CardDescription, CardContent, and CardFooter
+ * for consistent internal structure.
+ *
+ * @example Basic card
+ * ```tsx
+ * <Card>
+ *   <CardHeader>
+ *     <CardTitle>User Profile</CardTitle>
+ *     <CardDescription>Personal information</CardDescription>
+ *   </CardHeader>
+ *   <CardContent>
+ *     {/* Content here */}
+ *   </CardContent>
+ * </Card>
+ * ```
+ *
+ * @example Interactive card with loading
+ * ```tsx
+ * <Card 
+ *   variant="compact" 
+ *   onClick={handleClick} 
+ *   loading={isLoading}
+ * >
+ *   {/* Content */}
+ * </Card>
+ * ```
+ */
 export default function Card({
   children,
   variant = 'default',
@@ -61,13 +103,24 @@ export default function Card({
   );
 }
 
+/**
+ * CardHeader component props
+ */
 export interface CardHeaderProps {
+  /** Header content - typically CardTitle and CardDescription */
   children: React.ReactNode;
+  /** Additional CSS classes */
   className?: string;
   /** Action element (button, menu, etc.) to display in header */
   action?: React.ReactNode;
 }
 
+/**
+ * CardHeader - Header section for Card component
+ *
+ * Container for card title, description, and optional action buttons.
+ * Automatically handles layout when action element is provided.
+ */
 export function CardHeader({
   children,
   className = '',

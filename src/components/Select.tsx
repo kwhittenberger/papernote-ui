@@ -1,37 +1,67 @@
 import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle, useId } from 'react';
 import { Check, ChevronDown, Search, Loader2, X } from 'lucide-react';
 
+/**
+ * Single option in a select dropdown
+ */
 export interface SelectOption {
+  /** Unique value for this option */
   value: string;
+  /** Display label for this option */
   label: string;
+  /** Disable selection of this option */
   disabled?: boolean;
+  /** Optional icon to display before label */
   icon?: React.ReactNode;
 }
 
+/**
+ * Group of options with a section header
+ */
 export interface SelectOptionGroup {
+  /** Group header label */
   label: string;
+  /** Options in this group */
   options: SelectOption[];
 }
 
+/**
+ * Imperative handle for Select component (via ref)
+ */
 export interface SelectHandle {
+  /** Focus the select button */
   focus: () => void;
+  /** Blur the select button */
   blur: () => void;
+  /** Open the dropdown */
   open: () => void;
+  /** Close the dropdown */
   close: () => void;
 }
 
+/**
+ * Select component props
+ */
 export interface SelectProps {
   /** Flat list of options */
   options?: SelectOption[];
   /** Grouped options with section headers */
   groups?: SelectOptionGroup[];
+  /** Currently selected value */
   value?: string;
+  /** Callback when selection changes */
   onChange?: (value: string) => void;
+  /** Placeholder text when no option selected */
   placeholder?: string;
+  /** Enable search/filter functionality */
   searchable?: boolean;
+  /** Disable the select */
   disabled?: boolean;
+  /** Label text above select */
   label?: string;
+  /** Helper text below select */
   helperText?: string;
+  /** Error message (displayed below select in red) */
   error?: string;
   /** Show loading spinner */
   loading?: boolean;
@@ -49,6 +79,66 @@ export interface SelectProps {
   virtualItemHeight?: number;
 }
 
+/**
+ * Select - Dropdown select component with search, groups, and virtual scrolling
+ *
+ * A feature-rich select component supporting flat or grouped options, search/filter,
+ * option creation, virtual scrolling for large lists, and clear functionality.
+ *
+ * @example Basic select
+ * ```tsx
+ * const options = [
+ *   { value: '1', label: 'Option 1' },
+ *   { value: '2', label: 'Option 2' },
+ *   { value: '3', label: 'Option 3' },
+ * ];
+ *
+ * <Select
+ *   label="Choose option"
+ *   options={options}
+ *   value={selected}
+ *   onChange={setSelected}
+ * />
+ * ```
+ *
+ * @example Searchable with groups
+ * ```tsx
+ * const groups = [
+ *   {
+ *     label: 'Fruits',
+ *     options: [
+ *       { value: 'apple', label: 'Apple', icon: <Apple /> },
+ *       { value: 'banana', label: 'Banana' },
+ *     ]
+ *   },
+ *   {
+ *     label: 'Vegetables',
+ *     options: [
+ *       { value: 'carrot', label: 'Carrot' },
+ *     ]
+ *   },
+ * ];
+ *
+ * <Select
+ *   groups={groups}
+ *   searchable
+ *   clearable
+ *   placeholder="Search food..."
+ * />
+ * ```
+ *
+ * @example Creatable with virtual scrolling
+ * ```tsx
+ * <Select
+ *   options={largeOptionList}
+ *   searchable
+ *   creatable
+ *   onCreateOption={handleCreate}
+ *   virtualized
+ *   virtualHeight="400px"
+ * />
+ * ```
+ */
 const Select = forwardRef<SelectHandle, SelectProps>(
   (props, ref) => {
   const {
