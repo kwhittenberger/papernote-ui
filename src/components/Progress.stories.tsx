@@ -1,0 +1,328 @@
+import type { Meta, StoryObj } from '@storybook/react';
+import { useState, useEffect } from 'react';
+import Progress from './Progress';
+
+const meta = {
+  title: 'Feedback/Progress',
+  component: Progress,
+  parameters: {
+    layout: 'centered',
+  },
+  tags: ['autodocs'],
+  argTypes: {
+    variant: {
+      control: 'select',
+      options: ['linear', 'circular'],
+    },
+    size: {
+      control: 'select',
+      options: ['sm', 'md', 'lg'],
+    },
+    color: {
+      control: 'select',
+      options: ['primary', 'success', 'warning', 'error'],
+    },
+  },
+  decorators: [
+    (Story) => (
+      <div style={{ minWidth: '400px', padding: '2rem' }}>
+        <Story />
+      </div>
+    ),
+  ],
+} satisfies Meta<typeof Progress>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const Linear: Story = {
+  args: {
+    value: 60,
+    variant: 'linear',
+  },
+};
+
+export const Circular: Story = {
+  args: {
+    value: 75,
+    variant: 'circular',
+  },
+};
+
+export const WithLabel: Story = {
+  args: {
+    value: 60,
+    variant: 'linear',
+    showLabel: true,
+  },
+};
+
+export const CircularWithLabel: Story = {
+  args: {
+    value: 75,
+    variant: 'circular',
+    showLabel: true,
+  },
+};
+
+export const CustomLabel: Story = {
+  args: {
+    value: 80,
+    variant: 'linear',
+    label: 'Upload Progress',
+    showLabel: true,
+  },
+};
+
+export const SmallSize: Story = {
+  args: {
+    value: 45,
+    size: 'sm',
+  },
+};
+
+export const LargeSize: Story = {
+  args: {
+    value: 65,
+    size: 'lg',
+    showLabel: true,
+  },
+};
+
+export const SuccessColor: Story = {
+  args: {
+    value: 100,
+    color: 'success',
+    showLabel: true,
+  },
+};
+
+export const WarningColor: Story = {
+  args: {
+    value: 75,
+    color: 'warning',
+    showLabel: true,
+  },
+};
+
+export const ErrorColor: Story = {
+  args: {
+    value: 30,
+    color: 'error',
+    showLabel: true,
+  },
+};
+
+export const Striped: Story = {
+  args: {
+    value: 60,
+    striped: true,
+  },
+};
+
+export const StripedAnimated: Story = {
+  args: {
+    value: 60,
+    striped: true,
+    animated: true,
+  },
+};
+
+export const AllColors: Story = {
+  render: () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <div>
+        <div style={{ fontSize: '0.875rem', marginBottom: '0.5rem', color: '#64748b' }}>Primary</div>
+        <Progress value={60} color="primary" showLabel />
+      </div>
+      <div>
+        <div style={{ fontSize: '0.875rem', marginBottom: '0.5rem', color: '#64748b' }}>Success</div>
+        <Progress value={100} color="success" showLabel />
+      </div>
+      <div>
+        <div style={{ fontSize: '0.875rem', marginBottom: '0.5rem', color: '#64748b' }}>Warning</div>
+        <Progress value={75} color="warning" showLabel />
+      </div>
+      <div>
+        <div style={{ fontSize: '0.875rem', marginBottom: '0.5rem', color: '#64748b' }}>Error</div>
+        <Progress value={30} color="error" showLabel />
+      </div>
+    </div>
+  ),
+};
+
+export const AllSizesLinear: Story = {
+  render: () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <div>
+        <div style={{ fontSize: '0.875rem', marginBottom: '0.5rem', color: '#64748b' }}>Small</div>
+        <Progress value={60} size="sm" />
+      </div>
+      <div>
+        <div style={{ fontSize: '0.875rem', marginBottom: '0.5rem', color: '#64748b' }}>Medium</div>
+        <Progress value={60} size="md" />
+      </div>
+      <div>
+        <div style={{ fontSize: '0.875rem', marginBottom: '0.5rem', color: '#64748b' }}>Large</div>
+        <Progress value={60} size="lg" />
+      </div>
+    </div>
+  ),
+};
+
+export const AllSizesCircular: Story = {
+  render: () => (
+    <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+        <Progress value={60} variant="circular" size="sm" showLabel />
+        <div style={{ fontSize: '0.75rem', color: '#64748b' }}>Small</div>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+        <Progress value={60} variant="circular" size="md" showLabel />
+        <div style={{ fontSize: '0.875rem', color: '#64748b' }}>Medium</div>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+        <Progress value={60} variant="circular" size="lg" showLabel />
+        <div style={{ fontSize: '1rem', color: '#64748b' }}>Large</div>
+      </div>
+    </div>
+  ),
+};
+
+export const FileUpload: Story = {
+  render: () => {
+    const [progress, setProgress] = useState(0);
+    const [uploading, setUploading] = useState(false);
+
+    const startUpload = () => {
+      setUploading(true);
+      setProgress(0);
+      const interval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 100) {
+            clearInterval(interval);
+            setUploading(false);
+            return 100;
+          }
+          return prev + 10;
+        });
+      }, 300);
+    };
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%' }}>
+        <div style={{ padding: '2rem', border: '2px dashed #e5e5e5', borderRadius: '0.5rem', textAlign: 'center' }}>
+          <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📁</div>
+          <div style={{ fontSize: '0.875rem', color: '#64748b' }}>document.pdf</div>
+          <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.25rem' }}>2.5 MB</div>
+        </div>
+        {uploading || progress > 0 ? (
+          <div>
+            <Progress value={progress} color={progress === 100 ? 'success' : 'primary'} striped={progress < 100} animated={progress < 100} showLabel />
+            <div style={{ fontSize: '0.875rem', color: '#64748b', marginTop: '0.5rem', textAlign: 'center' }}>
+              {progress === 100 ? 'Upload complete!' : 'Uploading...'}
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={startUpload}
+            style={{
+              padding: '0.5rem 1rem',
+              border: 'none',
+              borderRadius: '0.375rem',
+              background: '#3b82f6',
+              color: 'white',
+              cursor: 'pointer',
+            }}
+          >
+            Start Upload
+          </button>
+        )}
+      </div>
+    );
+  },
+};
+
+export const StepProgress: Story = {
+  render: () => {
+    const steps = ['Account', 'Profile', 'Preferences', 'Review'];
+    const [currentStep, setCurrentStep] = useState(0);
+    const progress = ((currentStep + 1) / steps.length) * 100;
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '100%' }}>
+        <div>
+          <div style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '0.5rem' }}>
+            Step {currentStep + 1} of {steps.length}: {steps[currentStep]}
+          </div>
+          <Progress value={progress} color="primary" />
+        </div>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button
+            onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
+            disabled={currentStep === 0}
+            style={{
+              padding: '0.5rem 1rem',
+              border: '1px solid #e5e5e5',
+              borderRadius: '0.375rem',
+              background: 'white',
+              cursor: currentStep === 0 ? 'not-allowed' : 'pointer',
+              opacity: currentStep === 0 ? 0.5 : 1,
+            }}
+          >
+            Previous
+          </button>
+          <button
+            onClick={() => setCurrentStep(Math.min(steps.length - 1, currentStep + 1))}
+            disabled={currentStep === steps.length - 1}
+            style={{
+              padding: '0.5rem 1rem',
+              border: 'none',
+              borderRadius: '0.375rem',
+              background: currentStep === steps.length - 1 ? '#e5e5e5' : '#3b82f6',
+              color: currentStep === steps.length - 1 ? '#64748b' : 'white',
+              cursor: currentStep === steps.length - 1 ? 'not-allowed' : 'pointer',
+            }}
+          >
+            {currentStep === steps.length - 1 ? 'Complete' : 'Next'}
+          </button>
+        </div>
+      </div>
+    );
+  },
+};
+
+export const MultipleProgress: Story = {
+  render: () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '100%' }}>
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+          <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>CPU Usage</span>
+          <span style={{ fontSize: '0.875rem', color: '#64748b' }}>45%</span>
+        </div>
+        <Progress value={45} color="primary" />
+      </div>
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+          <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>Memory</span>
+          <span style={{ fontSize: '0.875rem', color: '#64748b' }}>78%</span>
+        </div>
+        <Progress value={78} color="warning" />
+      </div>
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+          <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>Disk Space</span>
+          <span style={{ fontSize: '0.875rem', color: '#64748b' }}>92%</span>
+        </div>
+        <Progress value={92} color="error" />
+      </div>
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+          <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>Network</span>
+          <span style={{ fontSize: '0.875rem', color: '#64748b' }}>23%</span>
+        </div>
+        <Progress value={23} color="success" />
+      </div>
+    </div>
+  ),
+};
