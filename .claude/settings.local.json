@@ -18,7 +18,9 @@
       "Bash(gh run list:*)",
       "Bash(find:*)",
       "Bash(git pull:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(python:*)",
+      "Bash(npx storybook@latest info)"
     ],
     "deny": [],
     "ask": []

@@ -7,28 +7,114 @@ const meta = {
   component: Button,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+Interactive button component with multiple variants, sizes, icons, loading states, and notification badges.
+
+## Features
+- **Variants**: primary, secondary, ghost, danger, outline
+- **Sizes**: sm, md, lg
+- **Icons**: Support for left/right positioned icons
+- **Loading state**: Shows spinner and disables interaction
+- **Badge**: Display notification counts in top-right corner
+- **Icon-only mode**: Square buttons with just icons
+- **Full width**: Stretch to container width
+
+## Usage
+
+\`\`\`tsx
+import { Button } from 'notebook-ui';
+import { Save } from 'lucide-react';
+
+<Button variant="primary" icon={<Save />}>
+  Save Changes
+</Button>
+\`\`\`
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
   argTypes: {
     variant: {
       control: 'select',
       options: ['primary', 'secondary', 'ghost', 'danger', 'outline'],
+      description: 'Visual style variant of the button',
+      table: {
+        type: { summary: 'primary | secondary | ghost | danger | outline' },
+        defaultValue: { summary: 'primary' },
+      },
     },
     size: {
       control: 'select',
       options: ['sm', 'md', 'lg'],
+      description: 'Button size',
+      table: {
+        type: { summary: 'sm | md | lg' },
+        defaultValue: { summary: 'md' },
+      },
     },
     loading: {
       control: 'boolean',
+      description: 'Show loading spinner and disable interaction',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
     },
     disabled: {
       control: 'boolean',
+      description: 'Disable the button',
+      table: {
+        type: { summary: 'boolean' },
+      },
     },
     fullWidth: {
       control: 'boolean',
+      description: 'Make button take full width of container',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
     },
     iconOnly: {
       control: 'boolean',
+      description: 'Icon-only mode - renders square button with just icon (no text padding)',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    icon: {
+      description: 'Icon to display alongside button text',
+      table: {
+        type: { summary: 'React.ReactNode' },
+      },
+    },
+    iconPosition: {
+      control: 'select',
+      options: ['left', 'right'],
+      description: 'Position of the icon relative to text',
+      table: {
+        type: { summary: 'left | right' },
+        defaultValue: { summary: 'left' },
+      },
+    },
+    badge: {
+      description: 'Badge content (number or text) displayed in top-right corner',
+      table: {
+        type: { summary: 'number | string' },
+      },
+    },
+    badgeVariant: {
+      control: 'select',
+      options: ['primary', 'success', 'warning', 'error'],
+      description: 'Badge color variant',
+      table: {
+        type: { summary: 'primary | success | warning | error' },
+        defaultValue: { summary: 'error' },
+      },
     },
   },
 } satisfies Meta<typeof Button>;
