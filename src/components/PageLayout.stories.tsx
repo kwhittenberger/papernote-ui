@@ -19,16 +19,39 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     title: 'Page Title',
-    description: 'This is a standard page layout with notebook styling',
+    description: 'This is a standard page layout with notebook styling - notice the red margin line on the left, subtle ruled lines, and paper texture',
     children: (
-      <Card>
-        <CardHeader>
-          <CardTitle>Content Section</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p>Your page content goes here with consistent structure across the application.</p>
-        </CardContent>
-      </Card>
+      <div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Content Section</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p style={{ marginBottom: '1rem' }}>
+              Your page content goes here with consistent structure across the application.
+              The PageLayout component wraps content in the Page component, which provides:
+            </p>
+            <ul style={{ marginLeft: '1.5rem', marginBottom: '1rem' }}>
+              <li>• Subtle paper texture background</li>
+              <li>• Red margin line on the left (look closely!)</li>
+              <li>• Ruled lines for that notebook feel</li>
+              <li>• Proper padding and max-width constraints</li>
+              <li>• Shadow and border for depth</li>
+            </ul>
+            <p>Scroll down to see more content and experience the full notebook aesthetic.</p>
+          </CardContent>
+        </Card>
+
+        {/* Additional content to show scrolling */}
+        <Card style={{ marginTop: '1.5rem' }}>
+          <CardHeader>
+            <CardTitle>Another Section</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>Add multiple sections to your page. The ruled lines and paper texture continue throughout.</p>
+          </CardContent>
+        </Card>
+      </div>
     ),
   },
 };

@@ -16,7 +16,9 @@
       "Bash(npm run build-storybook:*)",
       "Bash(git commit:*)",
       "Bash(gh run list:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(git pull:*)",
+      "Bash(git stash:*)"
     ],
     "deny": [],
     "ask": []

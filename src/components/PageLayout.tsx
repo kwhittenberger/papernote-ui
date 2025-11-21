@@ -1,21 +1,38 @@
 import { ReactNode } from 'react';
 import Page from './Page';
 
-interface PageLayoutProps {
+export interface PageLayoutProps {
+  /** Page title displayed at the top */
   title: string;
+  /** Optional subtitle/description text below the title */
   description?: string;
+  /** Main page content */
   children: ReactNode;
+  /** Additional CSS classes to apply to the content wrapper */
   className?: string;
-  /** Optional content to render before the title (e.g., ControlBar) */
+  /** Optional content to render before the title (e.g., breadcrumbs, alerts, control bars) */
   headerContent?: ReactNode;
 }
 
 /**
- * Standard page layout component providing consistent structure
- * across all application pages.
- * 
- * Wraps content in the Page component for notebook styling
- * (gray background, red margin line, ruled lines).
+ * PageLayout - Standard page layout with title, description, and content
+ *
+ * A high-level layout component that provides consistent page structure across your application.
+ * Wraps content in the Page component to include notebook styling (paper texture, ruled lines,
+ * red margin line).
+ *
+ * @example
+ * ```tsx
+ * <PageLayout
+ *   title="Dashboard"
+ *   description="Overview of your metrics"
+ *   headerContent={<Breadcrumbs />}
+ * >
+ *   <Card>
+ *     <CardContent>Your dashboard content</CardContent>
+ *   </Card>
+ * </PageLayout>
+ * ```
  */
 export function PageLayout({ 
   title, 

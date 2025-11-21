@@ -3,25 +3,26 @@
 [![npm version](https://img.shields.io/npm/v/@papernote/ui.svg)](https://www.npmjs.com/package/@papernote/ui)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
+[![Storybook](https://img.shields.io/badge/Storybook-8.0-ff4785)](https://storybook.js.org/)
 
-A modern React component library with a paper notebook aesthetic - minimal, professional, and expressive.
+A modern React component library with a paper notebook aesthetic - minimal, professional, and expressive. Built with TypeScript, Tailwind CSS, and designed for production use.
 
-**[📖 Live Demo (Storybook)](https://691fcf89b3393605ea470e93-ziadmszluo.chromatic.com/)** • **[📦 npm Package](https://www.npmjs.com/package/@papernote/ui)** • **[💬 GitHub Issues](https://github.com/kwhittenberger/papernote-ui/issues)**
+**[📖 Live Demo (Storybook)](https://691fcf89b3393605ea470e93-ziadmszluo.chromatic.com/)** • **[📦 npm Package](https://www.npmjs.com/package/@papernote/ui)** • **[💬 GitHub](https://github.com/kwhittenberger/papernote-ui)**
 
-## Features
+## ✨ Features
 
 - 🎨 **Paper Notebook Aesthetic** - Subtle grain textures, muted warm colors, inspired by quality paper notebooks
-- ⚡ **111+ Components** - Comprehensive set of production-ready React components
-- 🎯 **TypeScript First** - Full TypeScript support with comprehensive type definitions (0 errors, 0 warnings)
-- 🎨 **Tailwind CSS** - Built on Tailwind CSS v3 with custom design tokens
-- ♿ **Fully Accessible** - WCAG AA compliant with complete ARIA attributes, keyboard navigation, and screen reader support
+- ⚡ **115+ Components** - Comprehensive set of production-ready React components
+- 📚 **45+ Storybook Stories** - Extensive documentation with 500+ interactive examples
+- 🎯 **TypeScript First** - Full TypeScript support with comprehensive type definitions
+- 🎨 **Tailwind CSS v3** - Built on Tailwind with custom design tokens
+- ♿ **Accessible** - WCAG AA compliant with ARIA attributes and keyboard navigation
 - 🚀 **Tree-shakeable** - Import only what you need
-- 📱 **Responsive** - Mobile-first design with responsive utilities (Show/Hide components)
+- 📱 **Responsive** - Mobile-first design with responsive utilities
+- 🔧 **Virtual Scrolling** - High-performance rendering for large datasets (DataTable)
 - 🎯 **forwardRef Support** - All form components support ref forwarding
-- 🔧 **Virtual Scrolling** - High-performance rendering for large datasets
-- 🎨 **Comprehensive** - Complete CRUD patterns with DataPage, FormModal, ConfirmDialog
 
-## Installation
+## 📦 Installation
 
 ```bash
 npm install @papernote/ui
@@ -33,13 +34,11 @@ pnpm add @papernote/ui
 
 ### Peer Dependencies
 
-Make sure you have these installed in your project:
-
 ```bash
 npm install react react-dom react-router-dom lucide-react tailwindcss
 ```
 
-## Setup
+## 🚀 Quick Start
 
 ### 1. Import Styles
 
@@ -65,112 +64,199 @@ export default {
 };
 ```
 
-## Usage
+### 3. Use Components
 
 ```tsx
-import { Button, Card, Toast, Table } from '@papernote/ui';
+import { Button, Card, CardHeader, CardTitle, CardContent } from '@papernote/ui';
 
 function App() {
   return (
     <Card>
-      <h2>Welcome to Notebook UI</h2>
-      <p>A beautiful component library with paper notebook aesthetic</p>
-      <Button variant="primary">Get Started</Button>
+      <CardHeader>
+        <CardTitle>Welcome to @papernote/ui</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p>A beautiful component library with paper notebook aesthetic</p>
+        <Button variant="primary">Get Started</Button>
+      </CardContent>
     </Card>
   );
 }
 ```
 
-## Components
+## 🧩 Component Categories
 
-### Core Components
-- **Button** - Multiple variants with loading states
-- **Input** - Form input with validation states
-- **Select** - Searchable dropdown with keyboard navigation
-- **Switch** - Toggle component
+### Form Components (15+)
+- **Button** - Primary, secondary, ghost, danger, outline variants with loading states
+- **Input** - Text input with prefix/suffix icons, clearable, validation states
+- **Select** - Searchable dropdown with clearable option
+- **MultiSelect** - Multiple selection dropdown
+- **Textarea** - Auto-expanding text area with resize control
+- **Checkbox** - Checkbox with icon support
+- **Radio** - Radio buttons with icon support
+- **Switch** - Toggle switch with loading state
+- **Slider** - Range input with value display
+- **DatePicker** - Calendar date picker with events and range mode
+- **TimePicker** - Time selection input
+- **ColorPicker** - Color selector with presets
+- **FileUpload** - Drag-and-drop file upload
+- **PasswordInput** - Password field with show/hide toggle
+- **NumberInput** - Numeric input with step controls
 
-### Layout Components
-- **Card** - Container with header, content, footer sections
-- **Modal** - Dialog with backdrop and animations
-- **Tabs** - Tab navigation (underline and pill styles)
-- **Accordion** - Collapsible panels
+### Layout Components (12+)
+- **Card** - Container with Header, Title, Content, Footer sections
+- **Stack** - Vertical/horizontal flex layout
+- **Grid** - Responsive grid system with GridItem
+- **Box** - Generic container with spacing utilities
+- **Text** - Typography component with size variants
+- **Page** - Notebook-style page background with ruled lines
+- **PageLayout** - Standard page layout with title and description
+- **Layout** - Complete app layout with sidebar and gutter navigation
+- **AppLayout** - Layout with expandable toolbar and status bar
+- **Dashboard** - Dashboard container with DashboardHeader and DashboardContent
+- **TwoColumnContent** - 1/3 sidebar + 2/3 main content layout
+- **Separator** - Horizontal/vertical divider
 
-### Navigation Components
-- **Breadcrumbs** - Path navigation
-- **Pagination** - Page navigation
+### Navigation Components (10+)
+- **Sidebar** - Collapsible navigation sidebar with nested items
+- **Breadcrumbs** - Path navigation with custom separators
+- **Pagination** - Page navigation with size options
+- **Tabs** - Tab navigation (underline and pill variants, vertical/horizontal)
 - **StepIndicator** - Progress stepper
-- **Dropdown** - Menu component
+- **TreeView** - Hierarchical tree navigation with expand/collapse
+- **CommandPalette** - Keyboard-driven command launcher (Cmd+K style)
+- **PageNavigation** - Scrollspy navigation dots for page sections
+- **Dropdown** - Action menu with icons and dividers
+- **Menu** - Context menu component
 
-### Feedback Components
-- **Toast** - Notification system (4 variants)
-- **Alert** - Notification banners
-- **Tooltip** - Hover tooltips
-- **EmptyState** - No data states
+### Data Display Components (10+)
+- **DataTable** - Feature-rich table with sorting, filtering, selection, row actions, expansion, virtual scrolling
+- **Table** - Basic table component
+- **Badge** - Status indicators with dot variant
+- **StatusBadge** - Status badges with color variants
+- **Avatar** - User avatars with fallback initials
+- **Timeline** - Vertical/horizontal event timeline
+- **KanbanBoard** - Drag-and-drop kanban board
+- **Calendar** - Full calendar with event markers
+- **CurrencyDisplay** - Formatted currency display
+- **DateDisplay** - Formatted date display
+- **StatCard** - Statistics card with trends
 
-### Data Display
-- **Table** - Basic table with sorting, filtering, selection
-- **DataTable** - Feature-rich table with actions, expansion, and advanced features
-- **Badge** - Status indicators
-- **Loading** - Spinners, dots, skeleton loaders
+### Feedback Components (8+)
+- **Toast** - Notification system (success, error, warning, info) with position control
+- **Alert** - Notification banners with action buttons
+- **Modal** - Dialog with multiple sizes and animation variants
+- **Drawer** - Side-sliding panel (left, right, top, bottom)
+- **Tooltip** - Hover tooltips with positioning
+- **EmptyState** - No data/empty states
+- **Loading** - Spinners, dots, pulse loaders
+- **Skeleton** - Loading placeholders (SkeletonCard, SkeletonTable)
+- **LoadingOverlay** - Full-screen loading overlay
+- **ConfirmDialog** - Confirmation dialogs
 
-### File Upload
-- **FileUpload** - Drag-and-drop with validation
+### Advanced Components (15+)
+- **Accordion** - Collapsible panels with custom icons
+- **Transfer** - Dual-list item transfer with search
+- **Carousel** - Image/content carousel with auto-play
+- **Stepper** - Multi-step wizard (horizontal/vertical)
+- **Rating** - Star rating input with half-star support
+- **Progress** - Linear and circular progress indicators
+- **Popover** - Rich content popovers with positioning
+- **ButtonGroup** - Toggle button groups (single/multiple selection)
+- **Autocomplete** - Auto-suggest input
+- **Combobox** - Searchable select with custom options
+- **DateRangePicker** - Date range selection
+- **RichTextEditor** - WYSIWYG editor
+- **MarkdownEditor** - Markdown editing
+- **InfiniteScroll** - Infinite scroll loading
+- **ContextMenu** - Right-click context menus
 
-## Design System
+### Utility Components (5+)
+- **Show/Hide** - Responsive visibility utilities
+- **ErrorBoundary** - Error boundary wrapper
+- **ThemeToggle** - Dark/light mode toggle
+- **QueryTransparency** - SQL query explanation
+- **NotificationIndicator** - Badge notification dots
+
+## 🎨 Design System
 
 ### Color Palette
 
 The library uses a muted, warm color palette inspired by paper and ink:
 
-- **Paper** - Warm off-white backgrounds (#fafaf9)
-- **Ink** - Warm gray text colors (#57534e)
-- **Accent** - Subtle warm gray highlights (#8b8878)
-- **Success** - Muted emerald (#10b981)
-- **Warning** - Soft amber (#f59e0b)
-- **Error** - Muted red (#ef4444)
+```javascript
+{
+  paper: {
+    50: '#fafaf9',   // Off-white background
+    100: '#f5f5f4',  // Light gray
+    200: '#e7e5e4',  // Border gray
+    300: '#d6d3d1',  // Subtle border
+  },
+  ink: {
+    600: '#57534e',  // Body text
+    700: '#44403c',  // Headings
+    900: '#1c1917',  // High contrast
+  },
+  accent: '#8b8878',    // Warm gray accents
+  primary: '#64748b',   // Slate blue
+  success: '#10b981',   // Muted emerald
+  warning: '#f59e0b',   // Soft amber
+  error: '#ef4444',     // Muted red
+}
+```
 
 ### Typography
 
-- Font Family: System font stack (ui-sans-serif, Inter)
-- Comfortable line heights for readability
-- Consistent font size scale
+- **Font Family**: System font stack (ui-sans-serif, system-ui, sans-serif)
+- **Font Sizes**: 12px (xs) to 48px (4xl)
+- **Line Heights**: 1.5 (body), 1.2 (headings)
+- **Font Weights**: 400 (normal), 500 (medium), 600 (semibold), 700 (bold)
 
 ### Shadows & Effects
 
-- Subtle paper-like shadows
-- Paper texture using SVG noise filters
-- Smooth transitions and animations
+- Subtle paper-like box shadows
+- SVG noise texture for paper grain
+- Smooth transitions (150ms-300ms)
+- Border radius: 0.375rem (6px) standard
 
-## Component Examples
+## 📚 Component Examples
 
-### Button
+### Button with Loading State
 
 ```tsx
 import { Button } from '@papernote/ui';
+import { Save } from 'lucide-react';
 
-<Button variant="primary" size="md" loading={false}>
-  Click Me
+<Button 
+  variant="primary" 
+  size="md" 
+  loading={isSaving}
+  icon={<Save />}
+  onClick={handleSave}
+>
+  Save Changes
 </Button>
 ```
 
 ### Toast Notifications
 
 ```tsx
-import { ToastContainer, useToast } from '@papernote/ui';
+import { addSuccessMessage, addErrorMessage, ToastContainer } from '@papernote/ui';
 
 function App() {
-  const { toasts, addToast, removeToast } = useToast();
+  const handleSuccess = () => {
+    addSuccessMessage('Changes saved successfully!');
+  };
+
+  const handleError = () => {
+    addErrorMessage('Failed to save changes', 'Please try again');
+  };
 
   return (
     <>
-      <Button onClick={() => addToast({
-        type: 'success',
-        title: 'Success!',
-        message: 'Your action was completed.'
-      })}>
-        Show Toast
-      </Button>
-      <ToastContainer toasts={toasts} onClose={removeToast} />
+      <Button onClick={handleSuccess}>Show Success</Button>
+      <Button onClick={handleError}>Show Error</Button>
+      <ToastContainer position="top-right" />
     </>
   );
 }
@@ -183,18 +269,27 @@ import { DataTable } from '@papernote/ui';
 import { Edit, Trash } from 'lucide-react';
 
 const columns = [
-  { key: 'name', header: 'Name', sortable: true },
+  { key: 'name', header: 'Name', sortable: true, filterable: true },
   { key: 'email', header: 'Email', sortable: true },
   { 
     key: 'status', 
-    header: 'Status', 
-    render: (row) => <Badge variant="success">{row.status}</Badge>
+    header: 'Status',
+    render: (row) => <Badge variant={row.status === 'active' ? 'success' : 'default'}>{row.status}</Badge>
   },
 ];
 
 const actions = [
-  { label: 'Edit', icon: Edit, onClick: (row) => handleEdit(row) },
-  { label: 'Delete', icon: Trash, onClick: (row) => handleDelete(row), variant: 'danger' },
+  { 
+    label: 'Edit', 
+    icon: <Edit className="h-4 w-4" />, 
+    onClick: (row) => handleEdit(row) 
+  },
+  { 
+    label: 'Delete', 
+    icon: <Trash className="h-4 w-4" />, 
+    onClick: (row) => handleDelete(row), 
+    variant: 'danger' as const 
+  },
 ];
 
 <DataTable
@@ -203,38 +298,101 @@ const actions = [
   actions={actions}
   loading={loading}
   selectable
-  onRowSelect={(selected) => console.log(selected)}
+  onRowSelect={(selectedRows) => console.log(selectedRows)}
   expandable
   renderExpandedRow={(row) => <UserDetails user={row} />}
-  onSortChange={(sort) => setSort(sort)}
-  currentSort={sort}
+  virtualized // Enable for 10,000+ rows
+  virtualHeight="600px"
 />
 ```
 
-### Modal Dialog
+### Form with Validation
 
 ```tsx
-import { Modal, ModalFooter, Button } from '@papernote/ui';
+import { Input, Textarea, Select, Button, Card } from '@papernote/ui';
+import { useState } from 'react';
 
-<Modal
-  isOpen={isOpen}
-  onClose={() => setIsOpen(false)}
-  title="Confirm Action"
-  size="md"
->
-  <p>Are you sure you want to proceed?</p>
-  <ModalFooter>
-    <Button variant="secondary" onClick={() => setIsOpen(false)}>
-      Cancel
-    </Button>
-    <Button variant="primary" onClick={handleConfirm}>
-      Confirm
-    </Button>
-  </ModalFooter>
-</Modal>
+function ContactForm() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    category: '',
+    message: ''
+  });
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Contact Us</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <Input
+            label="Name"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            required
+          />
+          <Input
+            label="Email"
+            type="email"
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            required
+          />
+          <Select
+            label="Category"
+            options={[
+              { value: 'general', label: 'General Inquiry' },
+              { value: 'support', label: 'Support' },
+              { value: 'feedback', label: 'Feedback' }
+            ]}
+            value={formData.category}
+            onChange={setFormData({ ...formData, category: value })}
+          />
+          <Textarea
+            label="Message"
+            value={formData.message}
+            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+            rows={4}
+          />
+          <Button variant="primary" type="submit">
+            Send Message
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 ```
 
-## Development
+### Layout with Sidebar
+
+```tsx
+import { Layout, Sidebar, Page, StatusBar } from '@papernote/ui';
+import { Home, Users, Settings } from 'lucide-react';
+
+const menuItems = [
+  { id: 'home', label: 'Home', icon: <Home />, href: '/' },
+  { id: 'users', label: 'Users', icon: <Users />, href: '/users' },
+  { id: 'settings', label: 'Settings', icon: <Settings />, href: '/settings' },
+];
+
+function App() {
+  return (
+    <Layout
+      sidebar={<Sidebar items={menuItems} />}
+      statusBar={<StatusBar />}
+    >
+      <Page>
+        {/* Your page content */}
+      </Page>
+    </Layout>
+  );
+}
+```
+
+## 🛠️ Development
 
 ```bash
 # Install dependencies
@@ -243,6 +401,9 @@ npm install
 # Build library
 npm run build
 
+# Build Storybook
+npm run build-storybook
+
 # Type check
 npm run typecheck
 
@@ -250,26 +411,35 @@ npm run typecheck
 npm run lint
 ```
 
-## Documentation
+## 📖 Documentation
 
-**📚 [Documentation Index](./docs/INDEX.md)** - Complete documentation hub
+- **[Storybook Live Demo](https://691fcf89b3393605ea470e93-ziadmszluo.chromatic.com/)** - Interactive component playground with 500+ examples
+- **[npm Package](https://www.npmjs.com/package/@papernote/ui)** - Package registry
+- **[GitHub Repository](https://github.com/kwhittenberger/papernote-ui)** - Source code
 
-**Quick Links:**
-- **[Quick Start Guide](./examples/QUICK-START.md)** - Get started in minutes
-- **[Component Catalog](./docs/COMPONENT-CATALOG.md)** - All 111+ components with examples
-- **[Examples](./examples/README.md)** - Example applications and patterns
-- **[Work Summary](./docs/WORK-SUMMARY-2025-11-20.md)** - Latest updates and status
+## 🤝 Contributing
 
-## Contributing
+Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
 
-We welcome contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## License
+## 📄 License
 
 MIT License - Copyright (c) 2025 kwhittenberger
 
 See [LICENSE](./LICENSE) for full details.
 
-## Credits
+## 🙏 Credits
 
-Inspired by Claude's minimal, professional interface design and the aesthetic of quality paper notebooks.
+Inspired by the minimal, professional aesthetic of quality paper notebooks and Claude's interface design.
+
+## 🔗 Links
+
+- [npm Package](https://www.npmjs.com/package/@papernote/ui)
+- [Live Storybook](https://691fcf89b3393605ea470e93-ziadmszluo.chromatic.com/)
+- [GitHub Repository](https://github.com/kwhittenberger/papernote-ui)
+- [Report Issues](https://github.com/kwhittenberger/papernote-ui/issues)

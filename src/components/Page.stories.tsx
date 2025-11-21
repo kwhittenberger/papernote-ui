@@ -19,17 +19,39 @@ export const Default: Story = {
   render: () => (
     <Page>
       <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '1rem' }}>
-        Page Title
+        📓 Notebook Page Component
       </h1>
-      <p style={{ color: '#64748b', marginBottom: '2rem' }}>
-        This is the default page layout with notebook-style background
+      <p style={{ color: '#64748b', marginBottom: '1rem' }}>
+        This is the Page component with authentic notebook styling - look for these features:
       </p>
+      <Card style={{ marginBottom: '1.5rem', backgroundColor: '#fffbeb', border: '1px solid #fbbf24' }}>
+        <CardContent>
+          <h3 style={{ fontWeight: 600, marginBottom: '0.75rem', fontSize: '0.875rem' }}>✨ Notebook Features to Notice:</h3>
+          <ul style={{ marginLeft: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.875rem' }}>
+            <li><strong>Red margin line</strong> - Very subtle red line on the left (3rem from edge)</li>
+            <li><strong>Ruled lines</strong> - Horizontal lines every 2rem creating that lined paper effect</li>
+            <li><strong>Paper texture</strong> - Subtle grain background (look closely at the white area)</li>
+            <li><strong>Shadow & depth</strong> - Elevated paper appearance with shadow</li>
+            <li><strong>Left border</strong> - Binding edge effect (4px border-left)</li>
+            <li><strong>Margins</strong> - Proper spacing and max-width (1400px) for readability</li>
+          </ul>
+        </CardContent>
+      </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Content Card</CardTitle>
+          <CardTitle>Content Area</CardTitle>
         </CardHeader>
         <CardContent>
-          <p>Page content goes here</p>
+          <p style={{ marginBottom: '1rem' }}>
+            Your content goes here with the classic notebook aesthetic. The CSS classes <code style={{ backgroundColor: '#f5f5f5', padding: '0.25rem 0.5rem', borderRadius: '0.25rem' }}>notebook-page</code>,{' '}
+            <code style={{ backgroundColor: '#f5f5f5', padding: '0.25rem 0.5rem', borderRadius: '0.25rem' }}>notebook-margin</code>, and{' '}
+            <code style={{ backgroundColor: '#f5f5f5', padding: '0.25rem 0.5rem', borderRadius: '0.25rem' }}>notebook-ruled</code> work together
+            to create this effect.
+          </p>
+          <p>
+            The ruled lines are intentionally subtle (rgba(231, 229, 228, 0.3)) to not interfere with content readability.
+            Scroll down through other stories to see how this background continues.
+          </p>
         </CardContent>
       </Card>
     </Page>

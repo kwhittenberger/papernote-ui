@@ -4,32 +4,76 @@
 import React from 'react';
 import { PageNavigation } from './PageNavigation';
 
-interface Section {
+export interface Section {
+  /** Unique identifier for the section */
   id: string;
+  /** Display label for the section in navigation */
   label: string;
 }
 
 export interface LayoutProps {
-  /** Sidebar content (usually the Sidebar component) */
+  /** Sidebar content - typically the Sidebar component with navigation items */
   sidebar: React.ReactNode;
-  /** Main page content */
+  /** Main page content - wrap in Page or PageLayout components for notebook styling */
   children: React.ReactNode;
-  /** Status bar component (optional) */
+  /** Optional status bar component displayed at the bottom of the layout */
   statusBar?: React.ReactNode;
-  /** Custom className for the layout container */
+  /** Additional CSS classes to apply to the layout container */
   className?: string;
-  /** External sections for PageNavigation (e.g., from iframe PostMessage) */
+  /** Page sections for navigation dots in the gutter (auto-detected from section IDs in content) */
   sections?: Section[];
 }
 
 /**
- * Complete app layout component that enforces notebook-style structure:
- * - Sidebar on the left (256px wide, flex-shrink-0)
- * - Gutter area between sidebar and content (64px wide) with page navigation dots
- * - Content area that scrolls independently
- * - Optional status bar at the bottom
+ * Layout - Complete application layout with sidebar, gutter, and scrollable content
  *
- * This component handles all layout concerns using flexbox.
+ * The top-level layout component that creates the classic notebook application structure:
+ * - **Sidebar** - Fixed 256px wide navigation sidebar with notebook binding effect
+ * - **Gutter** - 32px space between sidebar and content, contains page navigation dots
+ * - **Content area** - Flexible, independently scrollable main content region
+ * - **Status bar** - Optional fixed bar at the bottom for status information
+ *
+ * The gutter contains PageNavigation dots that automatically track scroll position when sections
+ * are provided. This creates the table-of-contents navigation experience.
+ *
+ * @example Basic usage with sidebar and content
+ * ```tsx
+ * <Layout
+ *   sidebar={
+ *     <Sidebar
+ *       items={[
+ *         { id: 'home', label: 'Home', icon: <Home />, href: '/' },
+ *         { id: 'settings', label: 'Settings', icon: <Settings />, href: '/settings' }
+ *       ]}
+ *       currentPath="/"
+ *     />
+ *   }
+ *   statusBar={<StatusBar />}
+ * >
+ *   <Page>
+ *     <h1>Dashboard</h1>
+ *     <Card>Your content</Card>
+ *   </Page>
+ * </Layout>
+ * ```
+ *
+ * @example With page sections for navigation dots
+ * ```tsx
+ * <Layout
+ *   sidebar={<Sidebar items={items} />}
+ *   sections={[
+ *     { id: 'overview', label: 'Overview' },
+ *     { id: 'stats', label: 'Statistics' },
+ *     { id: 'settings', label: 'Settings' }
+ *   ]}
+ * >
+ *   <Page>
+ *     <section id="overview">...</section>
+ *     <section id="stats">...</section>
+ *     <section id="settings">...</section>
+ *   </Page>
+ * </Layout>
+ * ```
  */
 export const Layout: React.FC<LayoutProps> = ({
   sidebar,
