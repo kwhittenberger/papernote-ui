@@ -7,7 +7,7 @@
 
 A modern React component library with a paper notebook aesthetic - minimal, professional, and expressive. Built with TypeScript, Tailwind CSS, and designed for production use.
 
-**[📖 Live Demo (Storybook)](https://691fcf89b3393605ea470e93-ziadmszluo.chromatic.com/)** • **[📦 npm Package](https://www.npmjs.com/package/@papernote/ui)** • **[💬 GitHub](https://github.com/kwhittenberger/papernote-ui)**
+**[📖 Live Demo (Storybook)](https://691fcf89b3393605ea470e93-rzwuumklem.chromatic.com/)** • **[📦 npm Package](https://www.npmjs.com/package/@papernote/ui)** • **[💬 GitHub](https://github.com/kwhittenberger/papernote-ui)**
 
 ## ✨ Features
 
@@ -413,7 +413,7 @@ npm run lint
 
 ## 📖 Documentation
 
-- **[Storybook Live Demo](https://691fcf89b3393605ea470e93-ziadmszluo.chromatic.com/)** - Interactive component playground with 500+ examples
+- **[Storybook Live Demo](https://691fcf89b3393605ea470e93-rzwuumklem.chromatic.com/)** - Interactive component playground with 500+ examples
 - **[npm Package](https://www.npmjs.com/package/@papernote/ui)** - Package registry
 - **[GitHub Repository](https://github.com/kwhittenberger/papernote-ui)** - Source code
 
@@ -440,6 +440,6 @@ Inspired by the minimal, professional aesthetic of quality paper notebooks and C
 ## 🔗 Links
 
 - [npm Package](https://www.npmjs.com/package/@papernote/ui)
-- [Live Storybook](https://691fcf89b3393605ea470e93-ziadmszluo.chromatic.com/)
+- [Live Storybook](https://691fcf89b3393605ea470e93-rzwuumklem.chromatic.com/)
 - [GitHub Repository](https://github.com/kwhittenberger/papernote-ui)
 - [Report Issues](https://github.com/kwhittenberger/papernote-ui/issues)
