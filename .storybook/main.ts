@@ -10,13 +10,21 @@ const config: StorybookConfig = {
     options: {},
   },
   docs: {
-    autodocs: true, // Enable autodocs for all components
+    autodocs: 'tag', // Only generate for stories with tags: ['autodocs']
+    defaultName: 'Docs', // Default name for docs entries
   },
   typescript: {
+    check: false, // Disable type checking for faster builds
     reactDocgen: 'react-docgen-typescript',
     reactDocgenTypescriptOptions: {
       shouldExtractLiteralValuesFromEnum: true,
       shouldRemoveUndefinedFromOptional: true,
+      savePropValueAsString: true,
+      skipChildrenPropWithoutDoc: false,
+      compilerOptions: {
+        allowSyntheticDefaultImports: true,
+        esModuleInterop: true,
+      },
       propFilter: (prop) => {
         if (prop.parent) {
           return !prop.parent.fileName.includes('node_modules');
