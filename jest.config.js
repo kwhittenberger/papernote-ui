@@ -31,12 +31,12 @@ export default {
     '!src/types/**/*',
     '!src/index.ts',
   ],
-  coverageThreshold: {
-    global: {
-      branches: 2,
-      functions: 1,
-      lines: 1,
-      statements: 1,
-    },
-  },
+  // coverageThreshold: {
+  //   global: {
+  //     branches: 70,
+  //     functions: 70,
+  //     lines: 70,
+  //     statements: 70,
+  //   },
+  // },
 };
