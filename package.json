@@ -1,5 +1,5 @@
 {
-  "name": "notebook-ui",
+  "name": "@papernote/ui",
   "version": "1.0.0",
   "type": "module",
   "description": "A modern React component library with a paper notebook aesthetic - minimal, professional, and expressive",
@@ -87,9 +87,13 @@
     "professional"
   ],
   "author": "kwhittenberger",
-  "license": "PROPRIETARY",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/kwhittenberger/notebook-ui.git"
+  },
+  "homepage": "https://github.com/kwhittenberger/notebook-ui#readme",
+  "bugs": {
+    "url": "https://github.com/kwhittenberger/notebook-ui/issues"
   }
 }

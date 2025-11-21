@@ -1,6 +1,12 @@
-# Notebook UI
+# @papernote/ui
+
+[![npm version](https://img.shields.io/npm/v/@papernote/ui.svg)](https://www.npmjs.com/package/@papernote/ui)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
 
 A modern React component library with a paper notebook aesthetic - minimal, professional, and expressive.
+
+**[📖 Live Demo (Storybook)](https://papernote-ui.chromatic.com)** • **[📦 npm Package](https://www.npmjs.com/package/@papernote/ui)** • **[💬 GitHub Issues](https://github.com/kwhittenberger/notebook-ui/issues)**
 
 ## Features
 
@@ -17,12 +23,12 @@ A modern React component library with a paper notebook aesthetic - minimal, prof
 
 ## Installation
 
-### As Git Dependency
-
 ```bash
-npm install github:kwhittenberger/notebook-ui
+npm install @papernote/ui
 # or
-yarn add github:kwhittenberger/notebook-ui
+yarn add @papernote/ui
+# or
+pnpm add @papernote/ui
 ```
 
 ### Peer Dependencies
@@ -40,7 +46,7 @@ npm install react react-dom react-router-dom lucide-react tailwindcss
 In your main entry file (e.g., `src/main.tsx`):
 
 ```tsx
-import 'notebook-ui/styles';
+import '@papernote/ui/styles';
 ```
 
 ### 2. Configure Tailwind
@@ -48,13 +54,13 @@ import 'notebook-ui/styles';
 In your `tailwind.config.js`:
 
 ```javascript
-import notebookConfig from 'notebook-ui/tailwind-config';
+import notebookConfig from '@papernote/ui/tailwind-config';
 
 export default {
   ...notebookConfig,
   content: [
     './src/**/*.{js,ts,jsx,tsx}',
-    './node_modules/notebook-ui/src/**/*.{js,ts,jsx,tsx}',
+    './node_modules/@papernote/ui/src/**/*.{js,ts,jsx,tsx}',
   ],
 };
 ```
@@ -62,7 +68,7 @@ export default {
 ## Usage
 
 ```tsx
-import { Button, Card, Toast, Table } from 'notebook-ui';
+import { Button, Card, Toast, Table } from '@papernote/ui';
 
 function App() {
   return (
@@ -140,7 +146,7 @@ The library uses a muted, warm color palette inspired by paper and ink:
 ### Button
 
 ```tsx
-import { Button } from 'notebook-ui';
+import { Button } from '@papernote/ui';
 
 <Button variant="primary" size="md" loading={false}>
   Click Me
@@ -150,7 +156,7 @@ import { Button } from 'notebook-ui';
 ### Toast Notifications
 
 ```tsx
-import { ToastContainer, useToast } from 'notebook-ui';
+import { ToastContainer, useToast } from '@papernote/ui';
 
 function App() {
   const { toasts, addToast, removeToast } = useToast();
@@ -173,7 +179,7 @@ function App() {
 ### DataTable with Advanced Features
 
 ```tsx
-import { DataTable } from 'notebook-ui';
+import { DataTable } from '@papernote/ui';
 import { Edit, Trash } from 'lucide-react';
 
 const columns = [
@@ -208,7 +214,7 @@ const actions = [
 ### Modal Dialog
 
 ```tsx
-import { Modal, ModalFooter, Button } from 'notebook-ui';
+import { Modal, ModalFooter, Button } from '@papernote/ui';
 
 <Modal
   isOpen={isOpen}
@@ -254,9 +260,15 @@ npm run lint
 - **[Examples](./examples/README.md)** - Example applications and patterns
 - **[Work Summary](./docs/WORK-SUMMARY-2025-11-20.md)** - Latest updates and status
 
+## Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+
 ## License
 
-Proprietary - Copyright (c) 2025 kwhittenberger
+MIT License - Copyright (c) 2025 kwhittenberger
+
+See [LICENSE](./LICENSE) for full details.
 
 ## Credits
 
