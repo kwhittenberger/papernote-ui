@@ -164,8 +164,8 @@ export const PageNavigation: React.FC<PageNavigationProps> = ({
   if (sections.length === 0) return null;
 
   return (
-    <nav className={`page-nav ${className}`} aria-label="Page sections">
-      <div className="page-nav-dots">
+    <nav className={className} aria-label="Page sections">
+      <div className="flex flex-col gap-2 items-center">
         {sections.map((section) => (
           <div
             key={section.id}
