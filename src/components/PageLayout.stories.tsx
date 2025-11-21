@@ -430,6 +430,12 @@ export const WithSidebarAndGutter: Story = {
       { id: 'settings', label: 'Settings', icon: <Settings className="h-5 w-5" />, href: '#settings' },
     ];
 
+    const sections = [
+      { id: 'overview', label: 'Overview' },
+      { id: 'metrics', label: 'Metrics' },
+      { id: 'activity', label: 'Activity' },
+    ];
+
     return (
       <Layout
         sidebar={
@@ -439,55 +445,83 @@ export const WithSidebarAndGutter: Story = {
           />
         }
         statusBar={<StatusBar />}
+        sections={sections}
       >
         <PageLayout
           title="Dashboard with Complete Layout"
-          description="This shows PageLayout inside Layout - notice the sidebar on the left and the gutter between sidebar and content"
+          description="This shows PageLayout inside Layout - notice the sidebar on the left and the GUTTER with navigation dots between sidebar and content"
         >
-          <Card style={{ marginBottom: '1.5rem', backgroundColor: '#d1fae5', border: '1px solid #10b981' }}>
-            <CardContent>
-              <h3 style={{ fontWeight: 600, marginBottom: '0.75rem', fontSize: '0.875rem', color: '#065f46' }}>
-                ✅ Complete Layout with Sidebar & Gutter
-              </h3>
-              <p style={{ fontSize: '0.875rem', marginBottom: '0.5rem' }}>
-                Now you can see the <strong>gutter</strong> (the narrow space between the sidebar and content).
-                This is where navigation dots would appear if you had page sections defined.
-              </p>
-              <p style={{ fontSize: '0.875rem' }}>
-                Check out the <strong>Layout</strong> component stories to see the gutter navigation in action with scrollable sections.
-              </p>
-            </CardContent>
-          </Card>
+          <section id="overview">
+            <Card style={{ marginBottom: '1.5rem', backgroundColor: '#d1fae5', border: '1px solid #10b981' }}>
+              <CardContent>
+                <h3 style={{ fontWeight: 600, marginBottom: '0.75rem', fontSize: '0.875rem', color: '#065f46' }}>
+                  ✅ Complete Layout with Sidebar & Gutter Navigation Dots
+                </h3>
+                <p style={{ fontSize: '0.875rem', marginBottom: '0.5rem' }}>
+                  Now you can see the <strong>gutter</strong> (the narrow space between the sidebar and content) with
+                  <strong> navigation dots</strong>! The dots track which section is visible as you scroll.
+                </p>
+                <p style={{ fontSize: '0.875rem' }}>
+                  Scroll down to see the dots change as you move between Overview, Metrics, and Activity sections.
+                </p>
+              </CardContent>
+            </Card>
+          </section>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }}>
+          <section id="metrics" style={{ minHeight: '600px', paddingTop: '2rem' }}>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem' }}>Metrics</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }}>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Total Users</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div style={{ fontSize: '2rem', fontWeight: 700, color: '#3b82f6' }}>1,234</div>
+                  <div style={{ fontSize: '0.875rem', color: '#10b981', marginTop: '0.5rem' }}>↑ 12% from last month</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Revenue</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div style={{ fontSize: '2rem', fontWeight: 700, color: '#10b981' }}>$45,678</div>
+                  <div style={{ fontSize: '0.875rem', color: '#10b981', marginTop: '0.5rem' }}>↑ 8% from last month</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Active Orders</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div style={{ fontSize: '2rem', fontWeight: 700, color: '#f59e0b' }}>89</div>
+                  <div style={{ fontSize: '0.875rem', color: '#64748b', marginTop: '0.5rem' }}>Pending fulfillment</div>
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+
+          <section id="activity" style={{ minHeight: '600px', paddingTop: '2rem' }}>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem' }}>Recent Activity</h2>
             <Card>
-              <CardHeader>
-                <CardTitle>Total Users</CardTitle>
-              </CardHeader>
               <CardContent>
-                <div style={{ fontSize: '2rem', fontWeight: 700, color: '#3b82f6' }}>1,234</div>
-                <div style={{ fontSize: '0.875rem', color: '#10b981', marginTop: '0.5rem' }}>↑ 12% from last month</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.75rem', borderBottom: '1px solid #e5e5e5' }}>
+                    <span>New user registration</span>
+                    <span style={{ color: '#64748b', fontSize: '0.875rem' }}>2 minutes ago</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.75rem', borderBottom: '1px solid #e5e5e5' }}>
+                    <span>Order #1234 completed</span>
+                    <span style={{ color: '#64748b', fontSize: '0.875rem' }}>15 minutes ago</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>Payment received</span>
+                    <span style={{ color: '#64748b', fontSize: '0.875rem' }}>1 hour ago</span>
+                  </div>
+                </div>
               </CardContent>
             </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>Revenue</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div style={{ fontSize: '2rem', fontWeight: 700, color: '#10b981' }}>$45,678</div>
-                <div style={{ fontSize: '0.875rem', color: '#10b981', marginTop: '0.5rem' }}>↑ 8% from last month</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>Active Orders</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div style={{ fontSize: '2rem', fontWeight: 700, color: '#f59e0b' }}>89</div>
-                <div style={{ fontSize: '0.875rem', color: '#64748b', marginTop: '0.5rem' }}>Pending fulfillment</div>
-              </CardContent>
-            </Card>
-          </div>
+          </section>
         </PageLayout>
       </Layout>
     );

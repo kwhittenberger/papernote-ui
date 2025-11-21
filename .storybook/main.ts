@@ -4,14 +4,13 @@ const config: StorybookConfig = {
   stories: ['../src/**/*.stories.@(js|jsx|ts|tsx|mdx)'],
   addons: [
     '@storybook/addon-a11y',
-    '@storybook/addon-docs',
   ],
   framework: {
     name: '@storybook/react-vite',
     options: {},
   },
   docs: {
-    autodocs: 'tag',
+    autodocs: true, // Enable autodocs for all components
   },
   typescript: {
     reactDocgen: 'react-docgen-typescript',

@@ -22,6 +22,9 @@ const preview: Preview = {
         },
       ],
     },
+    docs: {
+      toc: true, // Enable table of contents
+    },
   },
 };
 
