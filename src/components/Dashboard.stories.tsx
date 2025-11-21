@@ -23,16 +23,28 @@ export const Default: Story = {
       <div style={{ padding: '2rem' }}>
         <Dashboard>
           <DashboardHeader
-            title="Dashboard"
-            subtitle="Welcome back! Here's your overview."
+            title="📊 Dashboard Component"
+            subtitle="Simple wrapper for consistent dashboard layouts"
           />
           <DashboardContent>
+            <Card style={{ marginBottom: '1.5rem', backgroundColor: '#fffbeb', border: '2px solid #fbbf24' }}>
+              <CardContent>
+                <h3 style={{ fontWeight: 600, marginBottom: '0.75rem', fontSize: '0.875rem' }}>🎯 What Dashboard Provides:</h3>
+                <ul style={{ marginLeft: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.875rem' }}>
+                  <li><strong>DashboardHeader</strong> - Consistent header with title, subtitle, and optional action buttons</li>
+                  <li><strong>DashboardContent</strong> - Content area with proper spacing and grid support</li>
+                  <li><strong>Composable</strong> - Use inside Page or PageLayout for paper aesthetic</li>
+                  <li><strong>Flexible</strong> - Supports any grid layout (cards, tables, charts, etc.)</li>
+                </ul>
+              </CardContent>
+            </Card>
             <Card>
               <CardHeader>
                 <CardTitle>Content Section</CardTitle>
               </CardHeader>
               <CardContent>
-                <p>Dashboard content goes here</p>
+                <p style={{ marginBottom: '0.75rem' }}>Dashboard is a lightweight wrapper that provides consistent header and content structure.</p>
+                <p style={{ color: '#64748b', fontSize: '0.875rem' }}>See other stories for complete dashboard examples with metrics, analytics, and project tracking.</p>
               </CardContent>
             </Card>
           </DashboardContent>
