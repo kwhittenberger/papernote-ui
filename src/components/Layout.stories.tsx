@@ -19,7 +19,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const menuItems = [
+const sidebarItems = [
   { id: 'dashboard', label: 'Dashboard', icon: <Home className="h-5 w-5" />, href: '#dashboard' },
   { id: 'users', label: 'Users', icon: <Users className="h-5 w-5" />, href: '#users' },
   { id: 'products', label: 'Products', icon: <ShoppingCart className="h-5 w-5" />, href: '#products' },
@@ -38,10 +38,8 @@ export const Default: Story = {
       <Layout
         sidebar={
           <Sidebar
-            menuItems={menuItems}
-            activeItem={activeItem}
-            onItemClick={setActiveItem}
-            title="My Application"
+            items={sidebarItems}
+            currentPath={`#${activeItem}`}
           />
         }
         statusBar={<StatusBar />}
@@ -77,10 +75,8 @@ export const WithoutStatusBar: Story = {
       <Layout
         sidebar={
           <Sidebar
-            menuItems={menuItems}
-            activeItem={activeItem}
-            onItemClick={setActiveItem}
-            title="My Application"
+            items={sidebarItems}
+            currentPath={`#${activeItem}`}
           />
         }
       >
@@ -119,10 +115,8 @@ export const WithPageSections: Story = {
       <Layout
         sidebar={
           <Sidebar
-            menuItems={menuItems}
-            activeItem={activeItem}
-            onItemClick={setActiveItem}
-            title="My Application"
+            items={sidebarItems}
+            currentPath={`#${activeItem}`}
           />
         }
         statusBar={<StatusBar />}
