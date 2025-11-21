@@ -12,7 +12,9 @@
       "Bash(npm run lint)",
       "Bash(npm install:*)",
       "Bash(npm view:*)",
-      "Bash(npm org:*)"
+      "Bash(npm org:*)",
+      "Bash(npm run build-storybook:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []
