@@ -9,6 +9,8 @@ dist/
 build/
 *.tsbuildinfo
 storybook-static/
+docs-site/.vitepress/dist/
+docs-site/.vitepress/cache/
 
 # IDE
 .vscode/

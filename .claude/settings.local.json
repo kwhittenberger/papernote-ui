@@ -32,7 +32,8 @@
       "mcp__filesystem__read_multiple_files",
       "Bash(comm:*)",
       "Bash(npm whoami:*)",
-      "Bash(npm test:*)"
+      "Bash(npm test:*)",
+      "Bash(npm run docs:dev:*)"
     ],
     "deny": [],
     "ask": []
