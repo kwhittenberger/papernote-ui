@@ -249,3 +249,34 @@ export const Complete: Story = {
     return <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} variant="underline" />;
   },
 };
+
+export const ControlledMode: Story = {
+  render: () => {
+    const [activeTab, setActiveTab] = useState('profile');
+    return (
+      <div>
+        <div style={{ marginBottom: '1rem', display: 'flex', gap: '0.5rem' }}>
+          <button
+            onClick={() => setActiveTab('profile')}
+            style={{ padding: '0.5rem 1rem', background: activeTab === 'profile' ? '#334155' : '#f1f5f9', color: activeTab === 'profile' ? 'white' : '#334155', border: 'none', borderRadius: '0.375rem', cursor: 'pointer' }}
+          >
+            Go to Profile
+          </button>
+          <button
+            onClick={() => setActiveTab('settings')}
+            style={{ padding: '0.5rem 1rem', background: activeTab === 'settings' ? '#334155' : '#f1f5f9', color: activeTab === 'settings' ? 'white' : '#334155', border: 'none', borderRadius: '0.375rem', cursor: 'pointer' }}
+          >
+            Go to Settings
+          </button>
+          <button
+            onClick={() => setActiveTab('notifications')}
+            style={{ padding: '0.5rem 1rem', background: activeTab === 'notifications' ? '#334155' : '#f1f5f9', color: activeTab === 'notifications' ? 'white' : '#334155', border: 'none', borderRadius: '0.375rem', cursor: 'pointer' }}
+          >
+            Go to Notifications
+          </button>
+        </div>
+        <Tabs tabs={basicTabs} activeTab={activeTab} onChange={setActiveTab} />
+      </div>
+    );
+  },
+};

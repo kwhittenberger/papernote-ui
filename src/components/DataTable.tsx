@@ -502,6 +502,9 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
   const [scrollTop, setScrollTop] = useState(0);
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
+  // Row hover state (for coordinating primary + secondary row highlighting)
+  const [hoveredRowKey, setHoveredRowKey] = useState<string | null>(null);
+
   // Filter columns based on hiddenColumns
   const baseVisibleColumns = columns.filter(
     col => !hiddenColumns.includes(String(col.key))
@@ -980,50 +983,83 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
       const isSelected = selectedRowsSet.has(rowKey);
       const isExpanded = expandedRowsSet.has(rowKey);
       const rowBgClass = getRowBackgroundClass(item, index);
-      const hoverClass = disableHover ? '' : 'hover:bg-paper-100';
       const borderClass = bordered ? `border-b ${borderColor}` : (!visibleColumns.some(col => !!col.renderSecondary) ? `border-b ${borderColor}` : '');
+      const hasSecondaryRow = visibleColumns.some(col => !!col.renderSecondary);
+
+      // Hover state for row pair (primary + secondary)
+      const isHovered = hoveredRowKey === rowKey;
+      const hoverClass = disableHover ? '' : (isHovered ? 'bg-paper-100' : '');
 
       return (
       <React.Fragment key={rowKey}>
         <tr
-          className={`${hoverClass} table-row-stable ${onRowDoubleClick || onRowClick || (expandedRowConfig?.edit?.triggerOnDoubleClick !== false) || (expandedRowConfig?.details?.triggerOnDoubleClick === true) ? 'cursor-pointer' : ''} ${isSelected ? 'bg-accent-50 border-l-2 border-accent-500' : rowBgClass} ${borderClass}`}
+          className={`table-row-stable ${onRowDoubleClick || onRowClick || onEdit || expandedRowConfig?.edit || expandedRowConfig?.details || expandedRowConfig?.addRelated?.length || expandedRowConfig?.manageRelated?.length ? 'cursor-pointer' : ''} ${isSelected ? 'bg-accent-50 border-l-2 border-accent-500' : hoverClass || rowBgClass} ${borderClass}`}
+          onMouseEnter={() => !disableHover && setHoveredRowKey(rowKey)}
+          onMouseLeave={() => !disableHover && setHoveredRowKey(null)}
           onClick={() => onRowClick?.(item)}
           onDoubleClick={() => {
-            // Check for edit mode with triggerOnDoubleClick
-            if (expandedRowConfig?.edit && expandedRowConfig.edit.triggerOnDoubleClick !== false) {
+            // Priority 1: If there's an onEdit handler (legacy), trigger it
+            if (onEdit) {
+              onEdit(item);
+            }
+            // Priority 2: If there's an expandable edit mode, trigger it
+            else if (expandedRowConfig?.edit) {
               handleExpansionWithMode(rowKey, 'edit');
             }
-            // Check for details mode with triggerOnDoubleClick
-            else if (expandedRowConfig?.details && expandedRowConfig.details.triggerOnDoubleClick === true) {
+            // Priority 3: If there's an expandable details mode, trigger it
+            else if (expandedRowConfig?.details) {
               handleExpansionWithMode(rowKey, 'details');
             }
-            // Legacy: use onRowDoubleClick handler
+            // Priority 4: If there's any addRelated mode, trigger the first one
+            else if (expandedRowConfig?.addRelated && expandedRowConfig.addRelated.length > 0) {
+              handleExpansionWithMode(rowKey, `addRelated-${expandedRowConfig.addRelated[0].key}`);
+            }
+            // Priority 5: If there's any manageRelated mode, trigger the first one
+            else if (expandedRowConfig?.manageRelated && expandedRowConfig.manageRelated.length > 0) {
+              handleExpansionWithMode(rowKey, `manageRelated-${expandedRowConfig.manageRelated[0].key}`);
+            }
+            // Priority 6: Legacy onRowDoubleClick handler
             else {
               onRowDoubleClick?.(item);
             }
           }}
           title={
-            expandedRowConfig?.edit && expandedRowConfig.edit.triggerOnDoubleClick !== false ? 'Double-click to edit inline' :
-            expandedRowConfig?.details && expandedRowConfig.details.triggerOnDoubleClick === true ? 'Double-click to view details' :
-            onRowDoubleClick ? 'Double-click to open details' : 
-            onRowClick ? 'Click to select' : 
+            onEdit ? 'Double-click to edit' :
+            expandedRowConfig?.edit ? 'Double-click to edit inline' :
+            expandedRowConfig?.details ? 'Double-click to view details' :
+            expandedRowConfig?.addRelated && expandedRowConfig.addRelated.length > 0 ? `Double-click to ${expandedRowConfig.addRelated[0].label}` :
+            expandedRowConfig?.manageRelated && expandedRowConfig.manageRelated.length > 0 ? `Double-click to ${expandedRowConfig.manageRelated[0].label}` :
+            onRowDoubleClick ? 'Double-click for details' :
+            onRowClick ? 'Click to select' :
             undefined
           }
         >
           {selectable && (
-          <td className={`sticky left-0 bg-white ${currentDensity.cell} z-10 align-middle ${bordered ? `border ${borderColor}` : ''}`}>
+          <td
+            className={`sticky left-0 z-10 ${bordered ? `border ${borderColor}` : ''}`}
+            style={{
+              backgroundColor: 'inherit',
+              verticalAlign: 'middle',
+              padding: '0.375rem 0.75rem',
+              textAlign: 'center'
+            }}
+            rowSpan={hasSecondaryRow ? 2 : 1}
+          >
             <input
               type="checkbox"
               checked={isSelected}
               onChange={() => handleRowSelect(rowKey)}
               className="w-4 h-4 text-accent-600 border-paper-300 rounded focus:ring-accent-400"
-              style={{ verticalAlign: 'middle' }}
               aria-label={`Select row ${rowKey}`}
             />
           </td>
           )}
             {((expandable || expandedRowConfig) && showExpandChevron) && (
-            <td className={`sticky left-0 bg-white px-2 ${currentDensity.cell} z-10 ${bordered ? `border ${borderColor}` : ''}`}>
+            <td
+              className={`sticky left-0 px-2 ${currentDensity.cell} z-10 ${bordered ? `border ${borderColor}` : ''}`}
+              style={{ backgroundColor: 'inherit', verticalAlign: 'middle' }}
+              rowSpan={hasSecondaryRow ? 2 : 1}
+            >
               <button
                 onClick={() => {
                   // NEW: Enhanced logic for expandedRowConfig
@@ -1059,14 +1095,14 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
               verticalAlign: 'middle'
             }}
             onClick={(e) => e.stopPropagation()}
-            rowSpan={visibleColumns.some(col => !!col.renderSecondary) ? 2 : 1}
+            rowSpan={hasSecondaryRow ? 2 : 1}
           >
             <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '28px' }}>
               <ActionMenu actions={allActions} item={item} />
             </div>
           </td>
         )}
-        {visibleColumns.map((column) => {
+        {visibleColumns.map((column, colIdx) => {
           const columnKey = String(column.key);
           const dynamicWidth = columnWidths[columnKey];
           const value = typeof column.key === 'string'
@@ -1075,10 +1111,14 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
 
           const primaryContent = column.render ? column.render(item, value) : String(value || '');
 
+          // Reduce left padding on first column when there are action buttons
+          const isFirstColumn = colIdx === 0;
+          const paddingClass = isFirstColumn && allActions.length > 0 ? 'pl-3' : '';
+
           return (
             <td
               key={`${item.id}-${columnKey}`}
-              className={`${currentDensity.cell} ${column.className || ''} ${bordered ? `border ${borderColor}` : ''}`}
+              className={`${currentDensity.cell} ${paddingClass} ${column.className || ''} ${bordered ? `border ${borderColor}` : ''}`}
               style={getColumnStyle(column, dynamicWidth)}
             >
               <div className={`${currentDensity.text} leading-tight`}>{primaryContent}</div>
@@ -1088,12 +1128,16 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
             </tr>
             
             {/* Secondary row - only render if any column has renderSecondary */}
-            {visibleColumns.some(col => !!col.renderSecondary) && (
-              <tr className={`secondary-row ${hoverClass} border-b ${borderColor}`}>
-                {selectable && <td className={`sticky left-0 bg-white ${currentDensity.cell} py-0.5 z-10 ${bordered ? `border ${borderColor}` : ''}`}></td>}
-                {((expandable || expandedRowConfig) && showExpandChevron) && <td className={`sticky left-0 bg-white px-2 py-0.5 z-10 ${bordered ? `border ${borderColor}` : ''}`}></td>}
+            {hasSecondaryRow && (
+              <tr
+                className={`secondary-row ${isSelected ? 'bg-accent-50 border-l-2 border-accent-500' : hoverClass || rowBgClass} border-b ${borderColor}`}
+                onMouseEnter={() => !disableHover && setHoveredRowKey(rowKey)}
+                onMouseLeave={() => !disableHover && setHoveredRowKey(null)}
+              >
+                {/* Selectable checkbox uses rowspan from primary row, no cell needed here */}
+                {/* Expand chevron uses rowspan from primary row, no cell needed here */}
                 {/* Actions column uses rowspan from primary row, no cell needed here */}
-                {visibleColumns.map((column) => {
+                {visibleColumns.map((column, colIdx) => {
                   const columnKey = String(column.key);
                   const dynamicWidth = columnWidths[columnKey];
                   const value = typeof column.key === 'string'
@@ -1101,10 +1145,14 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
                     : item[column.key];
                   const secondaryContent = column.renderSecondary ? column.renderSecondary(item, value) : null;
 
+                  // Reduce left padding on first column when there are action buttons
+                  const isFirstColumn = colIdx === 0;
+                  const paddingClass = isFirstColumn && allActions.length > 0 ? 'pl-3' : '';
+
                   return (
                     <td
                       key={`${item.id}-${columnKey}-secondary`}
-                      className={`${currentDensity.cell} py-0.5 ${column.className || ''} ${bordered ? `border ${borderColor}` : ''}`}
+                      className={`${currentDensity.cell} py-0.5 ${paddingClass} ${column.className || ''} ${bordered ? `border ${borderColor}` : ''}`}
                       style={getColumnStyle(column, dynamicWidth)}
                     >
                       <div className="text-xs text-ink-500 leading-tight">

@@ -283,12 +283,16 @@ export type { NotificationIndicatorProps } from './NotificationIndicator';
 
 // Data Table
 export { default as DataTable } from './DataTable';
-export type { 
-  DataTableColumn, 
+export type {
+  DataTableColumn,
   DataTableAction,
   ExpandedRowConfig,
   ExpansionMode
 } from './DataTable';
+
+// Spreadsheet
+export { Spreadsheet, SpreadsheetReport } from './Spreadsheet';
+export type { SpreadsheetProps, SpreadsheetCell, Matrix, CellBase } from './Spreadsheet';
 
 export { default as ExpandedRowEditForm } from './ExpandedRowEditForm';
 export type {

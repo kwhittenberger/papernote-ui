@@ -44,7 +44,7 @@ src/
 
 **Layout Primitives**: Stack, Grid, GridItem, Box, Text, Card (with CardHeader, CardTitle, CardContent, CardFooter)
 
-**Data Display**: DataTable (feature-rich with sorting/filtering/expansion), Table (basic), Badge, StatusBadge, CurrencyDisplay, DateDisplay
+**Data Display**: DataTable (feature-rich with sorting/filtering/expansion), Table (basic), Badge, StatusBadge, CurrencyDisplay, DateDisplay, Spreadsheet (Excel-like with formulas)
 
 **Feedback**: Toast (with addSuccessMessage, addErrorMessage, etc.), Alert, Modal, ConfirmDialog, Tooltip
 
@@ -71,6 +71,33 @@ The library uses a muted, warm color palette defined in `tailwind.config.js`:
 - Row expansion with multiple modes
 - Selection and pagination
 - Loading states
+
+**Spreadsheet** (`src/components/Spreadsheet.tsx`) provides Excel-like functionality for report designers:
+- Built on react-spreadsheet with Fast Formula Parser (280+ Excel formulas)
+- Formula support: SUM, AVERAGE, VLOOKUP, IF, COUNT, DATE, and 275+ more
+- Excel import/export via SheetJS (xlsx package)
+- Save/load functionality with async support
+- Keyboard navigation and copy/paste
+- Two components: `Spreadsheet` (configurable) and `SpreadsheetReport` (pre-configured)
+- Example formulas: `=SUM(B2:B10)`, `=AVERAGE(C1:C5)`, `=IF(A1>100, "High", "Low")`
+
+```typescript
+import { SpreadsheetReport, Matrix, SpreadsheetCell } from 'notebook-ui';
+
+const [reportData, setReportData] = useState<Matrix<SpreadsheetCell>>([
+  [{ value: 'Q1' }, { value: 100 }],
+  [{ value: 'Q2' }, { value: 200 }],
+  [{ value: 'Total' }, { formula: '=SUM(B1:B2)' }],
+]);
+
+<SpreadsheetReport
+  data={reportData}
+  onChange={setReportData}
+  title="Sales Report"
+  onSave={async (data) => await api.saveReport(data)}
+  exportFileName="sales-report.xlsx"
+/>
+```
 
 **Toast system** uses a global `statusManager` with convenience functions:
 ```typescript

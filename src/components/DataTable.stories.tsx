@@ -334,3 +334,90 @@ export const FullFeatured: Story = {
     ),
   },
 };
+
+export const WithSecondaryRows: Story = {
+  args: {
+    data: sampleUsers,
+    columns: [
+      {
+        key: 'name',
+        header: 'Name',
+        sortable: true,
+        renderSecondary: (user: User) => (
+          <span className="text-xs text-ink-500">Member since {user.joinedAt}</span>
+        ),
+      },
+      {
+        key: 'email',
+        header: 'Email',
+        sortable: true,
+        renderSecondary: (user: User) => (
+          <span className="text-xs text-ink-500">{user.role}</span>
+        ),
+      },
+      {
+        key: 'status',
+        header: 'Status',
+        render: (user: User) => (
+          <Badge variant={user.status === 'active' ? 'success' : user.status === 'inactive' ? 'error' : 'warning'}>
+            {user.status}
+          </Badge>
+        ),
+      },
+    ],
+    selectable: true,
+    actions: [
+      {
+        label: 'Edit',
+        icon: <Edit className="h-4 w-4" />,
+        onClick: (user: User) => alert(`Edit ${user.name}`),
+      },
+      {
+        label: 'View',
+        icon: <Eye className="h-4 w-4" />,
+        onClick: (user: User) => alert(`View ${user.name}`),
+      },
+    ],
+  },
+};
+
+export const FullWidthWrappingText: Story = {
+  args: {
+    data: [
+      { id: '1', name: 'ADOBE Adobe Systems SAN JOSE CA - Expense - Monthly subscription for creative cloud services' },
+      { id: '2', name: 'AMAZON PRIME Amazon.com SEATTLE WA - Entertainment - Annual membership fee' },
+      { id: '3', name: 'SPOTIFY Spotify USA NEW YORK NY - Music streaming service monthly payment' },
+      { id: '4', name: 'NETFLIX Netflix.com LOS GATOS CA - Video streaming monthly subscription' },
+      { id: '5', name: 'MICROSOFT Microsoft Corporation REDMOND WA - Office 365 business subscription annual fee' },
+    ],
+    columns: [
+      {
+        key: 'name',
+        header: 'Transaction Name',
+        flex: 1,
+      },
+    ],
+  },
+};
+
+export const FullWidthWithSecondaryRow: Story = {
+  args: {
+    data: [
+      { id: '1', name: 'ADOBE Adobe Systems SAN JOSE CA - Expense', frequency: 'Monthly', amount: '$16.52' },
+      { id: '2', name: 'AMAZON PRIME Amazon.com SEATTLE WA - Entertainment', frequency: 'Monthly', amount: '$25.00' },
+      { id: '3', name: 'SPOTIFY Spotify USA NEW YORK NY - Music streaming service', frequency: 'Monthly', amount: '$9.99' },
+      { id: '4', name: 'NETFLIX Netflix.com LOS GATOS CA - Video streaming', frequency: 'Monthly', amount: '$15.49' },
+      { id: '5', name: 'MICROSOFT Microsoft Corporation REDMOND WA - Office 365 business subscription', frequency: 'Annual', amount: '$132.14' },
+    ],
+    columns: [
+      {
+        key: 'name',
+        header: 'Name',
+        flex: 1,
+        renderSecondary: (item: any) => (
+          <span className="text-xs text-ink-500">{item.frequency} • {item.amount}</span>
+        ),
+      },
+    ],
+  },
+};

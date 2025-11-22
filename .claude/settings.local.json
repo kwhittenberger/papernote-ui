@@ -37,7 +37,8 @@
       "Bash(node -e:*)",
       "Bash(npm ls:*)",
       "Bash(npm ci:*)",
-      "Bash(npm run lint:*)"
+      "Bash(npm run lint:*)",
+      "WebSearch"
     ],
     "deny": [],
     "ask": []

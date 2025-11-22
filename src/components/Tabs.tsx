@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export interface Tab {
   id: string;
@@ -10,20 +10,44 @@ export interface Tab {
 
 export interface TabsProps {
   tabs: Tab[];
+  /** Controlled mode: Currently active tab ID */
+  activeTab?: string;
+  /** Uncontrolled mode: Initial tab ID (ignored if activeTab is provided) */
   defaultTab?: string;
   variant?: 'underline' | 'pill';
   /** Orientation of tabs (default: 'horizontal') */
   orientation?: 'horizontal' | 'vertical';
   /** Size of tabs (default: 'md') */
   size?: 'sm' | 'md' | 'lg';
+  /** Called when tab changes (required for controlled mode) */
   onChange?: (tabId: string) => void;
 }
 
-export default function Tabs({ tabs, defaultTab, variant = 'underline', orientation = 'horizontal', size = 'md', onChange }: TabsProps) {
-  const [activeTab, setActiveTab] = useState(defaultTab || tabs[0]?.id);
+export default function Tabs({ tabs, activeTab: controlledActiveTab, defaultTab, variant = 'underline', orientation = 'horizontal', size = 'md', onChange }: TabsProps) {
+  const [internalActiveTab, setInternalActiveTab] = useState(defaultTab || tabs[0]?.id);
+
+  // Controlled mode: use activeTab prop, Uncontrolled mode: use internal state
+  const isControlled = controlledActiveTab !== undefined;
+  const activeTab = isControlled ? controlledActiveTab : internalActiveTab;
+
+  // Ensure the activeTab exists in the current tabs array
+  // This handles the case where tabs array reference changes at the same time as activeTab
+  useEffect(() => {
+    const tabExists = tabs.some(tab => tab.id === activeTab);
+    if (!tabExists && tabs.length > 0) {
+      // If the activeTab doesn't exist in the new tabs array, use the first tab
+      if (isControlled) {
+        onChange?.(tabs[0].id);
+      } else {
+        setInternalActiveTab(tabs[0].id);
+      }
+    }
+  }, [tabs, activeTab, isControlled, onChange]);
 
   const handleTabChange = (tabId: string) => {
-    setActiveTab(tabId);
+    if (!isControlled) {
+      setInternalActiveTab(tabId);
+    }
     onChange?.(tabId);
   };
 

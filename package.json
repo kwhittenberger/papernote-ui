@@ -68,6 +68,7 @@
     "jest-environment-jsdom": "^30.2.0",
     "lucide-react": "^0.554.0",
     "postcss": "^8.4.0",
+    "postcss-import": "^16.1.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.9.6",
@@ -104,5 +105,9 @@
   "homepage": "https://github.com/kwhittenberger/papernote-ui#readme",
   "bugs": {
     "url": "https://github.com/kwhittenberger/papernote-ui/issues"
+  },
+  "dependencies": {
+    "react-spreadsheet": "^0.10.1",
+    "xlsx": "^0.18.5"
   }
 }
