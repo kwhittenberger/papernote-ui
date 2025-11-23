@@ -22,6 +22,14 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Upgrade npm for OIDC support
+        run: |
+          echo "Current npm version:"
+          npm --version
+          npm install -g npm@latest
+          echo "Updated npm version:"
+          npm --version
+
       - name: Install dependencies
         run: npm ci
 
@@ -52,6 +60,20 @@ jobs:
             exit 1
           fi
           echo "Build output verified successfully"
+
+      - name: Debug OIDC environment
+        run: |
+          echo "Checking for OIDC environment variables..."
+          if [ -n "$ACTIONS_ID_TOKEN_REQUEST_URL" ]; then
+            echo "✓ ACTIONS_ID_TOKEN_REQUEST_URL is set"
+          else
+            echo "✗ ACTIONS_ID_TOKEN_REQUEST_URL is NOT set"
+          fi
+          if [ -n "$ACTIONS_ID_TOKEN_REQUEST_TOKEN" ]; then
+            echo "✓ ACTIONS_ID_TOKEN_REQUEST_TOKEN is set"
+          else
+            echo "✗ ACTIONS_ID_TOKEN_REQUEST_TOKEN is NOT set"
+          fi
 
       - name: Publish to npm
         run: npm publish --access public --provenance
