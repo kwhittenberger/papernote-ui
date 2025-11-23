@@ -20,7 +20,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          # registry-url removed - using OIDC via Trusted Publishers instead
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
         run: npm ci
