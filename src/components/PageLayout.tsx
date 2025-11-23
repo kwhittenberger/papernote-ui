@@ -12,6 +12,10 @@ export interface PageLayoutProps {
   className?: string;
   /** Optional content to render before the title (e.g., breadcrumbs, alerts, control bars) */
   headerContent?: ReactNode;
+  /** Maximum width constraint for the page content (default: '7xl' = 1400px) */
+  maxWidth?: '4xl' | '5xl' | '6xl' | '7xl' | 'full';
+  /** Fix all margins/padding instead of responsive (default: false) */
+  fixed?: boolean;
 }
 
 /**
@@ -51,19 +55,34 @@ export interface PageLayoutProps {
  * </Layout>
  * ```
  */
-export function PageLayout({ 
-  title, 
-  description, 
-  children, 
+export function PageLayout({
+  title,
+  description,
+  children,
   className = '',
-  headerContent
+  headerContent,
+  maxWidth = '7xl',
+  fixed = false
 }: PageLayoutProps) {
+  // Responsive padding classes - fixed left/top, responsive right/bottom
+  const paddingClasses = fixed
+    ? 'p-6 pb-20'
+    : 'pt-6 pl-6 pr-2 pb-8 sm:pr-4 md:pr-6 sm:pb-12 md:pb-16 lg:pb-20';
+
+  const maxWidthClasses = {
+    '4xl': 'max-w-4xl',
+    '5xl': 'max-w-5xl',
+    '6xl': 'max-w-6xl',
+    '7xl': 'max-w-7xl',
+    'full': 'max-w-full',
+  };
+
   return (
-    <Page>
+    <Page padding="none" maxWidth={maxWidth} fixed={fixed}>
       {/* Content before title (e.g., ControlBar) */}
       {headerContent}
-      
-      <div className={`p-6 max-w-7xl mx-auto pb-20 ${className}`}>
+
+      <div className={`${paddingClasses} ${maxWidthClasses[maxWidth]} mx-auto ${className}`}>
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-ink-900 mb-2">{title}</h1>
@@ -71,7 +90,7 @@ export function PageLayout({
             <p className="text-ink-600">{description}</p>
           )}
         </div>
-        
+
         {children}
       </div>
     </Page>

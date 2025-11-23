@@ -35,7 +35,7 @@ src/
 ├── components/     # All React components (70+ exports)
 ├── types/          # Shared TypeScript interfaces
 ├── styles/         # Global CSS (index.css)
-└── utils/          # Helper functions (statisticsFormatter, sqlToNaturalLanguage)
+└── utils/          # Helper functions (statisticsFormatter, sqlToNaturalLanguage, excelExport)
 ```
 
 ### Component Categories
@@ -109,6 +109,49 @@ import { addSuccessMessage, addErrorMessage } from 'notebook-ui';
 - `PaginationResponse`: Standard paginated API response shape
 - `DataFetchParams`: Parameters for fetching paginated data
 - `SortConfig`, `AppliedFilter`: Sorting and filtering state
+
+**Excel Export Utilities** (`src/utils/excelExport.ts`) for exporting data to Excel without the Spreadsheet component:
+- `exportToExcel`: Export any data array to Excel with custom columns and formatting
+- `exportDataTableToExcel`: Helper specifically for DataTable data
+- `createMultiSheetExcel`: Create multi-sheet Excel workbooks
+
+```typescript
+import { exportToExcel, exportDataTableToExcel, createMultiSheetExcel } from 'notebook-ui';
+
+// Simple export
+exportToExcel({
+  data: products,
+  filename: 'products.xlsx',
+});
+
+// Custom columns with formatting
+exportToExcel({
+  data: users,
+  filename: 'users.xlsx',
+  columns: [
+    { key: 'id', label: 'User ID' },
+    { key: 'name', label: 'Full Name' },
+    { key: 'createdAt', label: 'Joined', format: (date) => new Date(date).toLocaleDateString() },
+    { key: 'isActive', label: 'Status', format: (active) => active ? 'Active' : 'Inactive' },
+  ],
+});
+
+// Export DataTable data
+exportDataTableToExcel({
+  data: tableData,
+  columns: tableColumns,
+  filename: 'export.xlsx',
+});
+
+// Multi-sheet workbook
+createMultiSheetExcel({
+  filename: 'report.xlsx',
+  sheets: [
+    { name: 'Products', data: products },
+    { name: 'Orders', data: orders, columns: orderColumns },
+  ],
+});
+```
 
 ### Consumer Setup
 

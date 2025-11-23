@@ -30,6 +30,7 @@ export default function Modal({
   animation = 'scale',
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
+  const mouseDownOnBackdrop = useRef(false);
   const titleId = useId();
 
   // Handle escape key
@@ -51,11 +52,22 @@ export default function Modal({
     };
   }, [isOpen, onClose]);
 
-  // Handle click outside
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  // Track if mousedown originated on the backdrop
+  const handleBackdropMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
+      mouseDownOnBackdrop.current = true;
+    } else {
+      mouseDownOnBackdrop.current = false;
+    }
+  };
+
+  // Handle click outside - only close if both mousedown and click happened on backdrop
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget && mouseDownOnBackdrop.current) {
       onClose();
     }
+    // Reset the flag after handling click
+    mouseDownOnBackdrop.current = false;
   };
 
   const getAnimationClass = () => {
@@ -80,6 +92,7 @@ export default function Modal({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900 bg-opacity-50 backdrop-blur-sm animate-fade-in"
+      onMouseDown={handleBackdropMouseDown}
       onClick={handleBackdropClick}
     >
       <div

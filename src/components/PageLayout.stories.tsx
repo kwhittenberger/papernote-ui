@@ -586,3 +586,78 @@ export const WithSidebarAndGutter: Story = {
     );
   },
 };
+
+export const ResponsiveLayout: Story = {
+  render: () => (
+    <PageLayout
+      title="Responsive PageLayout"
+      description="Default responsive behavior - resize your browser to see the right and bottom padding adapt"
+    >
+      <Card style={{ marginBottom: '1.5rem', backgroundColor: '#dbeafe', border: '1px solid #3b82f6' }}>
+        <CardContent>
+          <h3 style={{ fontWeight: 600, marginBottom: '0.75rem', fontSize: '0.875rem', color: '#1e40af' }}>
+            📐 Responsive Layout (Default)
+          </h3>
+          <p style={{ fontSize: '0.875rem', marginBottom: '0.5rem' }}>
+            Try resizing your browser window! PageLayout keeps <strong>left and top padding fixed</strong>,
+            but <strong>right and bottom resize responsively</strong>:
+          </p>
+          <ul style={{ marginLeft: '1.5rem', fontSize: '0.875rem' }}>
+            <li>• Small screens: Minimal right/bottom padding (pr-2 pb-8)</li>
+            <li>• Medium screens (640px+): Increased padding (pr-4 pb-12)</li>
+            <li>• Large screens (768px+): More padding (pr-6 pb-16)</li>
+            <li>• XL screens (1024px+): Maximum padding (pb-20)</li>
+          </ul>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Content Adapts to Screen Size</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>
+            This is perfect for applications where you want the notebook aesthetic to be
+            maintained while optimizing for different device sizes.
+          </p>
+        </CardContent>
+      </Card>
+    </PageLayout>
+  ),
+};
+
+export const FixedLayout: Story = {
+  render: () => (
+    <PageLayout
+      title="Fixed PageLayout"
+      description="All padding remains constant regardless of screen size"
+      fixed={true}
+    >
+      <Card style={{ marginBottom: '1.5rem', backgroundColor: '#fef3c7', border: '1px solid #f59e0b' }}>
+        <CardContent>
+          <h3 style={{ fontWeight: 600, marginBottom: '0.75rem', fontSize: '0.875rem', color: '#92400e' }}>
+            📌 Fixed Layout (fixed=true)
+          </h3>
+          <p style={{ fontSize: '0.875rem', marginBottom: '0.5rem' }}>
+            This page uses <code style={{ backgroundColor: '#fff', padding: '0.125rem 0.375rem', borderRadius: '0.25rem' }}>fixed=true</code>.
+            All padding stays <strong>constant regardless of screen size</strong>:
+          </p>
+          <ul style={{ marginLeft: '1.5rem', fontSize: '0.875rem' }}>
+            <li>• Same padding on mobile and desktop</li>
+            <li>• Predictable layout at all viewport sizes</li>
+            <li>• Use when you need absolute consistency</li>
+          </ul>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Consistent Everywhere</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>
+            Try resizing your browser - the spacing remains identical at all screen sizes.
+          </p>
+        </CardContent>
+      </Card>
+    </PageLayout>
+  ),
+};

@@ -12,6 +12,8 @@ export interface PageProps {
   className?: string;
   /** Padding size around the content (default: 'normal') */
   padding?: 'none' | 'sm' | 'normal' | 'lg';
+  /** Fix all margins/padding instead of responsive (default: false) */
+  fixed?: boolean;
 }
 
 /**
@@ -47,14 +49,44 @@ export interface PageProps {
  */
 export const Page: React.FC<PageProps> = ({
   children,
-  maxWidth: _maxWidth = '7xl',
+  maxWidth = '7xl',
   className = '',
-  padding: _padding = 'normal'
+  padding = 'normal',
+  fixed = false
 }) => {
+  // Max width classes
+  const maxWidthClasses = {
+    '4xl': 'max-w-4xl',
+    '5xl': 'max-w-5xl',
+    '6xl': 'max-w-6xl',
+    '7xl': 'max-w-7xl',
+    'full': 'max-w-full',
+  };
+
+  // Padding classes - responsive (fixed left/top, responsive right/bottom) vs all fixed
+  const paddingClasses = {
+    none: fixed ? 'p-0' : 'pt-0 pl-0 pr-0 pb-0',
+    sm: fixed ? 'p-4' : 'pt-4 pl-4 pr-4 pb-4 sm:pr-6 md:pr-8 sm:pb-6 md:pb-8',
+    normal: fixed ? 'pt-12 pl-20 pr-16 pb-12' : 'pt-12 pl-20 pr-4 pb-4 sm:pr-8 md:pr-12 lg:pr-16 sm:pb-8 md:pb-12 lg:pb-16',
+    lg: fixed ? 'pt-16 pl-24 pr-20 pb-16' : 'pt-16 pl-24 pr-6 pb-6 sm:pr-12 md:pr-16 lg:pr-20 sm:pb-12 md:pb-16 lg:pb-20',
+  };
+
+  // Margin classes - responsive (fixed left/top, responsive right/bottom) vs all fixed
+  const marginClasses = fixed
+    ? 'mt-4 ml-4 mr-4 mb-4'
+    : 'mt-4 ml-4 mr-4 mb-4 sm:mr-6 md:mr-8 lg:mr-auto sm:mb-6 md:mb-8';
 
   return (
     <div className="min-h-screen bg-paper-100">
-      <div className={`notebook-page notebook-margin notebook-ruled ${className}`}>
+      <div className={`
+        bg-white bg-subtle-grain rounded-sm shadow-lg border-l-4 border-paper-300
+        min-h-[calc(100vh-2rem)] relative
+        notebook-margin notebook-ruled
+        ${maxWidthClasses[maxWidth]}
+        ${paddingClasses[padding]}
+        ${marginClasses}
+        ${className}
+      `.trim().replace(/\s+/g, ' ')}>
         {children}
       </div>
     </div>

@@ -309,6 +309,8 @@ export type {
 // Display Components
 export { default as CurrencyDisplay } from './CurrencyDisplay';
 export type { CurrencyDisplayProps } from './CurrencyDisplay';
+export { default as CurrencyInput } from './CurrencyInput';
+export type { CurrencyInputProps } from './CurrencyInput';
 
 export { default as DateDisplay } from './DateDisplay';
 export type { DateDisplayProps } from './DateDisplay';
@@ -408,6 +410,9 @@ export {
   loadColumnOrder,
 } from '../utils/tableEnhancements';
 export type { ColumnResize, ColumnOrder } from '../utils/tableEnhancements';
+
+export { exportToExcel, exportDataTableToExcel, createMultiSheetExcel } from '../utils/excelExport';
+export type { ExcelColumn, ExportToExcelOptions, DataTableExportOptions, MultiSheetExcelOptions } from '../utils/excelExport';
 
 // Hooks
 export { useColumnResize, useColumnReorder } from '../hooks/useTableEnhancements';

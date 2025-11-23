@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown, ChevronRight, MoreVertical, Edit, Trash } from 'lucide-react';
+import Menu, { MenuItem } from './Menu';
 
 /**
  * Base data item interface - all data items must have an id
@@ -164,6 +165,8 @@ interface DataTableProps<T extends BaseDataItem = BaseDataItem> {
   onDelete?: (item: T) => void | Promise<void>;
   /** Optional custom row actions (in addition to edit/delete) */
   actions?: DataTableAction<T>[];
+  /** Enable context menu (right-click) for row actions (default: true when actions exist) */
+  enableContextMenu?: boolean;
   /** Optional click handler for rows */
   onRowClick?: (item: T) => void;
   /** Optional double-click handler for rows */
@@ -455,6 +458,7 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
   onEdit,
   onDelete,
   actions = [],
+  enableContextMenu = true,
   onRowClick,
   onRowDoubleClick,
   selectable = false,
@@ -504,6 +508,17 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
 
   // Row hover state (for coordinating primary + secondary row highlighting)
   const [hoveredRowKey, setHoveredRowKey] = useState<string | null>(null);
+
+  // Context menu state
+  const [contextMenuState, setContextMenuState] = useState<{
+    isOpen: boolean;
+    position: { x: number; y: number };
+    item: T | null;
+  }>({
+    isOpen: false,
+    position: { x: 0, y: 0 },
+    item: null,
+  });
 
   // Filter columns based on hiddenColumns
   const baseVisibleColumns = columns.filter(
@@ -757,7 +772,31 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
   }
   
   const allActions = [...builtInActions, ...actions];
-  
+
+  // Convert actions to menu items for context menu
+  const convertActionsToMenuItems = (item: T): MenuItem[] => {
+    const visibleActions = allActions.filter(action => !action.show || action.show(item));
+
+    return visibleActions.map((action, idx) => {
+      let iconElement: React.ReactNode = null;
+      if (action.icon) {
+        if (React.isValidElement(action.icon)) {
+          iconElement = action.icon;
+        } else {
+          iconElement = React.createElement(action.icon as any, { className: 'h-4 w-4' });
+        }
+      }
+
+      return {
+        id: `action-${idx}`,
+        label: action.label,
+        icon: iconElement,
+        onClick: () => action.onClick(item),
+        danger: action.variant === 'danger',
+      };
+    });
+  };
+
   // Selection state management
   const [internalSelectedRows, setInternalSelectedRows] = useState<Set<string>>(new Set());
   
@@ -997,6 +1036,21 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
           onMouseEnter={() => !disableHover && setHoveredRowKey(rowKey)}
           onMouseLeave={() => !disableHover && setHoveredRowKey(null)}
           onClick={() => onRowClick?.(item)}
+          onContextMenu={(e) => {
+            if (enableContextMenu && allActions.length > 0) {
+              e.preventDefault();
+              e.stopPropagation();
+
+              const x = e.clientX;
+              const y = e.clientY;
+
+              setContextMenuState({
+                isOpen: true,
+                position: { x, y },
+                item,
+              });
+            }
+          }}
           onDoubleClick={() => {
             // Priority 1: If there's an onEdit handler (legacy), trigger it
             if (onEdit) {
@@ -1382,18 +1436,28 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
   );
 
   // Wrap in scrollable container if virtualized
-  if (virtualized) {
-    return (
-      <div
-        ref={tableContainerRef}
-        onScroll={handleScroll}
-        style={{ height: virtualHeight, overflow: 'auto' }}
-        className="rounded-lg"
-      >
-        {tableContent}
-      </div>
-    );
-  }
+  const finalContent = virtualized ? (
+    <div
+      ref={tableContainerRef}
+      onScroll={handleScroll}
+      style={{ height: virtualHeight, overflow: 'auto' }}
+      className="rounded-lg"
+    >
+      {tableContent}
+    </div>
+  ) : tableContent;
 
-  return tableContent;
+  // Render with context menu
+  return (
+    <>
+      {finalContent}
+      {contextMenuState.isOpen && contextMenuState.item && (
+        <Menu
+          items={convertActionsToMenuItems(contextMenuState.item)}
+          position={contextMenuState.position}
+          onClose={() => setContextMenuState({ isOpen: false, position: { x: 0, y: 0 }, item: null })}
+        />
+      )}
+    </>
+  );
 }
