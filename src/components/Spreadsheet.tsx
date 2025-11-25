@@ -1,10 +1,10 @@
 import React, { useState, useCallback } from 'react';
 import BaseSpreadsheet, { CellBase, Matrix } from 'react-spreadsheet';
-import { read, utils, writeFile, WorkBook } from 'xlsx';
+import { utils, writeFile } from 'xlsx';
 import Button from './Button';
 import Card, { CardHeader, CardTitle, CardContent } from './Card';
 import Stack from './Stack';
-import { Download, Upload, Save } from 'lucide-react';
+import { Download, Save } from 'lucide-react';
 import { addSuccessMessage, addErrorMessage } from './StatusBar';
 import './Spreadsheet.css';
 
@@ -39,7 +39,11 @@ export interface SpreadsheetProps {
   rowLabels?: string[];
   /** Show toolbar with actions */
   showToolbar?: boolean;
-  /** Enable Excel import */
+  /**
+   * Enable Excel import
+   * @deprecated Excel import has been disabled due to security vulnerabilities in the xlsx library.
+   * This prop is kept for API compatibility but has no effect.
+   */
   enableImport?: boolean;
   /** Enable Excel export */
   enableExport?: boolean;
@@ -123,7 +127,7 @@ export const Spreadsheet: React.FC<SpreadsheetProps> = ({
   columnLabels,
   rowLabels,
   showToolbar = false,
-  enableImport = false,
+  enableImport: _enableImport = false, // Deprecated - kept for API compatibility
   enableExport = false,
   enableSave = false,
   onSave,
@@ -151,44 +155,6 @@ export const Spreadsheet: React.FC<SpreadsheetProps> = ({
       onChange?.(newData);
     },
     [onChange]
-  );
-
-  // Handle Excel import
-  const handleImport = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files?.[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const workbook: WorkBook = read(e.target?.result, { type: 'binary' });
-          const sheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[sheetName];
-
-          // Convert to array of arrays
-          const jsonData: any[][] = utils.sheet_to_json(worksheet, { header: 1 });
-
-          // Convert to spreadsheet format
-          const spreadsheetData: Matrix<SpreadsheetCell> = jsonData.map(row =>
-            row.map(cell => ({
-              value: cell,
-            }))
-          );
-
-          handleChange(spreadsheetData);
-          addSuccessMessage('Excel file imported successfully');
-        } catch (error) {
-          console.error('Error importing Excel file:', error);
-          addErrorMessage('Failed to import Excel file');
-        }
-      };
-      reader.readAsBinaryString(file);
-
-      // Reset input
-      event.target.value = '';
-    },
-    [handleChange]
   );
 
   // Handle Excel export
@@ -237,20 +203,6 @@ export const Spreadsheet: React.FC<SpreadsheetProps> = ({
   const toolbar = showToolbar && (
     <Stack direction="horizontal" spacing="md" align="center" className="mb-4">
       {title && <div className="text-lg font-medium text-ink-900 flex-1">{title}</div>}
-
-      {enableImport && (
-        <label>
-          <input
-            type="file"
-            accept=".xlsx,.xls,.csv"
-            onChange={handleImport}
-            className="hidden"
-          />
-          <Button variant="ghost" size="sm" icon={<Upload className="h-4 w-4" />}>
-            Import
-          </Button>
-        </label>
-      )}
 
       {enableExport && (
         <Button
@@ -342,7 +294,6 @@ export const SpreadsheetReport: React.FC<
     <Spreadsheet
       {...props}
       showToolbar
-      enableImport
       enableExport
       enableSave
       wrapInCard

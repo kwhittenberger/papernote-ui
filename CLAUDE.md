@@ -206,11 +206,15 @@ The library uses a muted, warm color palette defined in `tailwind.config.js`:
 **Spreadsheet** (`src/components/Spreadsheet.tsx`) provides Excel-like functionality for report designers:
 - Built on react-spreadsheet with Fast Formula Parser (280+ Excel formulas)
 - Formula support: SUM, AVERAGE, VLOOKUP, IF, COUNT, DATE, and 275+ more
-- Excel import/export via SheetJS (xlsx package)
+- Excel **export** via SheetJS (xlsx package) - **import disabled due to security vulnerabilities**
 - Save/load functionality with async support
 - Keyboard navigation and copy/paste
 - Two components: `Spreadsheet` (configurable) and `SpreadsheetReport` (pre-configured)
 - Example formulas: `=SUM(B2:B10)`, `=AVERAGE(C1:C5)`, `=IF(A1>100, "High", "Low")`
+
+> **Note**: Excel import (`enableImport` prop) has been disabled due to security vulnerabilities
+> (Prototype Pollution, ReDoS) in the xlsx library's parsing functions. Export remains safe and functional.
+> A future migration to exceljs is planned to restore import functionality.
 
 ```typescript
 import { SpreadsheetReport, Matrix, SpreadsheetCell } from 'notebook-ui';
