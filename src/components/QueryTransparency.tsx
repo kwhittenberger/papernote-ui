@@ -37,7 +37,7 @@ export interface QueryTransparencyInfo {
   relatedData?: Array<{
     entity: string;
     description: string;
-    type: 'join' | 'include' | 'lookup';
+    type: 'primary' | 'join' | 'include' | 'lookup';
   }>;
   // Backend calculations
   calculations?: Array<{

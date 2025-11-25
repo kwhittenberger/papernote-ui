@@ -2,6 +2,8 @@
  * Core types for notebook-ui library
  */
 
+import type { QueryTransparencyInfo } from '../components/QueryTransparency';
+
 /**
  * Base interface for all data items that can be displayed in tables
  */
@@ -22,6 +24,8 @@ export interface PaginationResponse<T = BaseDataItem> {
   // Query transparency fields (optional)
   executedQuery?: string;
   executionTimeMs?: number;
+  // Full query transparency info for QueryTransparency component
+  queryInfo?: QueryTransparencyInfo;
 }
 
 /**
