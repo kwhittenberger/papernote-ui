@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { Grid } from './Grid';
 import Box from './Box';
 import Text from './Text';
-import Card from './Card';
+import Card, { CardHeader, CardTitle, CardContent } from './Card';
 
 const meta = {
   title: 'Layout/Grid',
@@ -251,28 +251,28 @@ export const WithCards: Story = {
   render: () => (
     <Grid columns={1} md={2} lg={3} gap="md">
       <Card>
-        <Card.Header>
-          <Card.Title>Card 1</Card.Title>
-        </Card.Header>
-        <Card.Content>
+        <CardHeader>
+          <CardTitle>Card 1</CardTitle>
+        </CardHeader>
+        <CardContent>
           <Text color="secondary">Content for the first card.</Text>
-        </Card.Content>
+        </CardContent>
       </Card>
       <Card>
-        <Card.Header>
-          <Card.Title>Card 2</Card.Title>
-        </Card.Header>
-        <Card.Content>
+        <CardHeader>
+          <CardTitle>Card 2</CardTitle>
+        </CardHeader>
+        <CardContent>
           <Text color="secondary">Content for the second card.</Text>
-        </Card.Content>
+        </CardContent>
       </Card>
       <Card>
-        <Card.Header>
-          <Card.Title>Card 3</Card.Title>
-        </Card.Header>
-        <Card.Content>
+        <CardHeader>
+          <CardTitle>Card 3</CardTitle>
+        </CardHeader>
+        <CardContent>
           <Text color="secondary">Content for the third card.</Text>
-        </Card.Content>
+        </CardContent>
       </Card>
     </Grid>
   ),
