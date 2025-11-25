@@ -1,7 +1,7 @@
 // Box Component - Generic container with design system styling
 // Provides consistent padding, borders, and other container styles
 
-import React from 'react';
+import React, { forwardRef } from 'react';
 
 export interface BoxProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Content */
@@ -42,8 +42,9 @@ export interface BoxProps extends React.HTMLAttributes<HTMLDivElement> {
 
 /**
  * Box component for generic containers with design system spacing and borders.
+ * Supports ref forwarding for DOM access.
  */
-export const Box: React.FC<BoxProps> = ({
+export const Box = forwardRef<HTMLDivElement, BoxProps>(({
   children,
   padding,
   paddingTop,
@@ -62,7 +63,7 @@ export const Box: React.FC<BoxProps> = ({
   height,
   className = '',
   ...htmlProps
-}) => {
+}, ref) => {
   const spacingMap = {
     none: '0',
     xs: '2',
@@ -148,6 +149,7 @@ export const Box: React.FC<BoxProps> = ({
 
   return (
     <div
+      ref={ref}
       {...htmlProps}
       className={`
         ${getPaddingClass()}
@@ -163,6 +165,8 @@ export const Box: React.FC<BoxProps> = ({
       {children}
     </div>
   );
-};
+});
+
+Box.displayName = 'Box';
 
 export default Box;

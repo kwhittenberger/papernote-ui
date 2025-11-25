@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { Loader2 } from 'lucide-react';
 
 /**
@@ -31,6 +31,8 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
  * A versatile button component that supports multiple visual styles, sizes, icons,
  * loading states, and notification badges.
  *
+ * Supports ref forwarding for DOM access.
+ *
  * @example Basic usage
  * ```tsx
  * <Button variant="primary">Click me</Button>
@@ -38,9 +40,9 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
  *
  * @example With icon and loading
  * ```tsx
- * <Button 
- *   variant="secondary" 
- *   icon={<Save />} 
+ * <Button
+ *   variant="secondary"
+ *   icon={<Save />}
  *   loading={isSaving}
  * >
  *   Save Changes
@@ -49,16 +51,22 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
  *
  * @example Icon-only with badge
  * ```tsx
- * <Button 
- *   iconOnly 
- *   badge={5} 
+ * <Button
+ *   iconOnly
+ *   badge={5}
  *   badgeVariant="error"
  * >
  *   <Bell />
  * </Button>
  * ```
+ *
+ * @example With ref
+ * ```tsx
+ * const buttonRef = useRef<HTMLButtonElement>(null);
+ * <Button ref={buttonRef}>Focusable</Button>
+ * ```
  */
-export default function Button({
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
   variant = 'primary',
   size = 'md',
   loading = false,
@@ -72,7 +80,7 @@ export default function Button({
   disabled,
   className = '',
   ...props
-}: ButtonProps) {
+}, ref) => {
   const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-400 disabled:opacity-40 disabled:cursor-not-allowed';
 
   const variantStyles = {
@@ -111,6 +119,7 @@ export default function Button({
 
   const buttonElement = (
     <button
+      ref={ref}
       className={`
         ${baseStyles}
         ${variantStyles[variant]}
@@ -163,4 +172,8 @@ export default function Button({
       </span>
     </div>
   );
-}
+});
+
+Button.displayName = 'Button';
+
+export default Button;

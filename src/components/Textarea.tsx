@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useRef } from 'react';
-import { AlertCircle, CheckCircle, AlertTriangle } from 'lucide-react';
+import { AlertCircle, CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
 
 export type ValidationState = 'error' | 'success' | 'warning' | null;
 
@@ -18,6 +18,8 @@ export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextArea
   maxRows?: number;
   /** Resize behavior (default: 'vertical') - overridden to 'none' when autoExpand is true */
   resize?: 'none' | 'vertical' | 'horizontal' | 'both';
+  /** Show loading spinner (for async operations like auto-save) */
+  loading?: boolean;
 }
 
 const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
@@ -33,6 +35,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       minRows = 2,
       maxRows = 10,
       resize = 'vertical',
+      loading = false,
       className = '',
       id,
       value,
@@ -136,26 +139,34 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           </label>
         )}
 
-        {/* Textarea */}
-        <textarea
-          ref={textareaRef}
-          id={textareaId}
-          value={value}
-          maxLength={maxLength}
-          rows={autoExpand ? minRows : rows}
-          className={`
-            block w-full px-4 py-3 border rounded-lg text-sm text-ink-800 placeholder-ink-400
-            bg-white bg-subtle-grain transition-all duration-200
-            focus:outline-none focus:ring-2 ${getResizeClass()}
-            disabled:bg-paper-100 disabled:text-ink-400 disabled:cursor-not-allowed disabled:opacity-60
-            ${getValidationClasses()}
-            ${className}
-          `}
-          aria-invalid={validationState === 'error'}
-          aria-describedby={validationMessage || helperText ? `${textareaId}-help` : undefined}
-          aria-required={props.required}
-          {...props}
-        />
+        {/* Textarea with loading indicator */}
+        <div className="relative">
+          <textarea
+            ref={textareaRef}
+            id={textareaId}
+            value={value}
+            maxLength={maxLength}
+            rows={autoExpand ? minRows : rows}
+            className={`
+              block w-full px-4 py-3 border rounded-lg text-sm text-ink-800 placeholder-ink-400
+              bg-white bg-subtle-grain transition-all duration-200
+              focus:outline-none focus:ring-2 ${getResizeClass()}
+              disabled:bg-paper-100 disabled:text-ink-400 disabled:cursor-not-allowed disabled:opacity-60
+              ${getValidationClasses()}
+              ${loading ? 'pr-10' : ''}
+              ${className}
+            `}
+            aria-invalid={validationState === 'error'}
+            aria-describedby={validationMessage || helperText ? `${textareaId}-help` : undefined}
+            aria-required={props.required}
+            {...props}
+          />
+          {loading && (
+            <div className="absolute top-3 right-3 pointer-events-none">
+              <Loader2 className="h-5 w-5 text-ink-400 animate-spin" />
+            </div>
+          )}
+        </div>
 
         {/* Helper Text / Validation Message / Character Count */}
         {((helperText || validationMessage) || (showCharCount && maxLength)) && (

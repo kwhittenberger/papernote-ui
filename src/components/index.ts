@@ -13,7 +13,7 @@ export { default as Select } from './Select';
 export type { SelectProps, SelectOption, SelectHandle } from './Select';
 
 export { default as MultiSelect } from './MultiSelect';
-export type { MultiSelectProps, MultiSelectOption } from './MultiSelect';
+export type { MultiSelectProps, MultiSelectOption, MultiSelectHandle } from './MultiSelect';
 
 export { default as Switch } from './Switch';
 export type { SwitchProps } from './Switch';
@@ -205,9 +205,6 @@ export { default as StepIndicator } from './StepIndicator';
 export type { StepIndicatorProps, Step } from './StepIndicator';
 
 // Data Display Components
-export { default as Table } from './Table';
-export type { TableProps, Column, SortDirection } from './Table';
-
 export { default as Badge } from './Badge';
 export type { BadgeProps } from './Badge';
 

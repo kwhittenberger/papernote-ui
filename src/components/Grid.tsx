@@ -1,11 +1,11 @@
 // Grid Component - CSS Grid layout system
 // Provides flexible grid layouts with consistent spacing
 
-import React from 'react';
+import React, { forwardRef } from 'react';
 
 type ColumnCount = 1 | 2 | 3 | 4 | 6 | 12;
 
-export interface GridProps {
+export interface GridProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Content to arrange in grid */
   children: React.ReactNode;
   /** Number of columns (default, or mobile-first base) */
@@ -26,6 +26,8 @@ export interface GridProps {
 
 /**
  * Grid component for arranging children in a CSS grid layout.
+ * 
+ * Supports ref forwarding for DOM access.
  *
  * Column options: 1, 2, 3, 4, 6, 12
  *
@@ -51,7 +53,7 @@ export interface GridProps {
  *   <Card>Item 2</Card>
  * </Grid>
  */
-export const Grid: React.FC<GridProps> = ({
+export const Grid = forwardRef<HTMLDivElement, GridProps>(({
   children,
   columns = 1,
   sm,
@@ -60,7 +62,8 @@ export const Grid: React.FC<GridProps> = ({
   xl,
   gap = 'md',
   className = '',
-}) => {
+  ...htmlProps
+}, ref) => {
   // Base column classes
   const baseColumnClasses: Record<ColumnCount, string> = {
     1: 'grid-cols-1',
@@ -128,6 +131,8 @@ export const Grid: React.FC<GridProps> = ({
 
   return (
     <div
+      ref={ref}
+      {...htmlProps}
       className={`
         grid
         ${columnClassList}
@@ -138,6 +143,8 @@ export const Grid: React.FC<GridProps> = ({
       {children}
     </div>
   );
-};
+});
+
+Grid.displayName = 'Grid';
 
 export default Grid;

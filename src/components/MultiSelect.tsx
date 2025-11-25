@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Check, ChevronDown, Search, X } from 'lucide-react';
+import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { Check, ChevronDown, Search, X, Loader2 } from 'lucide-react';
 
 export interface MultiSelectOption {
   value: string;
@@ -21,10 +21,22 @@ export interface MultiSelectProps {
   maxHeight?: number;
   /** Maximum number of selections allowed */
   maxSelections?: number;
+  /** Show loading spinner (for async options loading) */
+  loading?: boolean;
   'aria-label'?: string;
 }
 
-export default function MultiSelect({
+/** Handle for imperative methods */
+export interface MultiSelectHandle {
+  /** Focus the select trigger button */
+  focus: () => void;
+  /** Open the dropdown */
+  open: () => void;
+  /** Close the dropdown */
+  close: () => void;
+}
+
+const MultiSelect = forwardRef<MultiSelectHandle, MultiSelectProps>(({
   options,
   value = [],
   onChange,
@@ -36,12 +48,21 @@ export default function MultiSelect({
   error,
   maxHeight = 240,
   maxSelections,
+  loading = false,
   'aria-label': ariaLabel,
-}: MultiSelectProps) {
+}, ref) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const selectRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  // Expose imperative methods
+  useImperativeHandle(ref, () => ({
+    focus: () => triggerRef.current?.focus(),
+    open: () => !disabled && setIsOpen(true),
+    close: () => setIsOpen(false),
+  }));
 
   const selectedOptions = options.filter(opt => value.includes(opt.value));
   const hasReachedMax = maxSelections ? value.length >= maxSelections : false;
@@ -112,13 +133,14 @@ export default function MultiSelect({
       <div ref={selectRef} className="relative">
         {/* Trigger Button */}
         <button
+          ref={triggerRef}
           type="button"
-          onClick={() => !disabled && setIsOpen(!isOpen)}
-          disabled={disabled}
+          onClick={() => !disabled && !loading && setIsOpen(!isOpen)}
+          disabled={disabled || loading}
           className={`
             input w-full flex items-center justify-between min-h-[42px]
             ${error ? 'border-error-400 focus:border-error-400 focus:ring-error-400' : ''}
-            ${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}
+            ${disabled || loading ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}
           `}
           aria-haspopup="listbox"
           aria-expanded={isOpen}
@@ -148,7 +170,10 @@ export default function MultiSelect({
             )}
           </div>
           <div className="flex items-center gap-2 ml-2">
-            {selectedOptions.length > 0 && !disabled && (
+            {loading && (
+              <Loader2 className="h-4 w-4 text-ink-400 animate-spin" />
+            )}
+            {!loading && selectedOptions.length > 0 && !disabled && (
               <button
                 type="button"
                 onClick={handleClearAll}
@@ -158,7 +183,9 @@ export default function MultiSelect({
                 <X className="h-4 w-4" />
               </button>
             )}
-            <ChevronDown className={`h-4 w-4 text-ink-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+            {!loading && (
+              <ChevronDown className={`h-4 w-4 text-ink-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+            )}
           </div>
         </button>
 
@@ -244,4 +271,8 @@ export default function MultiSelect({
       </div>
     </div>
   );
-}
+});
+
+MultiSelect.displayName = 'MultiSelect';
+
+export default MultiSelect;

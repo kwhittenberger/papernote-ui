@@ -13,6 +13,8 @@ export interface EmptyStateProps {
     label: string;
     onClick: () => void;
   };
+  /** Optional custom content rendered below the description */
+  children?: React.ReactNode;
 }
 
 export default function EmptyState({
@@ -21,6 +23,7 @@ export default function EmptyState({
   description,
   action,
   secondaryAction,
+  children,
 }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
@@ -36,6 +39,13 @@ export default function EmptyState({
 
       {/* Description */}
       <p className="text-sm text-ink-600 max-w-md mb-8">{description}</p>
+
+      {/* Custom children content */}
+      {children && (
+        <div className="mb-8 w-full max-w-md">
+          {children}
+        </div>
+      )}
 
       {/* Actions */}
       {(action || secondaryAction) && (

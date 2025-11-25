@@ -49,7 +49,16 @@ import { Stack, Button } from 'notebook-ui';
     spacing: {
       control: 'select',
       options: ['none', 'xs', 'sm', 'md', 'lg', 'xl'],
-      description: 'Gap spacing between children (none: 0, xs: 0.25rem, sm: 0.5rem, md: 1rem, lg: 1.5rem, xl: 2rem)',
+      description: 'Gap spacing between children (alias: gap)',
+      table: {
+        type: { summary: 'none | xs | sm | md | lg | xl' },
+        defaultValue: { summary: 'md' },
+      },
+    },
+    gap: {
+      control: 'select',
+      options: ['none', 'xs', 'sm', 'md', 'lg', 'xl'],
+      description: 'Gap spacing between children (alias for spacing)',
       table: {
         type: { summary: 'none | xs | sm | md | lg | xl' },
         defaultValue: { summary: 'md' },
@@ -336,6 +345,20 @@ export const NestedStacks: Story = {
         <Box color="#8b5cf6">Stat 2</Box>
         <Box color="#10b981">Stat 3</Box>
       </Stack>
+    </Stack>
+  ),
+};
+
+/**
+ * The `gap` prop is an alias for `spacing` - they are interchangeable.
+ * This provides flexibility for developers who prefer the `gap` terminology.
+ */
+export const GapAlias: Story = {
+  render: () => (
+    <Stack direction="horizontal" gap="md">
+      <Box>Using</Box>
+      <Box color="#8b5cf6">gap</Box>
+      <Box color="#10b981">prop</Box>
     </Stack>
   ),
 };

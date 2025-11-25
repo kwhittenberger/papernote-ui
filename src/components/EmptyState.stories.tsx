@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import EmptyState from './EmptyState';
 import Button from './Button';
-import { Inbox, Users, FileText, Search, Database, ShoppingCart } from 'lucide-react';
+import Input from './Input';
+import Stack from './Stack';
+import Text from './Text';
+import { Inbox, Users, FileText, Search, Database, ShoppingCart, Plus } from 'lucide-react';
 
 const meta = {
   title: 'Feedback/EmptyState',
@@ -18,6 +21,7 @@ Empty state component for displaying helpful messages when no content is availab
 - **Title and description**: Clear messaging about empty state
 - **Primary action**: Main CTA button
 - **Secondary action**: Optional additional action
+- **Children support**: Custom content below description
 - **Centered layout**: Vertically and horizontally centered
 - **Responsive**: Adapts to container width
 
@@ -79,6 +83,12 @@ import { Inbox } from 'lucide-react';
         type: { summary: '{ label: string; onClick: () => void }' },
       },
     },
+    children: {
+      description: 'Optional custom content rendered below the description',
+      table: {
+        type: { summary: 'React.ReactNode' },
+      },
+    },
   },
   decorators: [
     (Story) => (
@@ -95,7 +105,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     title: 'No items found',
-    message: 'There are no items to display at this time.',
+    description: 'There are no items to display at this time.',
   },
 };
 
@@ -103,7 +113,7 @@ export const WithIcon: Story = {
   args: {
     icon: <Inbox className="h-12 w-12" />,
     title: 'Your inbox is empty',
-    message: 'No new messages at this time.',
+    description: 'No new messages at this time.',
   },
 };
 
@@ -111,32 +121,35 @@ export const WithAction: Story = {
   args: {
     icon: <Users className="h-12 w-12" />,
     title: 'No users yet',
-    message: 'Get started by adding your first user.',
-    action: <Button variant="primary">Add User</Button>,
+    description: 'Get started by adding your first user.',
+    action: {
+      label: 'Add User',
+      onClick: () => alert('Add user clicked'),
+    },
   },
 };
 
-export const WithMultipleActions: Story = {
-  render: () => (
-    <EmptyState
-      icon={<FileText className="h-12 w-12" />}
-      title="No documents"
-      message="You haven't created any documents yet. Create a new one or upload existing files."
-      action={
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
-          <Button variant="primary">Create New</Button>
-          <Button variant="outline">Upload Files</Button>
-        </div>
-      }
-    />
-  ),
+export const WithBothActions: Story = {
+  args: {
+    icon: <FileText className="h-12 w-12" />,
+    title: 'No documents',
+    description: "You haven't created any documents yet. Create a new one or upload existing files.",
+    action: {
+      label: 'Create New',
+      onClick: () => alert('Create clicked'),
+    },
+    secondaryAction: {
+      label: 'Upload Files',
+      onClick: () => alert('Upload clicked'),
+    },
+  },
 };
 
 export const SearchResults: Story = {
   args: {
     icon: <Search className="h-12 w-12" />,
     title: 'No results found',
-    message: 'Try adjusting your search or filter to find what you\'re looking for.',
+    description: "Try adjusting your search or filter to find what you're looking for.",
   },
 };
 
@@ -144,66 +157,103 @@ export const NoData: Story = {
   args: {
     icon: <Database className="h-12 w-12" />,
     title: 'No data available',
-    message: 'There is no data to display for the selected time period.',
+    description: 'There is no data to display for the selected time period.',
   },
 };
 
 export const EmptyCart: Story = {
-  render: () => (
-    <EmptyState
-      icon={<ShoppingCart className="h-12 w-12" />}
-      title="Your cart is empty"
-      message="Looks like you haven't added anything to your cart yet."
-      action={<Button variant="primary">Continue Shopping</Button>}
-    />
+  args: {
+    icon: <ShoppingCart className="h-12 w-12" />,
+    title: 'Your cart is empty',
+    description: "Looks like you haven't added anything to your cart yet.",
+    action: {
+      label: 'Continue Shopping',
+      onClick: () => alert('Continue shopping clicked'),
+    },
+  },
+};
+
+/**
+ * Use the `children` prop to add custom content below the description.
+ * This is useful for adding forms, additional context, or complex UI elements.
+ */
+export const WithChildren: Story = {
+  args: {
+    icon: <Plus className="h-12 w-12" />,
+    title: 'Create your first project',
+    description: 'Projects help you organize your work and collaborate with team members.',
+  },
+  render: (args) => (
+    <EmptyState {...args}>
+      <Stack spacing="sm" align="stretch">
+        <Input 
+          placeholder="Enter project name..." 
+          label="Project Name"
+        />
+        <Button variant="primary" icon={<Plus className="h-4 w-4" />}>
+          Create Project
+        </Button>
+      </Stack>
+    </EmptyState>
   ),
 };
 
-export const WithDescription: Story = {
-  render: () => (
-    <EmptyState
-      icon={<FileText className="h-12 w-12" />}
-      title="No projects yet"
-      message="Projects help you organize your work and collaborate with team members."
-      action={
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center' }}>
-          <Button variant="primary">Create Your First Project</Button>
-          <a href="#" style={{ fontSize: '0.875rem', color: '#3b82f6', textDecoration: 'none' }}>
-            Learn more about projects →
-          </a>
-        </div>
-      }
-    />
+/**
+ * Children can contain any custom content like search inputs for filtering.
+ */
+export const WithSearchInChildren: Story = {
+  args: {
+    icon: <Search className="h-12 w-12" />,
+    title: 'No results found',
+    description: 'Try a different search term or browse categories.',
+  },
+  render: (args) => (
+    <EmptyState {...args}>
+      <Stack spacing="md" align="center">
+        <Input 
+          placeholder="Search again..." 
+          prefixIcon={<Search className="h-4 w-4" />}
+          clearable
+        />
+        <Text size="sm" color="muted">
+          Popular searches: React, TypeScript, Components
+        </Text>
+      </Stack>
+    </EmptyState>
   ),
 };
 
-export const ErrorState: Story = {
-  render: () => (
-    <EmptyState
-      icon={
-        <div style={{
-          width: '64px',
-          height: '64px',
-          borderRadius: '50%',
-          backgroundColor: '#fef2f2',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-          <span style={{ fontSize: '2rem' }}>⚠️</span>
-        </div>
-      }
-      title="Something went wrong"
-      message="We encountered an error while loading your data. Please try again."
-      action={<Button variant="primary">Retry</Button>}
-    />
+/**
+ * Combine children with action buttons for maximum flexibility.
+ */
+export const WithChildrenAndActions: Story = {
+  args: {
+    icon: <Users className="h-12 w-12" />,
+    title: 'Invite team members',
+    description: 'Add team members to collaborate on this project.',
+    action: {
+      label: 'Send Invites',
+      onClick: () => alert('Send invites clicked'),
+    },
+    secondaryAction: {
+      label: 'Skip for now',
+      onClick: () => alert('Skip clicked'),
+    },
+  },
+  render: (args) => (
+    <EmptyState {...args}>
+      <Input 
+        placeholder="Enter email addresses..." 
+        helperText="Separate multiple emails with commas"
+      />
+    </EmptyState>
   ),
 };
 
 export const MinimalStyle: Story = {
   args: {
     title: 'No notifications',
-    message: 'You\'re all caught up!',
+    description: "You're all caught up!",
   },
 };
 
@@ -221,7 +271,7 @@ export const InCard: Story = {
       <EmptyState
         icon={<Inbox className="h-10 w-10" />}
         title="No recent activity"
-        message="Your recent activity will appear here."
+        description="Your recent activity will appear here."
       />
     </div>
   ),
@@ -240,13 +290,15 @@ export const FullPage: Story = {
       <EmptyState
         icon={<Users className="h-16 w-16" />}
         title="Welcome to Your Dashboard"
-        message="Get started by inviting team members or creating your first project."
-        action={
-          <div style={{ display: 'flex', gap: '0.75rem' }}>
-            <Button variant="primary">Invite Team</Button>
-            <Button variant="outline">Create Project</Button>
-          </div>
-        }
+        description="Get started by inviting team members or creating your first project."
+        action={{
+          label: 'Invite Team',
+          onClick: () => alert('Invite clicked'),
+        }}
+        secondaryAction={{
+          label: 'Create Project',
+          onClick: () => alert('Create clicked'),
+        }}
       />
     </div>
   ),

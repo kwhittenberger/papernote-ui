@@ -6,6 +6,137 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A React component library with a paper notebook aesthetic. This is the **single source of truth for all UI components** across multiple applications (CMMS, Conductor, epstein-files, etc.). Host applications must use notebook-ui components exclusively - no custom HTML/CSS/Tailwind is permitted.
 
+## Quick Reference - Common Patterns
+
+### CRITICAL: Do NOT Use Raw HTML
+```tsx
+// ❌ WRONG - Never do this
+<div className="flex gap-4">
+  <h1>Title</h1>
+  <p>Content</p>
+</div>
+
+// ✅ CORRECT - Use notebook-ui components
+import { Stack, Text } from 'notebook-ui';
+<Stack direction="horizontal" gap="md">
+  <Text as="h1" size="2xl" weight="bold">Title</Text>
+  <Text>Content</Text>
+</Stack>
+```
+
+### Layout Components (Use Instead of `<div>`)
+```tsx
+import { Stack, Grid, Box, Text, Card } from 'notebook-ui';
+
+// Vertical stack with spacing
+<Stack spacing="md">...</Stack>
+<Stack gap="md">...</Stack>  // 'gap' is alias for 'spacing'
+
+// Horizontal layout
+<Stack direction="horizontal" spacing="sm" align="center">...</Stack>
+
+// Grid layout
+<Grid columns={3} gap="md">...</Grid>
+
+// Generic container
+<Box padding="md">...</Box>
+
+// Typography (instead of h1, h2, p, span)
+<Text as="h1" size="2xl" weight="bold">Heading</Text>
+<Text size="sm" color="muted">Description</Text>
+<Text color="warning">Warning text</Text>
+```
+
+### Form Components
+```tsx
+import { Button, Input, Select, Textarea, Checkbox, Switch, MultiSelect } from 'notebook-ui';
+
+// Button with loading state
+<Button loading={isSubmitting} onClick={handleSubmit}>Save</Button>
+<Button variant="danger" onClick={handleDelete}>Delete</Button>
+
+// Input with validation and loading
+<Input
+  label="Email"
+  value={email}
+  onChange={(e) => setEmail(e.target.value)}
+  validationState="error"
+  validationMessage="Invalid email"
+  loading={isValidating}
+  clearable
+/>
+
+// Textarea with loading
+<Textarea label="Notes" loading={isSaving} />
+
+// Select with search
+<Select
+  options={[{ value: 'a', label: 'Option A' }]}
+  value={selected}
+  onChange={setSelected}
+  searchable
+  clearable
+/>
+
+// MultiSelect with imperative handle
+const multiSelectRef = useRef<MultiSelectHandle>(null);
+<MultiSelect
+  ref={multiSelectRef}
+  options={options}
+  value={selectedItems}
+  onChange={setSelectedItems}
+  loading={isLoadingOptions}
+/>
+// Imperative: multiSelectRef.current?.open()
+```
+
+### Data Display
+```tsx
+import { DataTable, Badge, StatusBadge } from 'notebook-ui';
+
+// DataTable with pagination (NEW!)
+<DataTable
+  data={currentPageData}
+  columns={[
+    { key: 'name', header: 'Name', sortable: true },
+    { key: 'status', header: 'Status', render: (item) => <Badge>{item.status}</Badge> },
+  ]}
+  // Built-in pagination
+  paginated
+  currentPage={page}
+  pageSize={10}
+  totalItems={totalCount}  // For server-side pagination
+  onPageChange={setPage}
+  onPageSizeChange={setPageSize}
+  // Actions
+  onEdit={(item) => openEditModal(item)}
+  onDelete={(item) => confirmDelete(item)}
+  // Selection
+  selectable
+  onRowSelect={(ids) => setSelectedIds(ids)}
+/>
+```
+
+### Feedback Components
+```tsx
+import { Modal, Toast, Alert, addSuccessMessage, addErrorMessage } from 'notebook-ui';
+
+// Toast messages (global)
+addSuccessMessage('Saved successfully');
+addErrorMessage('Failed to save');
+
+// Modal
+<Modal isOpen={isOpen} onClose={handleClose} title="Edit User" size="lg">
+  {/* content */}
+</Modal>
+```
+
+### All Icons from lucide-react
+```tsx
+import { Edit, Trash, Plus, Search, Check, X } from 'lucide-react';
+<Button icon={<Plus className="h-4 w-4" />}>Add Item</Button>
+```
+
 ## Commands
 
 ```bash

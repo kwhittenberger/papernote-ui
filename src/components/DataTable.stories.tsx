@@ -1,3 +1,4 @@
+import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import DataTable from './DataTable';
 import Badge from './Badge';
@@ -126,14 +127,6 @@ const actions = [
         defaultValue: { summary: 'false' },
       },
     },
-    multiSelect: {
-      control: 'boolean',
-      description: 'Allow multiple row selection (requires selectable=true)',
-      table: {
-        type: { summary: 'boolean' },
-        defaultValue: { summary: 'true' },
-      },
-    },
     actions: {
       description: 'Row actions displayed in sticky actions column',
       table: {
@@ -179,23 +172,21 @@ type Story = StoryObj<typeof meta>;
 const columns = [
   {
     key: 'name',
-    label: 'Name',
+    header: 'Name',
     sortable: true,
-    filterable: true,
   },
   {
     key: 'email',
-    label: 'Email',
+    header: 'Email',
     sortable: true,
   },
   {
     key: 'role',
-    label: 'Role',
-    filterable: true,
+    header: 'Role',
   },
   {
     key: 'status',
-    label: 'Status',
+    header: 'Status',
     render: (user: User) => {
       const variant = user.status === 'active' ? 'success' : user.status === 'inactive' ? 'error' : 'warning';
       return <Badge variant={variant}>{user.status}</Badge>;
@@ -203,7 +194,7 @@ const columns = [
   },
   {
     key: 'joinedAt',
-    label: 'Joined',
+    header: 'Joined',
     sortable: true,
   },
 ];
@@ -234,7 +225,7 @@ export const WithActions: Story = {
         label: 'Delete',
         icon: <Trash className="h-4 w-4" />,
         onClick: (user: User) => alert(`Delete ${user.name}`),
-        danger: true,
+        variant: 'danger',
       },
     ],
   },
@@ -245,16 +236,36 @@ export const Selectable: Story = {
     data: sampleUsers,
     columns,
     selectable: true,
-    onSelectionChange: (selected: User[]) => console.log('Selected:', selected),
+    onRowSelect: (selected: string[]) => console.log('Selected:', selected),
   },
 };
 
 export const Paginated: Story = {
-  args: {
-    data: sampleUsers,
-    columns,
-    paginated: true,
-    pageSize: 3,
+  render: () => {
+    const [currentPage, setCurrentPage] = React.useState(1);
+    const [pageSize, setPageSize] = React.useState(2);
+
+    // Simulate client-side pagination
+    const paginatedData = sampleUsers.slice(
+      (currentPage - 1) * pageSize,
+      currentPage * pageSize
+    );
+
+    return (
+      <DataTable
+        data={paginatedData}
+        columns={columns}
+        paginated
+        currentPage={currentPage}
+        pageSize={pageSize}
+        totalItems={sampleUsers.length}
+        onPageChange={setCurrentPage}
+        onPageSizeChange={(size) => {
+          setPageSize(size);
+          setCurrentPage(1);
+        }}
+      />
+    );
   },
 };
 
@@ -263,6 +274,7 @@ export const WithExpandedRows: Story = {
     data: sampleUsers,
     columns,
     expandable: true,
+    showExpandChevron: true,
     renderExpandedRow: (user: User) => (
       <div style={{ padding: '1rem', backgroundColor: '#f5f5f4' }}>
         <h4 style={{ marginBottom: '0.5rem', fontWeight: 600 }}>User Details</h4>
@@ -311,8 +323,6 @@ export const FullFeatured: Story = {
     data: sampleUsers,
     columns,
     selectable: true,
-    paginated: true,
-    pageSize: 3,
     actions: [
       {
         label: 'Edit',
@@ -323,10 +333,11 @@ export const FullFeatured: Story = {
         label: 'Delete',
         icon: <Trash className="h-4 w-4" />,
         onClick: (user: User) => alert(`Delete ${user.name}`),
-        danger: true,
+        variant: 'danger',
       },
     ],
     expandable: true,
+    showExpandChevron: true,
     renderExpandedRow: (user: User) => (
       <div style={{ padding: '1rem' }}>
         <p>Additional details for {user.name}</p>

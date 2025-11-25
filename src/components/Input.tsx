@@ -1,5 +1,5 @@
 import React, { forwardRef, useState } from 'react';
-import { AlertCircle, CheckCircle, AlertTriangle, Eye, EyeOff, X } from 'lucide-react';
+import { AlertCircle, CheckCircle, AlertTriangle, Eye, EyeOff, X, Loader2 } from 'lucide-react';
 
 /**
  * Validation state for input components
@@ -38,6 +38,8 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   clearable?: boolean;
   /** Callback when clear button is clicked */
   onClear?: () => void;
+  /** Show loading spinner in input */
+  loading?: boolean;
 }
 
 /**
@@ -105,6 +107,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       showPasswordToggle = false,
       clearable = false,
       onClear,
+      loading = false,
       className = '',
       id,
       type = 'text',
@@ -245,8 +248,15 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
           {/* Right Icon, Validation Icon, Clear Button, or Password Toggle */}
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center gap-2">
+            {/* Loading Spinner */}
+            {loading && (
+              <div className="pointer-events-none text-ink-400">
+                <Loader2 className="h-5 w-5 animate-spin" />
+              </div>
+            )}
+
             {/* Suffix Icon */}
-            {suffixIcon && !suffix && !validationState && !showPasswordToggle && !showClearButton && (
+            {suffixIcon && !suffix && !validationState && !showPasswordToggle && !showClearButton && !loading && (
               <div className="pointer-events-none text-ink-400">
                 {suffixIcon}
               </div>

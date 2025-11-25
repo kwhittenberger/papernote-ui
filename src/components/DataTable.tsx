@@ -3,6 +3,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown, ChevronRight, MoreVertical, Edit, Trash } from 'lucide-react';
 import Menu, { MenuItem } from './Menu';
+import Pagination from './Pagination';
+import Select from './Select';
 
 /**
  * Base data item interface - all data items must have an id
@@ -13,8 +15,6 @@ import Menu, { MenuItem } from './Menu';
 export interface BaseDataItem {
   /** Unique identifier for the data item */
   id: string | number;
-  /** Additional properties specific to your data type */
-  [key: string]: unknown;
 }
 
 /**
@@ -229,6 +229,24 @@ interface DataTableProps<T extends BaseDataItem = BaseDataItem> {
   virtualHeight?: string;
   /** Row height for virtual scrolling (default: 60) */
   virtualRowHeight?: number;
+
+  // Pagination props
+  /** Enable built-in pagination (renders Pagination component above table) */
+  paginated?: boolean;
+  /** Current page number (1-indexed) */
+  currentPage?: number;
+  /** Number of items per page */
+  pageSize?: number;
+  /** Total number of items (for server-side pagination) */
+  totalItems?: number;
+  /** Callback when page changes */
+  onPageChange?: (page: number) => void;
+  /** Available page size options (default: [10, 25, 50, 100]) */
+  pageSizeOptions?: number[];
+  /** Callback when page size changes */
+  onPageSizeChange?: (pageSize: number) => void;
+  /** Show page size selector (default: true when paginated) */
+  showPageSizeSelector?: boolean;
 }
 
 /**
@@ -490,6 +508,15 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
   virtualized = false,
   virtualHeight = '600px',
   virtualRowHeight = 60,
+  // Pagination props
+  paginated = false,
+  currentPage = 1,
+  pageSize = 10,
+  totalItems,
+  onPageChange,
+  pageSizeOptions = [10, 25, 50, 100],
+  onPageSizeChange,
+  showPageSizeSelector = true,
 }: DataTableProps<T>) {
   // Column resizing state
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
@@ -761,17 +788,31 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
     });
   }
   
+  // Combine all actions: built-in first, then custom actions, then delete last
+  // Delete is stored separately to ensure it's always last
+  let deleteAction: DataTableAction<T> | null = null;
   if (onDelete) {
-    builtInActions.push({
+    deleteAction = {
       label: 'Delete',
       icon: Trash,
       onClick: onDelete,
       variant: 'danger',
       tooltip: 'Delete item'
-    });
+    };
   }
   
-  const allActions = [...builtInActions, ...actions];
+  // Build final actions array with consistent ordering:
+  // 1. Edit (first - most common action)
+  // 2. View Details
+  // 3. Add Related actions
+  // 4. Manage Related actions
+  // 5. Custom actions (from actions prop)
+  // 6. Delete (always last - destructive action)
+  const allActions: DataTableAction<T>[] = [
+    ...builtInActions,
+    ...actions,
+    ...(deleteAction ? [deleteAction] : [])
+  ];
 
   // Convert actions to menu items for context menu
   const convertActionsToMenuItems = (item: T): MenuItem[] => {
@@ -1447,9 +1488,58 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
     </div>
   ) : tableContent;
 
+  // Calculate pagination values
+  const effectiveTotalItems = totalItems ?? data.length;
+  const totalPages = Math.ceil(effectiveTotalItems / pageSize);
+
+  // Page size selector options
+  const pageSizeSelectOptions = pageSizeOptions.map(size => ({
+    value: String(size),
+    label: `${size} per page`,
+  }));
+
+  // Render pagination controls
+  const renderPaginationControls = () => {
+    if (!paginated) return null;
+
+    return (
+      <div className="flex items-center justify-between mb-4 px-1">
+        <div className="flex items-center gap-4">
+          {showPageSizeSelector && onPageSizeChange && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-ink-600">Show:</span>
+              <Select
+                options={pageSizeSelectOptions}
+                value={String(pageSize)}
+                onChange={(value) => onPageSizeChange?.(Number(value))}
+              />
+            </div>
+          )}
+          <span className="text-sm text-ink-600">
+            {effectiveTotalItems > 0 ? (
+              <>
+                Showing {((currentPage - 1) * pageSize) + 1} - {Math.min(currentPage * pageSize, effectiveTotalItems)} of {effectiveTotalItems}
+              </>
+            ) : (
+              'No items'
+            )}
+          </span>
+        </div>
+        {totalPages > 1 && onPageChange && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+          />
+        )}
+      </div>
+    );
+  };
+
   // Render with context menu
   return (
     <>
+      {renderPaginationControls()}
       {finalContent}
       {contextMenuState.isOpen && contextMenuState.item && (
         <Menu

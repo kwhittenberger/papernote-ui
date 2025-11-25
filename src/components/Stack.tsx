@@ -1,15 +1,19 @@
 // Stack Component - Vertical or horizontal stacking layout
 // Provides consistent spacing between child elements
 
-import React from 'react';
+import React, { forwardRef } from 'react';
 
-export interface StackProps {
+type SpacingValue = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+
+export interface StackProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Content to stack */
   children: React.ReactNode;
   /** Direction of stack */
   direction?: 'vertical' | 'horizontal';
-  /** Spacing between items */
-  spacing?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  /** Spacing between items (alias: gap) */
+  spacing?: SpacingValue;
+  /** Spacing between items (alias for spacing - for developer convenience) */
+  gap?: SpacingValue;
   /** Alignment of items */
   align?: 'start' | 'center' | 'end' | 'stretch';
   /** Justify content */
@@ -23,23 +27,45 @@ export interface StackProps {
 /**
  * Stack component for arranging children vertically or horizontally with consistent spacing.
  * 
- * Spacing scale:
+ * Supports ref forwarding for DOM access.
+ * 
+ * Spacing scale (use either `spacing` or `gap` prop - they're aliases):
  * - none: 0
  * - xs: 0.5rem (2)
  * - sm: 0.75rem (3)
  * - md: 1.5rem (6)
  * - lg: 2rem (8)
  * - xl: 3rem (12)
+ * 
+ * @example
+ * ```tsx
+ * // Using spacing prop
+ * <Stack spacing="md">
+ *   <Card>Item 1</Card>
+ *   <Card>Item 2</Card>
+ * </Stack>
+ * 
+ * // Using gap prop (alias)
+ * <Stack gap="md">
+ *   <Card>Item 1</Card>
+ *   <Card>Item 2</Card>
+ * </Stack>
+ * ```
  */
-export const Stack: React.FC<StackProps> = ({
+export const Stack = forwardRef<HTMLDivElement, StackProps>(({
   children,
   direction = 'vertical',
-  spacing = 'md',
+  spacing,
+  gap,
   align = 'stretch',
   justify = 'start',
   wrap = false,
   className = '',
-}) => {
+  ...htmlProps
+}, ref) => {
+  // Use gap as alias for spacing (spacing takes precedence if both provided)
+  const effectiveSpacing = spacing ?? gap ?? 'md';
+
   const spacingClasses = {
     vertical: {
       none: '',
@@ -76,11 +102,13 @@ export const Stack: React.FC<StackProps> = ({
 
   return (
     <div
+      ref={ref}
+      {...htmlProps}
       className={`
         flex
         ${direction === 'vertical' ? 'flex-col' : 'flex-row'}
         ${wrap ? 'flex-wrap' : ''}
-        ${spacingClasses[direction][spacing]}
+        ${spacingClasses[direction][effectiveSpacing]}
         ${alignClasses[align]}
         ${justifyClasses[justify]}
         ${className}
@@ -89,6 +117,8 @@ export const Stack: React.FC<StackProps> = ({
       {children}
     </div>
   );
-};
+});
+
+Stack.displayName = 'Stack';
 
 export default Stack;

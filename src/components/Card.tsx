@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { Skeleton } from './Loading';
 
 /**
  * Card component props
  */
-export interface CardProps {
+export interface CardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onClick'> {
   /** Card content */
   children: React.ReactNode;
   /** Visual style variant affecting padding and shadow */
@@ -23,6 +23,8 @@ export interface CardProps {
 
 /**
  * Card - Container component with paper aesthetic and subtle shadow
+ *
+ * Supports ref forwarding for DOM access.
  *
  * A content container with paper texture, border, and shadow effects. Supports
  * different sizes, variants (padding/shadow levels), and loading states.
@@ -53,8 +55,14 @@ export interface CardProps {
  *   <p>Content</p>
  * </Card>
  * ```
+ * 
+ * @example With ref
+ * ```tsx
+ * const cardRef = useRef<HTMLDivElement>(null);
+ * <Card ref={cardRef}>Content</Card>
+ * ```
  */
-export default function Card({
+const Card = forwardRef<HTMLDivElement, CardProps>(({
   children,
   variant = 'default',
   width = 'auto',
@@ -62,7 +70,8 @@ export default function Card({
   onClick,
   hoverable = false,
   loading = false,
-}: CardProps) {
+  ...htmlProps
+}, ref) => {
   const baseStyles = 'bg-white bg-subtle-grain border-2 border-paper-300 transition-shadow duration-200';
 
   const variantStyles = {
@@ -84,6 +93,8 @@ export default function Card({
 
   return (
     <div
+      ref={ref}
+      {...htmlProps}
       className={`${baseStyles} ${variantStyles[variant]} ${widthStyles[width]} ${interactiveStyles} ${className}`}
       onClick={!loading ? onClick : undefined}
       role={onClick ? 'button' : undefined}
@@ -101,7 +112,11 @@ export default function Card({
       )}
     </div>
   );
-}
+});
+
+Card.displayName = 'Card';
+
+export default Card;
 
 /**
  * CardHeader component props

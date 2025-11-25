@@ -1,19 +1,21 @@
 // Text Component - Typography with consistent styling
 // Provides semantic text elements with design system styling
 
-import React from 'react';
+import React, { forwardRef } from 'react';
 
-export interface TextProps {
+type TextElement = 'p' | 'span' | 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'label';
+
+export interface TextProps extends Omit<React.HTMLAttributes<HTMLElement>, 'color'> {
   /** Text content */
   children: React.ReactNode;
   /** HTML element to render */
-  as?: 'p' | 'span' | 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'label';
+  as?: TextElement;
   /** Size variant */
   size?: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl';
   /** Weight variant */
   weight?: 'normal' | 'medium' | 'semibold' | 'bold';
   /** Color variant */
-  color?: 'primary' | 'secondary' | 'muted' | 'accent' | 'error' | 'success';
+  color?: 'primary' | 'secondary' | 'muted' | 'accent' | 'error' | 'success' | 'warning';
   /** Text alignment */
   align?: 'left' | 'center' | 'right';
   /** Truncate text with ellipsis (single line) */
@@ -29,6 +31,8 @@ export interface TextProps {
 /**
  * Text component for consistent typography across the application.
  * 
+ * Supports ref forwarding for DOM access.
+ * 
  * Size scale:
  * - xs: 0.75rem (12px)
  * - sm: 0.875rem (14px)
@@ -36,8 +40,21 @@ export interface TextProps {
  * - lg: 1.125rem (18px)
  * - xl: 1.25rem (20px)
  * - 2xl: 1.5rem (24px)
+ * 
+ * @example
+ * ```tsx
+ * <Text size="lg" weight="semibold" color="primary">
+ *   Hello World
+ * </Text>
+ * 
+ * <Text color="warning">Warning message</Text>
+ * 
+ * // With ref
+ * const textRef = useRef<HTMLParagraphElement>(null);
+ * <Text ref={textRef}>Measurable text</Text>
+ * ```
  */
-export const Text: React.FC<TextProps> = ({
+export const Text = forwardRef<HTMLElement, TextProps>(({
   children,
   as: Component = 'p',
   size = 'base',
@@ -48,7 +65,8 @@ export const Text: React.FC<TextProps> = ({
   lineClamp,
   transform,
   className = '',
-}) => {
+  ...htmlProps
+}, ref) => {
   const sizeClasses = {
     xs: 'text-xs',
     sm: 'text-sm',
@@ -72,6 +90,7 @@ export const Text: React.FC<TextProps> = ({
     accent: 'text-primary-600',
     error: 'text-error-600',
     success: 'text-success-600',
+    warning: 'text-warning-600',
   };
 
   const alignClasses = {
@@ -109,10 +128,16 @@ export const Text: React.FC<TextProps> = ({
   ].filter(Boolean).join(' ');
 
   return (
-    <Component className={classes}>
+    <Component 
+      ref={ref as any} 
+      className={classes}
+      {...htmlProps}
+    >
       {children}
     </Component>
   );
-};
+});
+
+Text.displayName = 'Text';
 
 export default Text;
