@@ -4,10 +4,12 @@
  *
  * Replaces window.confirm() with a styled, accessible modal dialog.
  * Supports different variants (danger, warning, info) and customizable buttons.
+ * 
+ * On mobile, automatically renders as a BottomSheet for better touch interaction.
  */
 
 import React from 'react';
-import Modal, { ModalFooter } from './Modal';
+import Modal, { ModalFooter, ModalProps } from './Modal';
 import { AlertTriangle, Info, Trash2 } from 'lucide-react';
 
 export interface ConfirmDialogProps {
@@ -21,6 +23,10 @@ export interface ConfirmDialogProps {
   variant?: 'danger' | 'warning' | 'info';
   icon?: React.ReactNode;
   isLoading?: boolean;
+  /** Mobile display mode (inherited from Modal) */
+  mobileMode?: ModalProps['mobileMode'];
+  /** Height preset for BottomSheet on mobile */
+  mobileHeight?: ModalProps['mobileHeight'];
 }
 
 const variantStyles = {
@@ -44,6 +50,41 @@ const variantStyles = {
   },
 };
 
+/**
+ * ConfirmDialog - Confirmation dialog with mobile support
+ * 
+ * @example Basic usage
+ * ```tsx
+ * <ConfirmDialog
+ *   isOpen={isOpen}
+ *   onClose={handleClose}
+ *   onConfirm={handleDelete}
+ *   title="Delete Item"
+ *   message="Are you sure you want to delete this item? This action cannot be undone."
+ *   variant="danger"
+ * />
+ * ```
+ * 
+ * @example With useConfirmDialog hook
+ * ```tsx
+ * const confirmDialog = useConfirmDialog();
+ * 
+ * const handleDelete = () => {
+ *   confirmDialog.show({
+ *     title: 'Delete Item',
+ *     message: 'Are you sure?',
+ *     onConfirm: async () => await deleteItem(),
+ *   });
+ * };
+ * 
+ * return (
+ *   <>
+ *     <button onClick={handleDelete}>Delete</button>
+ *     <ConfirmDialog {...confirmDialog.props} />
+ *   </>
+ * );
+ * ```
+ */
 export default function ConfirmDialog({
   isOpen,
   onClose,
@@ -55,6 +96,8 @@ export default function ConfirmDialog({
   variant = 'danger',
   icon,
   isLoading = false,
+  mobileMode = 'auto',
+  mobileHeight = 'sm',
 }: ConfirmDialogProps) {
   const variantStyle = variantStyles[variant];
   const IconComponent = icon || variantStyle.icon;
@@ -65,7 +108,16 @@ export default function ConfirmDialog({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={typeof title === 'string' ? title : String(title)} size="sm" showCloseButton={false}>
+    <Modal 
+      isOpen={isOpen} 
+      onClose={onClose} 
+      title={typeof title === 'string' ? title : String(title)} 
+      size="sm" 
+      showCloseButton={false}
+      mobileMode={mobileMode}
+      mobileHeight={mobileHeight}
+      mobileShowHandle={false}
+    >
       <div className="flex items-start gap-4">
         {/* Icon */}
         <div className={`flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full ${variantStyle.iconBg}`}>
@@ -89,14 +141,14 @@ export default function ConfirmDialog({
         <button
           onClick={onClose}
           disabled={isLoading}
-          className="px-4 py-2 text-sm font-medium text-ink-700 bg-white border border-paper-300 rounded-lg hover:bg-paper-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="px-4 py-2 text-sm font-medium text-ink-700 bg-white border border-paper-300 rounded-lg hover:bg-paper-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-h-touch-sm"
         >
           {typeof cancelLabel === 'string' ? cancelLabel : String(cancelLabel)}
         </button>
         <button
           onClick={handleConfirm}
           disabled={isLoading}
-          className={`px-4 py-2 text-sm font-medium text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors ${variantStyle.button}`}
+          className={`px-4 py-2 text-sm font-medium text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-h-touch-sm ${variantStyle.button}`}
         >
           {isLoading ? (
             <span className="flex items-center gap-2">

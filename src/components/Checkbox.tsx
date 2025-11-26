@@ -1,4 +1,5 @@
 import { forwardRef, useId } from 'react';
+import { useIsMobile } from '../hooks/useResponsive';
 import { Check, Minus } from 'lucide-react';
 
 export interface CheckboxProps {
@@ -13,7 +14,16 @@ export interface CheckboxProps {
   name?: string;
   /** Optional icon to display next to label */
   icon?: React.ReactNode;
+  /** Size variant - 'lg' provides 44px touch-friendly targets. On mobile, 'md' auto-upgrades to 'lg'. */
+  size?: 'sm' | 'md' | 'lg';
 }
+
+// Size classes for checkbox box and touch target
+const sizeConfig = {
+  sm: { box: 'w-4 h-4', icon: 'h-3 w-3', text: 'text-sm', gap: 'gap-2' },
+  md: { box: 'w-4 h-4', icon: 'h-3 w-3', text: 'text-sm', gap: 'gap-3' },
+  lg: { box: 'w-5 h-5', icon: 'h-4 w-4', text: 'text-base', gap: 'gap-3', touchTarget: 'min-h-touch py-2' }, // 44px touch target
+};
 
 const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
   checked,
@@ -26,10 +36,16 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
   id,
   name,
   icon,
+  size = 'md',
 }, ref) => {
   const generatedId = useId();
   const checkboxId = id || generatedId;
   const descId = description ? `${checkboxId}-desc` : undefined;
+  
+  // Auto-size for mobile
+  const isMobile = useIsMobile();
+  const effectiveSize = isMobile && size === 'md' ? 'lg' : size;
+  const config = sizeConfig[effectiveSize];
 
   const handleChange = () => {
     if (!disabled) {
@@ -47,9 +63,9 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
   return (
     <label
       htmlFor={checkboxId}
-      className={`flex items-start gap-3 ${
+      className={`flex items-start ${config.gap} ${
         disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'
-      } ${className}`}
+      } ${'touchTarget' in config ? config.touchTarget : ''} ${className}`}
     >
       {/* Checkbox */}
       <div className="relative inline-block flex-shrink-0 mt-0.5">
@@ -69,7 +85,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
         />
         <div
           className={`
-            w-4 h-4 rounded border transition-all duration-200
+            ${config.box} rounded border transition-all duration-200
             flex items-center justify-center
             ${
               checked || indeterminate
@@ -80,9 +96,9 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
           `}
         >
           {indeterminate ? (
-            <Minus className="h-3 w-3 text-white" />
+            <Minus className={`${config.icon} text-white`} />
           ) : checked ? (
-            <Check className="h-3 w-3 text-white" />
+            <Check className={`${config.icon} text-white`} />
           ) : null}
         </div>
       </div>
@@ -93,7 +109,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
           {label && (
             <div className="flex items-center gap-2">
               {icon && <span className="text-ink-700">{icon}</span>}
-              <p className="text-sm font-medium text-ink-900">{label}</p>
+              <p className={`${config.text} font-medium text-ink-900`}>{label}</p>
             </div>
           )}
           {description && (

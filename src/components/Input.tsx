@@ -9,7 +9,7 @@ export type ValidationState = 'error' | 'success' | 'warning' | null;
 /**
  * Input component props
  */
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   /** Input label text */
   label?: string;
   /** Helper text displayed below input */
@@ -40,6 +40,33 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   onClear?: () => void;
   /** Show loading spinner in input */
   loading?: boolean;
+  
+  // Mobile optimization props
+  /** 
+   * Input mode hint for mobile keyboards.
+   * 'none' - No virtual keyboard
+   * 'text' - Standard text keyboard (default)
+   * 'decimal' - Decimal number keyboard
+   * 'numeric' - Numeric keyboard
+   * 'tel' - Telephone keypad
+   * 'search' - Search optimized keyboard
+   * 'email' - Email optimized keyboard
+   * 'url' - URL optimized keyboard
+   */
+  inputMode?: 'none' | 'text' | 'decimal' | 'numeric' | 'tel' | 'search' | 'email' | 'url';
+  /**
+   * Enter key hint for mobile keyboards.
+   * 'enter' - Standard enter key
+   * 'done' - Done action
+   * 'go' - Go/navigate action
+   * 'next' - Move to next field
+   * 'previous' - Move to previous field
+   * 'search' - Search action
+   * 'send' - Send action
+   */
+  enterKeyHint?: 'enter' | 'done' | 'go' | 'next' | 'previous' | 'search' | 'send';
+  /** Size variant - 'md' is default, 'lg' provides larger touch target (44px min) */
+  size?: 'sm' | 'md' | 'lg';
 }
 
 /**
@@ -47,6 +74,11 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
  *
  * A feature-rich text input with support for validation states, character counting,
  * password visibility toggle, prefix/suffix text and icons, and clearable functionality.
+ * 
+ * Mobile optimizations:
+ * - inputMode prop for appropriate mobile keyboard
+ * - enterKeyHint prop for mobile keyboard action button
+ * - Size variants with touch-friendly targets (44px for 'lg')
  *
  * @example Basic input with label
  * ```tsx
@@ -54,6 +86,8 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
  *   label="Email" 
  *   type="email" 
  *   placeholder="Enter your email"
+ *   inputMode="email"
+ *   enterKeyHint="next"
  * />
  * ```
  *
@@ -79,11 +113,23 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
  * />
  * ```
  *
+ * @example Mobile-optimized phone input
+ * ```tsx
+ * <Input
+ *   label="Phone Number"
+ *   type="tel"
+ *   inputMode="tel"
+ *   enterKeyHint="done"
+ *   size="lg"
+ * />
+ * ```
+ *
  * @example With prefix/suffix
  * ```tsx
  * <Input
  *   label="Amount"
  *   type="number"
+ *   inputMode="decimal"
  *   prefixIcon={<DollarSign />}
  *   suffix="USD"
  *   clearable
@@ -113,6 +159,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       type = 'text',
       value,
       maxLength,
+      inputMode,
+      enterKeyHint,
+      size = 'md',
       ...props
     },
     ref
@@ -143,6 +192,31 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     // Calculate character count
     const currentLength = value ? String(value).length : 0;
     const showCounter = showCount && maxLength;
+
+    // Auto-detect inputMode based on type if not specified
+    const effectiveInputMode = inputMode || (() => {
+      switch (type) {
+        case 'email': return 'email';
+        case 'tel': return 'tel';
+        case 'url': return 'url';
+        case 'number': return 'decimal';
+        case 'search': return 'search';
+        default: return undefined;
+      }
+    })();
+
+    // Size classes
+    const sizeClasses = {
+      sm: 'h-8 text-sm',
+      md: 'h-10 text-base',
+      lg: 'h-12 text-base min-h-touch', // 44px touch target
+    };
+
+    const buttonSizeClasses = {
+      sm: 'p-1',
+      md: 'p-1.5',
+      lg: 'p-2 min-w-touch-sm min-h-touch-sm', // 36px touch target for buttons
+    };
 
     const getValidationIcon = () => {
       switch (validationState) {
@@ -223,8 +297,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             type={actualType}
             value={value}
             maxLength={maxLength}
+            inputMode={effectiveInputMode}
+            enterKeyHint={enterKeyHint}
             className={`
               input
+              ${sizeClasses[size]}
               ${getValidationClasses()}
               ${prefix ? 'pl-' + (prefix.length * 8 + 12) : ''}
               ${prefixIcon && !prefix ? 'pl-10' : ''}
@@ -247,7 +324,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           )}
 
           {/* Right Icon, Validation Icon, Clear Button, or Password Toggle */}
-          <div className="absolute inset-y-0 right-0 pr-3 flex items-center gap-2">
+          <div className="absolute inset-y-0 right-0 pr-3 flex items-center gap-1">
             {/* Loading Spinner */}
             {loading && (
               <div className="pointer-events-none text-ink-400">
@@ -267,7 +344,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               <button
                 type="button"
                 onClick={handleClear}
-                className="text-ink-400 hover:text-ink-600 focus:outline-none cursor-pointer pointer-events-auto"
+                className={`text-ink-400 hover:text-ink-600 focus:outline-none cursor-pointer pointer-events-auto rounded-full hover:bg-paper-100 flex items-center justify-center ${buttonSizeClasses[size]}`}
                 aria-label="Clear input"
               >
                 <X className="h-4 w-4" />
@@ -279,7 +356,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="text-ink-400 hover:text-ink-600 focus:outline-none cursor-pointer pointer-events-auto"
+                className={`text-ink-400 hover:text-ink-600 focus:outline-none cursor-pointer pointer-events-auto rounded-full hover:bg-paper-100 flex items-center justify-center ${buttonSizeClasses[size]}`}
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}

@@ -5,6 +5,8 @@ import { ChevronDown, ChevronRight, MoreVertical, Edit, Trash } from 'lucide-rea
 import Menu, { MenuItem } from './Menu';
 import Pagination from './Pagination';
 import Select from './Select';
+import DataTableCardView, { CardViewConfig } from './DataTableCardView';
+import { useIsMobile } from '../hooks/useResponsive';
 
 /**
  * Base data item interface - all data items must have an id
@@ -247,6 +249,16 @@ interface DataTableProps<T extends BaseDataItem = BaseDataItem> {
   onPageSizeChange?: (pageSize: number) => void;
   /** Show page size selector (default: true when paginated) */
   showPageSizeSelector?: boolean;
+
+  // Mobile view props
+  /** Mobile view mode: 'auto' (detect viewport), 'card' (always cards), 'table' (always table) */
+  mobileView?: 'auto' | 'card' | 'table';
+  /** Configuration for card view layout */
+  cardConfig?: CardViewConfig<T>;
+  /** Gap between cards in card view */
+  cardGap?: 'sm' | 'md' | 'lg';
+  /** Custom class name for cards */
+  cardClassName?: string;
 }
 
 /**
@@ -517,7 +529,14 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
   pageSizeOptions = [10, 25, 50, 100],
   onPageSizeChange,
   showPageSizeSelector = true,
+  // Mobile view props
+  mobileView = 'auto',
+  cardConfig,
+  cardGap = 'md',
+  cardClassName,
 }: DataTableProps<T>) {
+  // Mobile detection for auto mode
+  const isMobileViewport = useIsMobile();
   // Column resizing state
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
   const [resizingColumn, setResizingColumn] = useState<string | null>(null);
@@ -1536,11 +1555,51 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
     );
   };
 
+  // Determine if we should show card view
+  const shouldShowCardView = 
+    mobileView === 'card' || 
+    (mobileView === 'auto' && isMobileViewport);
+
+  // Card view content
+  const cardViewContent = shouldShowCardView ? (
+    <DataTableCardView
+      data={data}
+      columns={visibleColumns}
+      cardConfig={cardConfig}
+      loading={loading}
+      loadingRows={loadingRows}
+      emptyMessage={emptyMessage}
+      onCardClick={onRowClick}
+      onCardLongPress={(item, event) => {
+        if (enableContextMenu && allActions.length > 0) {
+          event.preventDefault();
+          const clientX = 'touches' in event ? event.touches[0].clientX : (event as React.MouseEvent).clientX;
+          const clientY = 'touches' in event ? event.touches[0].clientY : (event as React.MouseEvent).clientY;
+          setContextMenuState({
+            isOpen: true,
+            position: { x: clientX, y: clientY },
+            item,
+          });
+        }
+      }}
+      selectable={selectable}
+      selectedRows={selectedRowsSet}
+      onSelectionChange={onRowSelect ? (rows) => onRowSelect(rows) : undefined}
+      keyExtractor={getRowKey}
+      actions={allActions}
+      onEdit={onEdit}
+      onDelete={onDelete}
+      className={className}
+      cardClassName={cardClassName}
+      gap={cardGap}
+    />
+  ) : null;
+
   // Render with context menu
   return (
     <>
       {renderPaginationControls()}
-      {finalContent}
+      {shouldShowCardView ? cardViewContent : finalContent}
       {contextMenuState.isOpen && contextMenuState.item && (
         <Menu
           items={convertActionsToMenuItems(contextMenuState.item)}

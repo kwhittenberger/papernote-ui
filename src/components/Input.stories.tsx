@@ -367,3 +367,217 @@ export const LoginForm: Story = {
     );
   },
 };
+
+// Mobile-optimized stories
+export const MobileLargeTouch: Story = {
+  parameters: {
+    viewport: { defaultViewport: 'mobile1' },
+    docs: {
+      description: {
+        story: 'Large size (lg) input provides 44px minimum touch target for mobile devices, meeting Apple HIG guidelines.',
+      },
+    },
+  },
+  render: () => {
+    const [value, setValue] = useState('');
+    return (
+      <Input
+        label="Mobile-Friendly Input"
+        size="lg"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        placeholder="44px touch target"
+        helperText="Large size for easy touch interaction"
+      />
+    );
+  },
+};
+
+export const MobilePhoneInput: Story = {
+  parameters: {
+    viewport: { defaultViewport: 'mobile1' },
+    docs: {
+      description: {
+        story: 'Phone input with inputMode="tel" shows numeric keyboard on mobile devices.',
+      },
+    },
+  },
+  render: () => {
+    const [phone, setPhone] = useState('');
+    return (
+      <Input
+        label="Phone Number"
+        type="tel"
+        inputMode="tel"
+        enterKeyHint="done"
+        size="lg"
+        value={phone}
+        onChange={(e) => setPhone(e.target.value)}
+        placeholder="(555) 123-4567"
+        helperText="Shows numeric keyboard on mobile"
+      />
+    );
+  },
+};
+
+export const MobileEmailInput: Story = {
+  parameters: {
+    viewport: { defaultViewport: 'mobile1' },
+    docs: {
+      description: {
+        story: 'Email input with inputMode="email" shows email-optimized keyboard with @ and .com buttons.',
+      },
+    },
+  },
+  render: () => {
+    const [email, setEmail] = useState('');
+    return (
+      <Input
+        label="Email Address"
+        type="email"
+        inputMode="email"
+        enterKeyHint="next"
+        size="lg"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        prefixIcon={<Mail className="h-5 w-5" />}
+        placeholder="you@example.com"
+        helperText="Shows email keyboard with @ button"
+      />
+    );
+  },
+};
+
+export const MobileSearchInput: Story = {
+  parameters: {
+    viewport: { defaultViewport: 'mobile1' },
+    docs: {
+      description: {
+        story: 'Search input with inputMode="search" and enterKeyHint="search" shows search-optimized keyboard.',
+      },
+    },
+  },
+  render: () => {
+    const [search, setSearch] = useState('');
+    return (
+      <Input
+        label="Search"
+        type="search"
+        inputMode="search"
+        enterKeyHint="search"
+        size="lg"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        prefixIcon={<Search className="h-5 w-5" />}
+        placeholder="Search products..."
+        clearable
+        onClear={() => setSearch('')}
+        helperText="Shows search keyboard with Search button"
+      />
+    );
+  },
+};
+
+export const MobileNumericInput: Story = {
+  parameters: {
+    viewport: { defaultViewport: 'mobile1' },
+    docs: {
+      description: {
+        story: 'Numeric input with inputMode="decimal" shows decimal number keyboard for currency/amounts.',
+      },
+    },
+  },
+  render: () => {
+    const [amount, setAmount] = useState('');
+    return (
+      <Input
+        label="Amount"
+        type="text"
+        inputMode="decimal"
+        enterKeyHint="done"
+        size="lg"
+        value={amount}
+        onChange={(e) => setAmount(e.target.value)}
+        prefix="$"
+        placeholder="0.00"
+        helperText="Shows decimal keyboard on mobile"
+      />
+    );
+  },
+};
+
+export const MobileLoginForm: Story = {
+  parameters: {
+    viewport: { defaultViewport: 'mobile1' },
+    docs: {
+      description: {
+        story: 'Complete mobile login form with appropriate keyboard types and enter key hints for smooth form flow.',
+      },
+    },
+  },
+  render: () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1rem' }}>
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.5rem' }}>Sign In</h2>
+        <Input
+          label="Email"
+          type="email"
+          inputMode="email"
+          enterKeyHint="next"
+          size="lg"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          prefixIcon={<Mail className="h-5 w-5" />}
+          placeholder="you@example.com"
+          required
+        />
+        <Input
+          label="Password"
+          type="password"
+          enterKeyHint="done"
+          size="lg"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          prefixIcon={<Lock className="h-5 w-5" />}
+          placeholder="Enter password"
+          showPasswordToggle
+          required
+        />
+        <p style={{ fontSize: '0.75rem', color: '#666', marginTop: '0.5rem' }}>
+          Tap inputs to see mobile keyboard optimizations
+        </p>
+      </div>
+    );
+  },
+};
+
+export const MobileURLInput: Story = {
+  parameters: {
+    viewport: { defaultViewport: 'mobile1' },
+    docs: {
+      description: {
+        story: 'URL input with inputMode="url" shows URL-optimized keyboard with / and .com buttons.',
+      },
+    },
+  },
+  render: () => {
+    const [url, setUrl] = useState('');
+    return (
+      <Input
+        label="Website URL"
+        type="url"
+        inputMode="url"
+        enterKeyHint="go"
+        size="lg"
+        value={url}
+        onChange={(e) => setUrl(e.target.value)}
+        prefix="https://"
+        placeholder="example.com"
+        helperText="Shows URL keyboard with / and .com"
+      />
+    );
+  },
+};

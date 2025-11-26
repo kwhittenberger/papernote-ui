@@ -1,6 +1,7 @@
 
-import React, { useState } from 'react';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ChevronDown, ChevronRight, X } from 'lucide-react';
+import { createPortal } from 'react-dom';
 
 export interface SidebarItem {
   id: string;
@@ -22,6 +23,14 @@ export interface SidebarProps {
   header?: React.ReactNode; // Logo or header content
   footer?: React.ReactNode; // User profile or footer content
   currentPath?: string; // Current route for auto-active detection
+  
+  // Mobile drawer props
+  /** Whether sidebar is open on mobile (drawer mode) */
+  mobileOpen?: boolean;
+  /** Callback when mobile drawer should close */
+  onMobileClose?: () => void;
+  /** Width of the sidebar (default: 256px / w-64) */
+  width?: string;
 }
 
 export interface SidebarGroupProps {
@@ -169,12 +178,144 @@ export function SidebarGroup({ title, items, onNavigate, defaultExpanded = true,
   );
 }
 
-export default function Sidebar({ items, onNavigate, className = '', header, footer, currentPath }: SidebarProps) {
-  return (
-    <div className={`flex flex-col h-full bg-white border-r border-paper-300 notebook-binding ${className}`}>
-      {/* Header (Logo) */}
-      {header && (
+/**
+ * Sidebar - Navigation sidebar with mobile drawer support
+ * 
+ * On desktop: Renders as a fixed-width sidebar
+ * On mobile: Renders as a drawer overlay when mobileOpen is true
+ * 
+ * @example Desktop usage (no mobile props)
+ * ```tsx
+ * <Sidebar
+ *   items={navItems}
+ *   header={<Logo />}
+ *   footer={<UserProfile />}
+ *   currentPath={location.pathname}
+ *   onNavigate={(href) => navigate(href)}
+ * />
+ * ```
+ * 
+ * @example With mobile drawer support
+ * ```tsx
+ * const [mobileOpen, setMobileOpen] = useState(false);
+ * 
+ * <Sidebar
+ *   items={navItems}
+ *   header={<Logo />}
+ *   mobileOpen={mobileOpen}
+ *   onMobileClose={() => setMobileOpen(false)}
+ *   onNavigate={(href) => {
+ *     navigate(href);
+ *     setMobileOpen(false); // Close drawer on navigation
+ *   }}
+ * />
+ * ```
+ */
+export default function Sidebar({ 
+  items, 
+  onNavigate, 
+  className = '', 
+  header, 
+  footer, 
+  currentPath,
+  mobileOpen,
+  onMobileClose,
+  width = 'w-64',
+}: SidebarProps) {
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [shouldRender, setShouldRender] = useState(mobileOpen);
+
+  // Handle animation states for mobile drawer
+  useEffect(() => {
+    if (mobileOpen) {
+      setShouldRender(true);
+      // Small delay to trigger animation
+      requestAnimationFrame(() => {
+        setIsAnimating(true);
+      });
+      return; // No cleanup needed when opening
+    } else {
+      setIsAnimating(false);
+      // Wait for animation to complete before unmounting
+      const timer = setTimeout(() => {
+        setShouldRender(false);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [mobileOpen]);
+
+  // Handle escape key for mobile drawer
+  useEffect(() => {
+    if (!mobileOpen) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onMobileClose?.();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [mobileOpen, onMobileClose]);
+
+  // Lock body scroll when mobile drawer is open
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileOpen]);
+
+  // Handle navigation with auto-close on mobile
+  const handleNavigate = (href: string, external?: boolean) => {
+    onNavigate?.(href, external);
+    // Auto-close mobile drawer on navigation
+    if (mobileOpen) {
+      onMobileClose?.();
+    }
+  };
+
+  // Sidebar content (shared between desktop and mobile)
+  const sidebarContent = (
+    <div 
+      ref={sidebarRef}
+      className={`flex flex-col h-full bg-white border-r border-paper-300 notebook-binding ${width} ${className}`}
+    >
+      {/* Mobile close button */}
+      {mobileOpen !== undefined && (
+        <div className="flex items-center justify-between px-4 pt-4 md:hidden">
+          <div className="flex-1">
+            {header}
+          </div>
+          <button
+            onClick={onMobileClose}
+            className="
+              flex items-center justify-center
+              w-10 h-10 -mr-2
+              text-ink-500 hover:text-ink-700
+              hover:bg-paper-100 rounded-full
+              transition-colors
+            "
+            aria-label="Close sidebar"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+      )}
+
+      {/* Header (Logo) - desktop only when mobile drawer has its own */}
+      {header && mobileOpen === undefined && (
         <div className="px-6 pt-6 pb-4">
+          {header}
+        </div>
+      )}
+      {header && mobileOpen !== undefined && (
+        <div className="px-6 pt-2 pb-4 hidden md:block">
           {header}
         </div>
       )}
@@ -192,7 +333,7 @@ export default function Sidebar({ items, onNavigate, className = '', header, foo
             <SidebarNavItem
               key={item.id}
               item={item}
-              onNavigate={onNavigate}
+              onNavigate={handleNavigate}
               currentPath={currentPath}
             />
           );
@@ -206,5 +347,47 @@ export default function Sidebar({ items, onNavigate, className = '', header, foo
         </div>
       )}
     </div>
+  );
+
+  // If mobileOpen is not defined, render as regular sidebar (desktop mode)
+  if (mobileOpen === undefined) {
+    return sidebarContent;
+  }
+
+  // Mobile drawer mode
+  if (!shouldRender) {
+    return null;
+  }
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-50 md:hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Navigation menu"
+    >
+      {/* Backdrop */}
+      <div
+        className={`
+          absolute inset-0 bg-ink-900/50 backdrop-blur-sm
+          transition-opacity duration-300
+          ${isAnimating ? 'opacity-100' : 'opacity-0'}
+        `}
+        onClick={onMobileClose}
+        aria-hidden="true"
+      />
+
+      {/* Sidebar drawer */}
+      <div
+        className={`
+          absolute inset-y-0 left-0 flex max-w-full
+          transition-transform duration-300 ease-out
+          ${isAnimating ? 'translate-x-0' : '-translate-x-full'}
+        `}
+      >
+        {sidebarContent}
+      </div>
+    </div>,
+    document.body
   );
 }

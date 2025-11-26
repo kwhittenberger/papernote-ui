@@ -312,3 +312,165 @@ export const SelectAll: Story = {
     );
   },
 };
+
+// Mobile-optimized stories
+export const MobileLargeTouch: Story = {
+  parameters: {
+    viewport: { defaultViewport: 'mobile1' },
+    docs: {
+      description: {
+        story: 'Large size (lg) checkbox provides 44px minimum touch target height for mobile devices, meeting Apple HIG guidelines.',
+      },
+    },
+  },
+  render: () => {
+    const [checked, setChecked] = useState(false);
+    return (
+      <Checkbox
+        checked={checked}
+        onChange={setChecked}
+        size="lg"
+        label="Touch-friendly checkbox with 44px target"
+      />
+    );
+  },
+};
+
+export const MobilePreferencesList: Story = {
+  parameters: {
+    viewport: { defaultViewport: 'mobile1' },
+    docs: {
+      description: {
+        story: 'Mobile settings list with large touch targets and icons for easy interaction.',
+      },
+    },
+  },
+  render: () => {
+    const [prefs, setPrefs] = useState({
+      notifications: true,
+      sounds: false,
+      location: true,
+      analytics: false,
+    });
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', padding: '1rem' }}>
+        <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.75rem' }}>Settings</h3>
+        <Checkbox
+          checked={prefs.notifications}
+          onChange={(checked) => setPrefs({ ...prefs, notifications: checked })}
+          size="lg"
+          label="Push Notifications"
+        />
+        <Checkbox
+          checked={prefs.sounds}
+          onChange={(checked) => setPrefs({ ...prefs, sounds: checked })}
+          size="lg"
+          label="Sound Effects"
+        />
+        <Checkbox
+          checked={prefs.location}
+          onChange={(checked) => setPrefs({ ...prefs, location: checked })}
+          size="lg"
+          label="Location Services"
+        />
+        <Checkbox
+          checked={prefs.analytics}
+          onChange={(checked) => setPrefs({ ...prefs, analytics: checked })}
+          size="lg"
+          label="Analytics Sharing"
+        />
+      </div>
+    );
+  },
+};
+
+export const MobileFileTypeSelector: Story = {
+  parameters: {
+    viewport: { defaultViewport: 'mobile1' },
+    docs: {
+      description: {
+        story: 'Mobile file type selector with icons and large touch targets.',
+      },
+    },
+  },
+  render: () => {
+    const [selected, setSelected] = useState({
+      documents: true,
+      images: true,
+      audio: false,
+      video: false,
+    });
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', padding: '1rem' }}>
+        <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.75rem' }}>Include File Types</h3>
+        <Checkbox
+          checked={selected.documents}
+          onChange={(checked) => setSelected({ ...selected, documents: checked })}
+          size="lg"
+          label="Documents"
+          icon={<FileText className="h-5 w-5" />}
+        />
+        <Checkbox
+          checked={selected.images}
+          onChange={(checked) => setSelected({ ...selected, images: checked })}
+          size="lg"
+          label="Images"
+          icon={<Image className="h-5 w-5" />}
+        />
+        <Checkbox
+          checked={selected.audio}
+          onChange={(checked) => setSelected({ ...selected, audio: checked })}
+          size="lg"
+          label="Audio"
+          icon={<Music className="h-5 w-5" />}
+        />
+        <Checkbox
+          checked={selected.video}
+          onChange={(checked) => setSelected({ ...selected, video: checked })}
+          size="lg"
+          label="Video"
+          icon={<Video className="h-5 w-5" />}
+        />
+      </div>
+    );
+  },
+};
+
+export const MobileTermsAgreement: Story = {
+  parameters: {
+    viewport: { defaultViewport: 'mobile1' },
+    docs: {
+      description: {
+        story: 'Mobile terms agreement with easy-to-tap checkbox for form submissions.',
+      },
+    },
+  },
+  render: () => {
+    const [agreed, setAgreed] = useState(false);
+    const [newsletter, setNewsletter] = useState(false);
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1rem' }}>
+        <h3 style={{ fontSize: '1.125rem', fontWeight: 600 }}>Complete Your Signup</h3>
+        <Checkbox
+          checked={agreed}
+          onChange={setAgreed}
+          size="lg"
+          label="I agree to the Terms of Service and Privacy Policy"
+          icon={<FileText className="h-5 w-5" />}
+        />
+        <Checkbox
+          checked={newsletter}
+          onChange={setNewsletter}
+          size="lg"
+          label="Subscribe to our newsletter for updates"
+        />
+        <p style={{ fontSize: '0.75rem', color: '#666' }}>
+          Large touch targets make it easy to check on mobile
+        </p>
+      </div>
+    );
+  },
+};

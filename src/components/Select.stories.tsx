@@ -388,3 +388,193 @@ export const MultiSelect: Story = {
     );
   },
 };
+
+// Mobile Stories
+export const MobileBottomSheet: Story = {
+  parameters: {
+    viewport: {
+      defaultViewport: 'mobile1',
+    },
+    docs: {
+      description: {
+        story: 'On mobile viewports, Select automatically uses a BottomSheet for option selection. Resize your browser or use mobile viewport to see the effect.',
+      },
+    },
+  },
+  render: () => {
+    const [value, setValue] = useState('');
+    return (
+      <div style={{ padding: '16px' }}>
+        <Select
+          label="Mobile Select"
+          options={countryOptions}
+          value={value}
+          onChange={setValue}
+          mobileMode="auto"
+          searchable
+          placeholder="Tap to select..."
+        />
+      </div>
+    );
+  },
+};
+
+export const MobileSearchable: Story = {
+  parameters: {
+    viewport: {
+      defaultViewport: 'mobile1',
+    },
+  },
+  render: () => {
+    const [value, setValue] = useState('');
+    // Generate many options to demonstrate mobile search
+    const manyOptions = Array.from({ length: 50 }, (_, i) => ({
+      value: `option-${i}`,
+      label: `Option ${i + 1}`,
+    }));
+    return (
+      <div style={{ padding: '16px' }}>
+        <Select
+          label="Searchable Mobile"
+          options={manyOptions}
+          value={value}
+          onChange={setValue}
+          mobileMode="auto"
+          searchable
+          placeholder="Search options..."
+          helperText="Opens as bottom sheet with search on mobile"
+        />
+      </div>
+    );
+  },
+};
+
+export const MobileNative: Story = {
+  parameters: {
+    viewport: {
+      defaultViewport: 'mobile1',
+    },
+    docs: {
+      description: {
+        story: 'Uses the native OS select picker on mobile for familiar UX.',
+      },
+    },
+  },
+  render: () => {
+    const [value, setValue] = useState('');
+    return (
+      <div style={{ padding: '16px' }}>
+        <Select
+          label="Native Select"
+          options={basicOptions}
+          value={value}
+          onChange={setValue}
+          mobileMode="native"
+          placeholder="Uses native picker on mobile..."
+        />
+      </div>
+    );
+  },
+};
+
+export const MobileLargeSize: Story = {
+  parameters: {
+    viewport: {
+      defaultViewport: 'mobile1',
+    },
+    docs: {
+      description: {
+        story: 'Large size provides 44px touch targets. On mobile, md size auto-upgrades to lg.',
+      },
+    },
+  },
+  render: () => {
+    const [value, setValue] = useState('');
+    return (
+      <div style={{ padding: '16px' }}>
+        <Select
+          label="Touch-Friendly Select"
+          options={basicOptions}
+          value={value}
+          onChange={setValue}
+          size="lg"
+          clearable
+          placeholder="Large touch target..."
+        />
+      </div>
+    );
+  },
+};
+
+export const MobileWithGroups: Story = {
+  parameters: {
+    viewport: {
+      defaultViewport: 'mobile1',
+    },
+  },
+  render: () => {
+    const [value, setValue] = useState('');
+    const groupedOptions = [
+      {
+        label: 'Fruits',
+        options: [
+          { value: 'apple', label: 'Apple' },
+          { value: 'banana', label: 'Banana' },
+          { value: 'orange', label: 'Orange' },
+        ],
+      },
+      {
+        label: 'Vegetables',
+        options: [
+          { value: 'carrot', label: 'Carrot' },
+          { value: 'broccoli', label: 'Broccoli' },
+          { value: 'spinach', label: 'Spinach' },
+        ],
+      },
+    ];
+    return (
+      <div style={{ padding: '16px' }}>
+        <Select
+          label="Grouped Options"
+          groups={groupedOptions}
+          value={value}
+          onChange={setValue}
+          mobileMode="auto"
+          searchable
+          placeholder="Select food..."
+        />
+      </div>
+    );
+  },
+};
+
+export const MobileWithIcons: Story = {
+  parameters: {
+    viewport: {
+      defaultViewport: 'mobile1',
+    },
+  },
+  render: () => {
+    const [value, setValue] = useState('');
+    const iconOptions = [
+      { value: 'location1', label: 'New York', icon: <MapPin className="w-4 h-4" /> },
+      { value: 'location2', label: 'Los Angeles', icon: <MapPin className="w-4 h-4" /> },
+      { value: 'location3', label: 'Chicago', icon: <MapPin className="w-4 h-4" /> },
+      { value: 'user1', label: 'John Doe', icon: <User className="w-4 h-4" /> },
+      { value: 'user2', label: 'Jane Smith', icon: <User className="w-4 h-4" /> },
+    ];
+    return (
+      <div style={{ padding: '16px' }}>
+        <Select
+          label="With Icons"
+          options={iconOptions}
+          value={value}
+          onChange={setValue}
+          mobileMode="auto"
+          clearable
+          placeholder="Select option..."
+        />
+      </div>
+    );
+  },
+};

@@ -348,3 +348,186 @@ export const TextSelectionTest: Story = {
     );
   },
 };
+
+// Mobile-optimized stories
+export const MobileSlideUp: Story = {
+  parameters: {
+    viewport: { defaultViewport: 'mobile1' },
+    docs: {
+      description: {
+        story: 'On mobile devices, slide-up animation feels natural like a native bottom sheet, ideal for mobile modals.',
+      },
+    },
+  },
+  render: () => {
+    const [isOpen, setIsOpen] = useState(false);
+    return (
+      <>
+        <Button onClick={() => setIsOpen(true)}>Open Mobile Modal</Button>
+        <Modal
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          title="Mobile Modal"
+          animation="slide-up"
+          size="lg"
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <p>This modal slides up from the bottom, which feels natural on mobile devices.</p>
+            <Input
+              label="Email"
+              type="email"
+              inputMode="email"
+              enterKeyHint="next"
+              size="lg"
+              placeholder="you@example.com"
+            />
+          </div>
+          <ModalFooter>
+            <Button variant="ghost" onClick={() => setIsOpen(false)}>Cancel</Button>
+            <Button variant="primary" onClick={() => setIsOpen(false)}>Save</Button>
+          </ModalFooter>
+        </Modal>
+      </>
+    );
+  },
+};
+
+export const MobileFormModal: Story = {
+  parameters: {
+    viewport: { defaultViewport: 'mobile1' },
+    docs: {
+      description: {
+        story: 'Mobile form modal with touch-friendly inputs (size="lg") and appropriate keyboard hints.',
+      },
+    },
+  },
+  render: () => {
+    const [isOpen, setIsOpen] = useState(false);
+    return (
+      <>
+        <Button onClick={() => setIsOpen(true)}>Add Contact</Button>
+        <Modal
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          title="Add New Contact"
+          animation="slide-up"
+          size="lg"
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <Input
+              label="Full Name"
+              size="lg"
+              enterKeyHint="next"
+              placeholder="John Smith"
+              required
+            />
+            <Input
+              label="Phone Number"
+              type="tel"
+              inputMode="tel"
+              enterKeyHint="next"
+              size="lg"
+              placeholder="(555) 123-4567"
+            />
+            <Input
+              label="Email"
+              type="email"
+              inputMode="email"
+              enterKeyHint="done"
+              size="lg"
+              placeholder="john@example.com"
+            />
+          </div>
+          <ModalFooter>
+            <Button variant="ghost" size="lg" onClick={() => setIsOpen(false)}>Cancel</Button>
+            <Button variant="primary" size="lg" onClick={() => setIsOpen(false)}>Save Contact</Button>
+          </ModalFooter>
+        </Modal>
+      </>
+    );
+  },
+};
+
+export const MobileConfirmation: Story = {
+  parameters: {
+    viewport: { defaultViewport: 'mobile1' },
+    docs: {
+      description: {
+        story: 'Small confirmation modal on mobile with scale animation and touch-friendly buttons.',
+      },
+    },
+  },
+  render: () => {
+    const [isOpen, setIsOpen] = useState(false);
+    return (
+      <>
+        <Button variant="danger" onClick={() => setIsOpen(true)}>Delete Item</Button>
+        <Modal
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          title="Delete Item?"
+          animation="scale"
+          size="sm"
+        >
+          <p style={{ marginBottom: '1rem' }}>
+            Are you sure you want to delete this item? This action cannot be undone.
+          </p>
+          <ModalFooter>
+            <Button variant="ghost" size="lg" onClick={() => setIsOpen(false)}>Cancel</Button>
+            <Button variant="danger" size="lg" onClick={() => setIsOpen(false)}>Delete</Button>
+          </ModalFooter>
+        </Modal>
+      </>
+    );
+  },
+};
+
+export const MobileFullScreen: Story = {
+  parameters: {
+    viewport: { defaultViewport: 'mobile1' },
+    docs: {
+      description: {
+        story: 'Full-screen modal on mobile for complex content that needs maximum space.',
+      },
+    },
+  },
+  render: () => {
+    const [isOpen, setIsOpen] = useState(false);
+    return (
+      <>
+        <Button onClick={() => setIsOpen(true)}>View Details</Button>
+        <Modal
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          title="Product Details"
+          animation="slide-up"
+          size="full"
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ backgroundColor: '#f5f5f4', padding: '3rem', borderRadius: '0.5rem', textAlign: 'center' }}>
+              [Product Image]
+            </div>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 600 }}>Product Name</h3>
+            <p style={{ color: '#666' }}>$99.99</p>
+            <p>
+              This is a detailed product description that takes advantage of the full-screen
+              modal on mobile devices to show comprehensive information.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <h4 style={{ fontWeight: 600 }}>Features:</h4>
+              <ul style={{ marginLeft: '1.5rem' }}>
+                <li>Feature 1</li>
+                <li>Feature 2</li>
+                <li>Feature 3</li>
+              </ul>
+            </div>
+          </div>
+          <ModalFooter>
+            <Button variant="ghost" size="lg" onClick={() => setIsOpen(false)}>Close</Button>
+            <Button variant="primary" size="lg" onClick={() => setIsOpen(false)}>Add to Cart</Button>
+          </ModalFooter>
+        </Modal>
+      </>
+    );
+  },
+};

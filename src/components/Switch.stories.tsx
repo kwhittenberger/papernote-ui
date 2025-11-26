@@ -266,3 +266,161 @@ export const SettingsGroup: Story = {
     );
   },
 };
+
+// Mobile-optimized stories
+export const MobileLargeTouch: Story = {
+  parameters: {
+    viewport: { defaultViewport: 'mobile1' },
+    docs: {
+      description: {
+        story: 'Large size (lg) switch provides larger touch target for mobile devices. On mobile, md automatically upgrades to lg.',
+      },
+    },
+  },
+  render: () => {
+    const [checked, setChecked] = useState(false);
+    return (
+      <Switch
+        checked={checked}
+        onChange={setChecked}
+        size="lg"
+        label="Touch-friendly switch"
+      />
+    );
+  },
+};
+
+export const MobileSettingsPage: Story = {
+  parameters: {
+    viewport: { defaultViewport: 'mobile1' },
+    docs: {
+      description: {
+        story: 'Mobile settings page with large switches optimized for touch interaction.',
+      },
+    },
+  },
+  render: () => {
+    const [settings, setSettings] = useState({
+      darkMode: false,
+      notifications: true,
+      sounds: true,
+      haptics: false,
+      location: true,
+      analytics: false,
+    });
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', width: '100%', padding: '1rem' }}>
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.5rem' }}>Settings</h2>
+        
+        <div style={{ borderBottom: '1px solid #e5e5e5', paddingBottom: '0.5rem', marginBottom: '0.75rem' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Appearance
+          </div>
+        </div>
+        
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0' }}>
+          <div>
+            <div style={{ fontWeight: 500 }}>Dark Mode</div>
+            <div style={{ fontSize: '0.75rem', color: '#666' }}>Use dark color scheme</div>
+          </div>
+          <Switch checked={settings.darkMode} onChange={(v) => setSettings({...settings, darkMode: v})} size="lg" />
+        </div>
+        
+        <div style={{ borderBottom: '1px solid #e5e5e5', paddingBottom: '0.5rem', marginBottom: '0.75rem', marginTop: '1rem' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Notifications
+          </div>
+        </div>
+        
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0' }}>
+          <div>
+            <div style={{ fontWeight: 500 }}>Push Notifications</div>
+            <div style={{ fontSize: '0.75rem', color: '#666' }}>Enable push alerts</div>
+          </div>
+          <Switch checked={settings.notifications} onChange={(v) => setSettings({...settings, notifications: v})} size="lg" />
+        </div>
+        
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0' }}>
+          <div>
+            <div style={{ fontWeight: 500 }}>Sound Effects</div>
+            <div style={{ fontSize: '0.75rem', color: '#666' }}>Play sounds for actions</div>
+          </div>
+          <Switch checked={settings.sounds} onChange={(v) => setSettings({...settings, sounds: v})} size="lg" />
+        </div>
+        
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0' }}>
+          <div>
+            <div style={{ fontWeight: 500 }}>Haptic Feedback</div>
+            <div style={{ fontSize: '0.75rem', color: '#666' }}>Vibration feedback</div>
+          </div>
+          <Switch checked={settings.haptics} onChange={(v) => setSettings({...settings, haptics: v})} size="lg" />
+        </div>
+        
+        <div style={{ borderBottom: '1px solid #e5e5e5', paddingBottom: '0.5rem', marginBottom: '0.75rem', marginTop: '1rem' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Privacy
+          </div>
+        </div>
+        
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0' }}>
+          <div>
+            <div style={{ fontWeight: 500 }}>Location Services</div>
+            <div style={{ fontSize: '0.75rem', color: '#666' }}>Share your location</div>
+          </div>
+          <Switch checked={settings.location} onChange={(v) => setSettings({...settings, location: v})} size="lg" />
+        </div>
+        
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0' }}>
+          <div>
+            <div style={{ fontWeight: 500 }}>Analytics</div>
+            <div style={{ fontSize: '0.75rem', color: '#666' }}>Share usage data</div>
+          </div>
+          <Switch checked={settings.analytics} onChange={(v) => setSettings({...settings, analytics: v})} size="lg" />
+        </div>
+      </div>
+    );
+  },
+};
+
+export const MobileAsyncToggle: Story = {
+  parameters: {
+    viewport: { defaultViewport: 'mobile1' },
+    docs: {
+      description: {
+        story: 'Async toggle with loading state on mobile, showing spinner during API call.',
+      },
+    },
+  },
+  render: () => {
+    const [enabled, setEnabled] = useState(false);
+    const [loading, setLoading] = useState(false);
+
+    const handleChange = async (newValue: boolean) => {
+      setLoading(true);
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setEnabled(newValue);
+      setLoading(false);
+    };
+
+    return (
+      <div style={{ padding: '1rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0' }}>
+          <div>
+            <div style={{ fontWeight: 500 }}>Premium Features</div>
+            <div style={{ fontSize: '0.75rem', color: '#666' }}>Enable premium subscription</div>
+          </div>
+          <Switch
+            checked={enabled}
+            onChange={handleChange}
+            loading={loading}
+            size="lg"
+          />
+        </div>
+        <p style={{ fontSize: '0.75rem', color: '#999', marginTop: '0.5rem' }}>
+          Toggle shows loading spinner during async operations
+        </p>
+      </div>
+    );
+  },
+};

@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useId } from 'react';
 import { X } from 'lucide-react';
+import { useIsMobile } from '../hooks/useResponsive';
+import BottomSheet from './BottomSheet';
 
 export interface ModalProps {
   isOpen: boolean;
@@ -10,6 +12,14 @@ export interface ModalProps {
   showCloseButton?: boolean;
   /** Animation variant for modal entrance (default: 'scale') */
   animation?: 'scale' | 'slide-up' | 'slide-down' | 'fade' | 'none';
+  
+  // Mobile behavior props
+  /** Mobile display mode: 'auto' uses BottomSheet on mobile, 'modal' always uses modal, 'sheet' always uses BottomSheet */
+  mobileMode?: 'auto' | 'modal' | 'sheet';
+  /** Height preset for BottomSheet on mobile (default: 'lg') */
+  mobileHeight?: 'sm' | 'md' | 'lg' | 'full';
+  /** Show drag handle on BottomSheet (default: true) */
+  mobileShowHandle?: boolean;
 }
 
 const sizeClasses = {
@@ -20,6 +30,49 @@ const sizeClasses = {
   full: 'max-w-7xl',
 };
 
+/**
+ * Modal - Adaptive dialog component
+ * 
+ * On desktop, renders as a centered modal dialog.
+ * On mobile (when mobileMode='auto'), automatically renders as a BottomSheet
+ * for better touch interaction and visibility.
+ * 
+ * @example Basic modal
+ * ```tsx
+ * <Modal isOpen={isOpen} onClose={handleClose} title="Edit User">
+ *   <form>...</form>
+ *   <ModalFooter>
+ *     <Button onClick={handleClose}>Cancel</Button>
+ *     <Button variant="primary" onClick={handleSave}>Save</Button>
+ *   </ModalFooter>
+ * </Modal>
+ * ```
+ * 
+ * @example Force modal on mobile
+ * ```tsx
+ * <Modal 
+ *   isOpen={isOpen} 
+ *   onClose={handleClose} 
+ *   title="Settings"
+ *   mobileMode="modal"
+ * >
+ *   ...
+ * </Modal>
+ * ```
+ * 
+ * @example Always use BottomSheet
+ * ```tsx
+ * <Modal 
+ *   isOpen={isOpen} 
+ *   onClose={handleClose} 
+ *   title="Select Option"
+ *   mobileMode="sheet"
+ *   mobileHeight="md"
+ * >
+ *   ...
+ * </Modal>
+ * ```
+ */
 export default function Modal({
   isOpen,
   onClose,
@@ -28,13 +81,24 @@ export default function Modal({
   size = 'md',
   showCloseButton = true,
   animation = 'scale',
+  mobileMode = 'auto',
+  mobileHeight = 'lg',
+  mobileShowHandle = true,
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const mouseDownOnBackdrop = useRef(false);
   const titleId = useId();
+  const isMobile = useIsMobile();
 
-  // Handle escape key
+  // Determine if we should use BottomSheet
+  const useBottomSheet = 
+    mobileMode === 'sheet' || 
+    (mobileMode === 'auto' && isMobile);
+
+  // Handle escape key (only for modal mode, BottomSheet handles its own)
   useEffect(() => {
+    if (useBottomSheet) return; // BottomSheet handles escape
+    
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
         onClose();
@@ -50,7 +114,7 @@ export default function Modal({
       document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = 'unset';
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, useBottomSheet]);
 
   // Track if mousedown originated on the backdrop
   const handleBackdropMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -89,6 +153,23 @@ export default function Modal({
 
   if (!isOpen) return null;
 
+  // Render as BottomSheet on mobile
+  if (useBottomSheet) {
+    return (
+      <BottomSheet
+        isOpen={isOpen}
+        onClose={onClose}
+        title={title}
+        height={mobileHeight}
+        showHandle={mobileShowHandle}
+        showCloseButton={showCloseButton}
+      >
+        {children}
+      </BottomSheet>
+    );
+  }
+
+  // Render as standard modal on desktop
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900 bg-opacity-50 backdrop-blur-sm animate-fade-in"
@@ -127,7 +208,7 @@ export default function Modal({
 
 export function ModalFooter({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-paper-200 bg-paper-50">
+    <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-paper-200 bg-paper-50 -mx-6 -mb-4 mt-4 rounded-b-xl">
       {children}
     </div>
   );

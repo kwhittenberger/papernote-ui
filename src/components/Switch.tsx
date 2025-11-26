@@ -1,4 +1,5 @@
 import { forwardRef, useId } from 'react';
+import { useIsMobile } from '../hooks/useResponsive';
 import { Loader2 } from 'lucide-react';
 
 export interface SwitchProps {
@@ -7,6 +8,7 @@ export interface SwitchProps {
   label?: string;
   description?: string;
   disabled?: boolean;
+  /** Size variant - 'lg' provides better touch targets. On mobile, 'md' auto-upgrades to 'lg'. */
   size?: 'sm' | 'md' | 'lg';
   /** Show loading spinner (disables interaction) */
   loading?: boolean;
@@ -26,6 +28,10 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(({
   const labelId = label ? `${switchId}-label` : undefined;
   const descId = description ? `${switchId}-desc` : undefined;
   
+  // Auto-size for mobile
+  const isMobile = useIsMobile();
+  const effectiveSize = isMobile && size === 'md' ? 'lg' : size;
+
   const sizeStyles = {
     sm: {
       switch: 'w-9 h-5',
@@ -47,7 +53,7 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(({
     },
   };
 
-  const styles = sizeStyles[size];
+  const styles = sizeStyles[effectiveSize];
   const isDisabled = disabled || loading;
 
   const handleChange = () => {
@@ -56,8 +62,11 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(({
     }
   };
 
+  // Touch target padding for mobile
+  const touchTargetClass = effectiveSize === 'lg' ? 'min-h-touch py-1' : '';
+
   return (
-    <label htmlFor={switchId} className={`flex items-center gap-3 ${isDisabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}>
+    <label htmlFor={switchId} className={`flex items-center gap-3 ${touchTargetClass} ${isDisabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}>
       {/* Switch */}
       <div className="relative inline-block flex-shrink-0">
         <input
@@ -98,7 +107,7 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(({
       {/* Label */}
       {(label || description) && (
         <div className="flex-1">
-          {label && <p id={labelId} className="text-sm font-medium text-ink-900">{label}</p>}
+          {label && <p id={labelId} className={`${effectiveSize === 'lg' ? 'text-base' : 'text-sm'} font-medium text-ink-900`}>{label}</p>}
           {description && <p id={descId} className="text-xs text-ink-600 mt-0.5">{description}</p>}
         </div>
       )}

@@ -165,8 +165,14 @@ export type { MarkdownEditorProps } from './MarkdownEditor';
 export { default as Menu, MenuDivider } from './Menu';
 export type { MenuProps, MenuItem } from './Menu';
 
-export { default as Chip } from './Chip';
-export type { ChipProps } from './Chip';
+export { default as Chip, ChipGroup } from './Chip';
+export type { ChipProps, ChipGroupProps } from './Chip';
+
+export { default as CheckboxList } from './CheckboxList';
+export type { CheckboxListProps, CheckboxListItem } from './CheckboxList';
+
+export { default as SearchableList } from './SearchableList';
+export type { SearchableListProps, SearchableListItem } from './SearchableList';
 
 export { default as NumberInput } from './NumberInput';
 export type { NumberInputProps } from './NumberInput';
@@ -189,7 +195,10 @@ export type { BottomSheetProps } from './BottomSheet';
 export { default as Collapsible } from './Collapsible';
 export type { CollapsibleProps } from './Collapsible';
 
-export { Show, Hide, useMediaQuery } from './ResponsiveUtilities';
+export { default as ExpandablePanel, ExpandablePanelSpacer, ExpandablePanelContainer } from './ExpandablePanel';
+export type { ExpandablePanelProps } from './ExpandablePanel';
+
+export { Show, Hide } from './ResponsiveUtilities';
 
 // Navigation Components
 export { default as Breadcrumbs } from './Breadcrumbs';
@@ -243,6 +252,19 @@ export type { PageNavigationProps } from './PageNavigation';
 export { default as Sidebar, SidebarGroup } from './Sidebar';
 export type { SidebarProps, SidebarItem, SidebarGroupProps } from './Sidebar';
 
+// Mobile Navigation Components
+export { default as BottomNavigation, BottomNavigationSpacer } from './BottomNavigation';
+export type { BottomNavigationProps, BottomNavItem } from './BottomNavigation';
+
+export { default as MobileHeader, MobileHeaderSpacer } from './MobileHeader';
+export type { MobileHeaderProps } from './MobileHeader';
+
+export { default as FloatingActionButton, useFABScroll } from './FloatingActionButton';
+export type { FloatingActionButtonProps, FABAction } from './FloatingActionButton';
+
+export { default as PullToRefresh, usePullToRefresh } from './PullToRefresh';
+export type { PullToRefreshProps } from './PullToRefresh';
+
 // Logo
 export { default as Logo } from './Logo';
 export type { LogoProps } from './Logo';
@@ -254,6 +276,9 @@ export type { UserProfileButtonProps } from './UserProfileButton';
 // Layout
 export { default as Layout } from './Layout';
 export type { LayoutProps } from './Layout';
+
+export { default as MobileLayout } from './MobileLayout';
+export type { MobileLayoutProps } from './MobileLayout';
 
 export { default as TwoColumnContent } from './TwoColumnContent';
 export type { TwoColumnContentProps } from './TwoColumnContent';
@@ -286,6 +311,12 @@ export type {
   ExpandedRowConfig,
   ExpansionMode
 } from './DataTable';
+
+export { default as DataTableCardView } from './DataTableCardView';
+export type { CardViewConfig, DataTableCardViewProps } from './DataTableCardView';
+
+export { default as SwipeActions } from './SwipeActions';
+export type { SwipeActionsProps, SwipeAction } from './SwipeActions';
 
 // Spreadsheet
 export { Spreadsheet, SpreadsheetReport } from './Spreadsheet';
@@ -414,3 +445,32 @@ export type { ExcelColumn, ExportToExcelOptions, DataTableExportOptions, MultiSh
 // Hooks
 export { useColumnResize, useColumnReorder } from '../hooks/useTableEnhancements';
 export type { UseColumnResizeOptions, UseColumnReorderOptions } from '../hooks/useTableEnhancements';
+
+// Responsive Hooks
+export {
+  useViewportSize,
+  useBreakpoint,
+  useMediaQuery,
+  useIsMobile,
+  useIsTablet,
+  useIsDesktop,
+  useIsTouchDevice,
+  useOrientation,
+  useBreakpointValue,
+  useResponsiveCallback,
+  useSafeAreaInsets,
+  usePrefersMobile,
+  BREAKPOINTS,
+} from '../hooks/useResponsive';
+export type { Breakpoint, ViewportSize, Orientation } from '../hooks/useResponsive';
+
+// Mobile Context
+export {
+  MobileProvider,
+  useMobileContext,
+  withMobileContext,
+  MobileOnly,
+  DesktopOnly,
+  Responsive,
+} from '../context/MobileContext';
+export type { MobileContextValue, MobileProviderProps } from '../context/MobileContext';

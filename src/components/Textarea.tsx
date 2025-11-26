@@ -1,4 +1,5 @@
 import { forwardRef, useEffect, useRef } from 'react';
+import { useIsMobile } from '../hooks/useResponsive';
 import { AlertCircle, CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
 
 export type ValidationState = 'error' | 'success' | 'warning' | null;
@@ -20,7 +21,29 @@ export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextArea
   resize?: 'none' | 'vertical' | 'horizontal' | 'both';
   /** Show loading spinner (for async operations like auto-save) */
   loading?: boolean;
+  
+  // Mobile optimization props
+  /**
+   * Size variant - 'md' is default, 'lg' provides larger touch-friendly text and padding.
+   * On mobile, 'md' is automatically upgraded to 'lg' for better touch targets.
+   */
+  size?: 'sm' | 'md' | 'lg';
+  /**
+   * Enter key hint for mobile keyboards.
+   * 'enter' - Standard enter key (newline)
+   * 'done' - Done action
+   * 'go' - Go/navigate action
+   * 'send' - Send action
+   */
+  enterKeyHint?: 'enter' | 'done' | 'go' | 'send';
 }
+
+// Size classes for textarea
+const sizeClasses = {
+  sm: 'px-3 py-2 text-sm',
+  md: 'px-4 py-3 text-sm',
+  lg: 'px-4 py-3.5 text-base', // Larger padding and text for mobile
+};
 
 const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   (
@@ -36,6 +59,8 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       maxRows = 10,
       resize = 'vertical',
       loading = false,
+      size = 'md',
+      enterKeyHint,
       className = '',
       id,
       value,
@@ -44,6 +69,9 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     },
     ref
   ) => {
+    // Detect mobile and auto-size
+    const isMobile = useIsMobile();
+    const effectiveSize = isMobile && size === 'md' ? 'lg' : size;
     const textareaId = id || `textarea-${Math.random().toString(36).substring(2, 9)}`;
     const currentLength = typeof value === 'string' ? value.length : 0;
     const internalRef = useRef<HTMLTextAreaElement>(null);
@@ -147,11 +175,13 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             value={value}
             maxLength={maxLength}
             rows={autoExpand ? minRows : rows}
+            enterKeyHint={enterKeyHint}
             className={`
-              block w-full px-4 py-3 border rounded-lg text-sm text-ink-800 placeholder-ink-400
+              block w-full border rounded-lg text-ink-800 placeholder-ink-400
               bg-white bg-subtle-grain transition-all duration-200
               focus:outline-none focus:ring-2 ${getResizeClass()}
               disabled:bg-paper-100 disabled:text-ink-400 disabled:cursor-not-allowed disabled:opacity-60
+              ${sizeClasses[effectiveSize]}
               ${getValidationClasses()}
               ${loading ? 'pr-10' : ''}
               ${className}

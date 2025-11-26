@@ -38,7 +38,9 @@
       "Bash(npm ls:*)",
       "Bash(npm ci:*)",
       "Bash(npm run lint:*)",
-      "WebSearch"
+      "WebSearch",
+      "mcp__filesystem__read_file",
+      "mcp__filesystem__list_directory"
     ],
     "deny": [],
     "ask": []
