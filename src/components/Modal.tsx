@@ -12,6 +12,10 @@ export interface ModalProps {
   showCloseButton?: boolean;
   /** Animation variant for modal entrance (default: 'scale') */
   animation?: 'scale' | 'slide-up' | 'slide-down' | 'fade' | 'none';
+  /** Enable automatic scrolling for content that exceeds viewport height */
+  scrollable?: boolean;
+  /** Maximum height of the modal content area (e.g., '70vh', '500px') */
+  maxHeight?: string;
   
   // Mobile behavior props
   /** Mobile display mode: 'auto' uses BottomSheet on mobile, 'modal' always uses modal, 'sheet' always uses BottomSheet */
@@ -48,6 +52,30 @@ const sizeClasses = {
  * </Modal>
  * ```
  * 
+ * @example Scrollable modal for long content
+ * ```tsx
+ * <Modal 
+ *   isOpen={isOpen} 
+ *   onClose={handleClose} 
+ *   title="Terms and Conditions"
+ *   scrollable
+ * >
+ *   {longContent}
+ * </Modal>
+ * ```
+ * 
+ * @example Modal with custom max height
+ * ```tsx
+ * <Modal 
+ *   isOpen={isOpen} 
+ *   onClose={handleClose} 
+ *   title="Document Preview"
+ *   maxHeight="70vh"
+ * >
+ *   {documentContent}
+ * </Modal>
+ * ```
+ * 
  * @example Force modal on mobile
  * ```tsx
  * <Modal 
@@ -81,6 +109,8 @@ export default function Modal({
   size = 'md',
   showCloseButton = true,
   animation = 'scale',
+  scrollable = false,
+  maxHeight,
   mobileMode = 'auto',
   mobileHeight = 'lg',
   mobileShowHandle = true,
@@ -200,7 +230,14 @@ export default function Modal({
         </div>
 
         {/* Content */}
-        <div className="px-6 py-4">{children}</div>
+        <div 
+          className={`px-6 py-4 ${scrollable || maxHeight ? 'overflow-y-auto' : ''}`}
+          style={{
+            maxHeight: maxHeight || (scrollable ? 'calc(100vh - 200px)' : undefined),
+          }}
+        >
+          {children}
+        </div>
       </div>
     </div>
   );

@@ -96,6 +96,21 @@ const [isOpen, setIsOpen] = useState(false);
         defaultValue: { summary: 'true' },
       },
     },
+    scrollable: {
+      control: 'boolean',
+      description: 'Enable automatic scrolling for content that exceeds viewport height. Applies max-height: calc(100vh - 200px) and overflow-y: auto.',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    maxHeight: {
+      control: 'text',
+      description: 'Maximum height of the modal content area (e.g., "70vh", "500px"). Enables overflow-y: auto when set.',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
   },
 } satisfies Meta<typeof Modal>;
 
@@ -525,6 +540,196 @@ export const MobileFullScreen: Story = {
           <ModalFooter>
             <Button variant="ghost" size="lg" onClick={() => setIsOpen(false)}>Close</Button>
             <Button variant="primary" size="lg" onClick={() => setIsOpen(false)}>Add to Cart</Button>
+          </ModalFooter>
+        </Modal>
+      </>
+    );
+  },
+};
+
+// Scrollable content stories
+export const Scrollable: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Modal with `scrollable` prop enables automatic overflow handling for long content. The content area gets a max-height of `calc(100vh - 200px)` and becomes scrollable.',
+      },
+    },
+  },
+  render: () => {
+    const [isOpen, setIsOpen] = useState(false);
+    return (
+      <>
+        <Button onClick={() => setIsOpen(true)}>Open Scrollable Modal</Button>
+        <Modal
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          title="Terms and Conditions"
+          scrollable
+          size="lg"
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <h4 style={{ fontWeight: 600 }}>1. Introduction</h4>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor 
+              incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud 
+              exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            </p>
+            <h4 style={{ fontWeight: 600 }}>2. User Responsibilities</h4>
+            <p>
+              Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
+              fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in 
+              culpa qui officia deserunt mollit anim id est laborum.
+            </p>
+            <h4 style={{ fontWeight: 600 }}>3. Privacy Policy</h4>
+            <p>
+              Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium 
+              doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore 
+              veritatis et quasi architecto beatae vitae dicta sunt explicabo.
+            </p>
+            <h4 style={{ fontWeight: 600 }}>4. Data Collection</h4>
+            <p>
+              Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
+              quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.
+            </p>
+            <h4 style={{ fontWeight: 600 }}>5. Service Terms</h4>
+            <p>
+              Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, 
+              adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et 
+              dolore magnam aliquam quaerat voluptatem.
+            </p>
+            <h4 style={{ fontWeight: 600 }}>6. Liability</h4>
+            <p>
+              Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit 
+              laboriosam, nisi ut aliquid ex ea commodi consequatur.
+            </p>
+            <h4 style={{ fontWeight: 600 }}>7. Termination</h4>
+            <p>
+              Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil 
+              molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur.
+            </p>
+            <h4 style={{ fontWeight: 600 }}>8. Amendments</h4>
+            <p>
+              At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis 
+              praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias 
+              excepturi sint occaecati cupiditate non provident.
+            </p>
+          </div>
+          <ModalFooter>
+            <Button variant="ghost" onClick={() => setIsOpen(false)}>Decline</Button>
+            <Button variant="primary" onClick={() => setIsOpen(false)}>Accept</Button>
+          </ModalFooter>
+        </Modal>
+      </>
+    );
+  },
+};
+
+export const CustomMaxHeight: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Modal with custom `maxHeight` prop for precise control over content area height. Useful when you want a specific height constraint rather than the default scrollable behavior.',
+      },
+    },
+  },
+  render: () => {
+    const [isOpen, setIsOpen] = useState(false);
+    return (
+      <>
+        <Button onClick={() => setIsOpen(true)}>Open Modal (maxHeight: 300px)</Button>
+        <Modal
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          title="Document Preview"
+          maxHeight="300px"
+          size="lg"
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <p>This modal has a fixed maximum height of 300px for the content area.</p>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor 
+              incididunt ut labore et dolore magna aliqua.
+            </p>
+            <p>
+              Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut 
+              aliquip ex ea commodo consequat.
+            </p>
+            <p>
+              Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore 
+              eu fugiat nulla pariatur.
+            </p>
+            <p>
+              Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia 
+              deserunt mollit anim id est laborum.
+            </p>
+            <p>
+              Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium 
+              doloremque laudantium.
+            </p>
+          </div>
+          <ModalFooter>
+            <Button variant="ghost" onClick={() => setIsOpen(false)}>Close</Button>
+            <Button variant="primary" onClick={() => setIsOpen(false)}>Download</Button>
+          </ModalFooter>
+        </Modal>
+      </>
+    );
+  },
+};
+
+export const ScrollableWithViewportHeight: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Modal with `maxHeight="70vh"` - a common pattern for modals that should take up most of the viewport but leave some breathing room.',
+      },
+    },
+  },
+  render: () => {
+    const [isOpen, setIsOpen] = useState(false);
+    const items = Array.from({ length: 50 }, (_, i) => ({
+      id: i + 1,
+      name: `Item ${i + 1}`,
+      description: `Description for item ${i + 1}`,
+    }));
+    
+    return (
+      <>
+        <Button onClick={() => setIsOpen(true)}>Open Data Table Modal (70vh)</Button>
+        <Modal
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          title="Select Items"
+          maxHeight="70vh"
+          size="xl"
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <p style={{ color: '#666', marginBottom: '0.5rem' }}>
+              Select items from the list below. The content area is limited to 70% of viewport height.
+            </p>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: '2px solid #e5e5e4' }}>
+                  <th style={{ textAlign: 'left', padding: '0.75rem 0.5rem', fontWeight: 600 }}>ID</th>
+                  <th style={{ textAlign: 'left', padding: '0.75rem 0.5rem', fontWeight: 600 }}>Name</th>
+                  <th style={{ textAlign: 'left', padding: '0.75rem 0.5rem', fontWeight: 600 }}>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((item) => (
+                  <tr key={item.id} style={{ borderBottom: '1px solid #e5e5e4' }}>
+                    <td style={{ padding: '0.5rem' }}>{item.id}</td>
+                    <td style={{ padding: '0.5rem' }}>{item.name}</td>
+                    <td style={{ padding: '0.5rem' }}>{item.description}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <ModalFooter>
+            <Button variant="ghost" onClick={() => setIsOpen(false)}>Cancel</Button>
+            <Button variant="primary" onClick={() => setIsOpen(false)}>Select</Button>
           </ModalFooter>
         </Modal>
       </>

@@ -412,6 +412,33 @@ const options: RadioOption[] = [
 </Modal>
 ```
 
+**Scrollable Content**: Added `scrollable` and `maxHeight` props for long content
+- `scrollable`: Enables automatic overflow handling with `max-height: calc(100vh - 200px)`
+- `maxHeight`: Custom max height for content area (e.g., `"70vh"`, `"500px"`)
+- Both props enable `overflow-y: auto` on the content area
+
+```typescript
+// Auto-scrollable for long content
+<Modal
+  isOpen={isOpen}
+  onClose={handleClose}
+  title="Terms and Conditions"
+  scrollable
+>
+  {longContent}
+</Modal>
+
+// Custom max height
+<Modal
+  isOpen={isOpen}
+  onClose={handleClose}
+  title="Document Preview"
+  maxHeight="70vh"
+>
+  {documentContent}
+</Modal>
+```
+
 ### DataTable Component (`src/components/DataTable.tsx`)
 **Virtual Scrolling**: Added virtualization for large datasets (10,000+ rows)
 - `virtualized`: Enable virtual scrolling (boolean)
