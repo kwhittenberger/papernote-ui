@@ -380,6 +380,12 @@ export type { AppLayoutProps } from './AppLayout';
 
 export { PageLayout } from './PageLayout';
 
+export { default as PageHeader } from './PageHeader';
+export type { PageHeaderProps, PageHeaderAction } from './PageHeader';
+
+export { default as ActionBar, ActionBarLeft, ActionBarCenter, ActionBarRight } from './ActionBar';
+export type { ActionBarProps, ActionBarAction } from './ActionBar';
+
 export { AdminModal } from './AdminModal';
 export type { AdminModalProps, AdminModalTab } from './AdminModal';
 

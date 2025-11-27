@@ -57,9 +57,9 @@ function SidebarNavItem({
   // Auto-detect if this item or any child is active based on currentPath
   const isItemActive = currentPath && item.href ? currentPath === item.href : item.active;
   const isChildActive = hasChildren && currentPath
-    ? item.children?.some(child => currentPath === child.href || currentPath?.startsWith(child.href || ''))
+    ? item.children?.some(child => child.href && (currentPath === child.href || currentPath.startsWith(child.href)))
     : false;
-  const shouldExpandByDefault = isChildActive || (hasChildren && currentPath?.startsWith(item.href || ''));
+  const shouldExpandByDefault = isChildActive || (hasChildren && item.href && currentPath?.startsWith(item.href));
 
   const [isExpanded, setIsExpanded] = useState(shouldExpandByDefault);
 
