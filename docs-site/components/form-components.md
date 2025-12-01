@@ -22,6 +22,6 @@ Interactive form controls with validation, icons, and accessibility features.
 
 ## Live Examples
 
-View all form components in action: [Storybook](https://691fcf89b3393605ea470e93-rzwuumklem.chromatic.com/)
+View all form components in action: [Storybook](https://main--691fcf89b3393605ea470e93.chromatic.com/)
 
 _Detailed documentation coming soon._

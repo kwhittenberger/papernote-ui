@@ -81,7 +81,7 @@ function MyComponent() {
 
 ## Live Examples
 
-View all components in action in our **[Live Storybook](https://691fcf89b3393605ea470e93-rzwuumklem.chromatic.com/)** with 500+ interactive examples.
+View all components in action in our **[Live Storybook](https://main--691fcf89b3393605ea470e93.chromatic.com/)** with 500+ interactive examples.
 
 ## Component Features
 
@@ -176,6 +176,6 @@ const menuItems = [
 ## Need Help?
 
 - Browse component categories above for detailed documentation
-- Check out the [Live Storybook](https://691fcf89b3393605ea470e93-rzwuumklem.chromatic.com/) for interactive examples
+- Check out the [Live Storybook](https://main--691fcf89b3393605ea470e93.chromatic.com/) for interactive examples
 - See the [Testing Guide](/development/testing-guide) for testing patterns
 - Report issues on [GitHub](https://github.com/kwhittenberger/papernote-ui/issues)

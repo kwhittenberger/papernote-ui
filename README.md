@@ -17,7 +17,7 @@ A modern React component library with a paper notebook aesthetic - minimal, prof
 - **[🧪 Testing Guide](https://kwhittenberger.github.io/papernote-ui/development/testing-guide)** - Writing tests for components
 - **[🤝 Contributing](https://kwhittenberger.github.io/papernote-ui/development/contributing)** - How to contribute
 
-> **Quick Links:** **[🎨 Storybook](https://691fcf89b3393605ea470e93-rzwuumklem.chromatic.com/)** • **[📦 npm](https://www.npmjs.com/package/@papernote/ui)**
+> **Quick Links:** **[🎨 Storybook](https://main--691fcf89b3393605ea470e93.chromatic.com/)** • **[📦 npm](https://www.npmjs.com/package/@papernote/ui)**
 
 ## ✨ Features
 
@@ -423,7 +423,7 @@ npm run lint
 
 ## 📖 Documentation
 
-- **[Storybook Live Demo](https://691fcf89b3393605ea470e93-rzwuumklem.chromatic.com/)** - Interactive component playground with 500+ examples
+- **[Storybook Live Demo](https://main--691fcf89b3393605ea470e93.chromatic.com/)** - Interactive component playground with 500+ examples
 - **[npm Package](https://www.npmjs.com/package/@papernote/ui)** - Package registry
 - **[GitHub Repository](https://github.com/kwhittenberger/papernote-ui)** - Source code
 
@@ -450,6 +450,6 @@ Inspired by the minimal, professional aesthetic of quality paper notebooks and C
 ## 🔗 Links
 
 - [npm Package](https://www.npmjs.com/package/@papernote/ui)
-- [Live Storybook](https://691fcf89b3393605ea470e93-rzwuumklem.chromatic.com/)
+- [Live Storybook](https://main--691fcf89b3393605ea470e93.chromatic.com/)
 - [GitHub Repository](https://github.com/kwhittenberger/papernote-ui)
 - [Report Issues](https://github.com/kwhittenberger/papernote-ui/issues)

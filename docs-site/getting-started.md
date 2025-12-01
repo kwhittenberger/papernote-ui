@@ -203,7 +203,7 @@ import * as NotebookUI from '@papernote/ui';
 ## Next Steps
 
 - [Explore Components](/components/) - Browse the full component catalog
-- [View Live Examples](https://691fcf89b3393605ea470e93-rzwuumklem.chromatic.com/) - See components in action
+- [View Live Examples](https://main--691fcf89b3393605ea470e93.chromatic.com/) - See components in action
 - [Design System](/design-system) - Learn about colors, typography, and design tokens
 - [Developer Guide](/development/developer-guide) - Contributing and development setup
 
@@ -248,4 +248,4 @@ content: [
 - 📖 [Component Documentation](/components/)
 - 💬 [GitHub Issues](https://github.com/kwhittenberger/papernote-ui/issues)
 - 📦 [npm Package](https://www.npmjs.com/package/@papernote/ui)
-- 🎨 [Storybook Examples](https://691fcf89b3393605ea470e93-rzwuumklem.chromatic.com/)
+- 🎨 [Storybook Examples](https://main--691fcf89b3393605ea470e93.chromatic.com/)

@@ -17,7 +17,7 @@ hero:
       link: /components/
     - theme: alt
       text: Live Demo
-      link: https://691fcf89b3393605ea470e93-rzwuumklem.chromatic.com/
+      link: https://main--691fcf89b3393605ea470e93.chromatic.com/
 
 features:
   - icon: 🎨
@@ -138,7 +138,7 @@ WCAG AA compliant, ARIA attributes throughout, full keyboard navigation, screen 
 
 ## Resources
 
-- [📖 Live Storybook](https://691fcf89b3393605ea470e93-rzwuumklem.chromatic.com/) - Interactive component playground
+- [📖 Live Storybook](https://main--691fcf89b3393605ea470e93.chromatic.com/) - Interactive component playground
 - [📦 npm Package](https://www.npmjs.com/package/@papernote/ui) - Published package
 - [💬 GitHub](https://github.com/kwhittenberger/papernote-ui) - Source code and issues
 - [🎨 Design System](/design-system) - Colors, typography, and patterns

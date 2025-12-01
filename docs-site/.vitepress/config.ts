@@ -15,7 +15,7 @@ export default defineConfig({
     nav: [
       { text: 'Guide', link: '/getting-started' },
       { text: 'Components', link: '/components/' },
-      { text: 'Storybook', link: 'https://691fcf89b3393605ea470e93-rzwuumklem.chromatic.com/' },
+      { text: 'Storybook', link: 'https://main--691fcf89b3393605ea470e93.chromatic.com/' },
       { text: 'npm', link: 'https://www.npmjs.com/package/@papernote/ui' }
     ],
 

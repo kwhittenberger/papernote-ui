@@ -6,7 +6,7 @@ Welcome to the @papernote/ui component library documentation.
 
 ### 🚀 Getting Started
 - **[README](../README.md)** - Installation, quick start, and overview
-- **[Live Storybook](https://691fcf89b3393605ea470e93-rzwuumklem.chromatic.com/)** - Interactive component playground
+- **[Live Storybook](https://main--691fcf89b3393605ea470e93.chromatic.com/)** - Interactive component playground
 - **[npm Package](https://www.npmjs.com/package/@papernote/ui)** - Published package
 
 ### 📚 Reference
@@ -143,7 +143,7 @@ Accordion, Transfer, Carousel, Stepper, Popover, ButtonGroup, Autocomplete, Comb
 - [Component Catalog](./COMPONENT-CATALOG.md) - Complete component reference
 - [Developer Guide](./DEVELOPER-GUIDE.md) - Development workflow
 - [Storybook Guide](./STORYBOOK-GUIDE.md) - Story documentation standards
-- [Live Storybook](https://691fcf89b3393605ea470e93-rzwuumklem.chromatic.com/) - Interactive demos
+- [Live Storybook](https://main--691fcf89b3393605ea470e93.chromatic.com/) - Interactive demos
 
 ### Publishing
 - [Publishing Guide](./PUBLISHING.md) - Automated npm publishing
