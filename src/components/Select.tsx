@@ -83,6 +83,8 @@ export interface SelectProps {
   size?: 'sm' | 'md' | 'lg';
   /** Mobile display mode - 'auto' uses BottomSheet on mobile, 'dropdown' always uses dropdown, 'native' uses native select on mobile */
   mobileMode?: 'auto' | 'dropdown' | 'native';
+  /** Render dropdown via portal (default: true). Set to false when overflow clipping is not an issue */
+  usePortal?: boolean;
 }
 
 // Size classes for trigger button
@@ -191,13 +193,16 @@ const Select = forwardRef<SelectHandle, SelectProps>(
     virtualItemHeight = 42,
     size = 'md',
     mobileMode = 'auto',
+    usePortal = true,
   } = props;
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [scrollTop, setScrollTop] = useState(0);
   const [activeDescendant] = useState<string | undefined>(undefined);
+  const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; width: number; placement: 'bottom' | 'top' } | null>(null);
   const selectRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const mobileSearchInputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -313,9 +318,14 @@ const Select = forwardRef<SelectHandle, SelectProps>(
   // Handle click outside (desktop dropdown only)
   useEffect(() => {
     if (useMobileSheet) return; // Mobile sheet handles its own closing
-    
+
     const handleClickOutside = (event: MouseEvent) => {
-      if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      // Check if click is outside both the select trigger and the dropdown portal
+      const isOutsideSelect = selectRef.current && !selectRef.current.contains(target);
+      const isOutsideDropdown = dropdownRef.current && !dropdownRef.current.contains(target);
+
+      if (isOutsideSelect && isOutsideDropdown) {
         setIsOpen(false);
         setSearchQuery('');
       }
@@ -341,6 +351,55 @@ const Select = forwardRef<SelectHandle, SelectProps>(
       }
     }
   }, [isOpen, searchable, useMobileSheet]);
+
+  // Calculate dropdown position with collision detection and scroll/resize handling
+  useEffect(() => {
+    if (!isOpen || useMobileSheet || !usePortal) {
+      setDropdownPosition(null);
+      return;
+    }
+
+    const updatePosition = () => {
+      if (!buttonRef.current) return;
+
+      const rect = buttonRef.current.getBoundingClientRect();
+      const dropdownHeight = 240; // max-h-60 = 15rem = 240px
+      const gap = 2; // Small gap to visually connect to trigger
+      const viewportHeight = window.innerHeight;
+
+      // Check if there's enough space below
+      const spaceBelow = viewportHeight - rect.bottom;
+      const spaceAbove = rect.top;
+      const hasSpaceBelow = spaceBelow >= dropdownHeight + gap;
+      const hasSpaceAbove = spaceAbove >= dropdownHeight + gap;
+
+      // Prefer bottom placement, flip to top if not enough space below but enough above
+      const placement: 'bottom' | 'top' = hasSpaceBelow || !hasSpaceAbove ? 'bottom' : 'top';
+
+      const top = placement === 'bottom'
+        ? rect.bottom + gap
+        : rect.top - dropdownHeight - gap;
+
+      setDropdownPosition({
+        top,
+        left: rect.left,
+        width: rect.width,
+        placement,
+      });
+    };
+
+    // Initial position calculation
+    updatePosition();
+
+    // Listen for scroll events on all scrollable ancestors
+    window.addEventListener('scroll', updatePosition, true);
+    window.addEventListener('resize', updatePosition);
+
+    return () => {
+      window.removeEventListener('scroll', updatePosition, true);
+      window.removeEventListener('resize', updatePosition);
+    };
+  }, [isOpen, useMobileSheet, usePortal]);
 
   // Lock body scroll when mobile sheet is open
   useEffect(() => {
@@ -617,9 +676,64 @@ const Select = forwardRef<SelectHandle, SelectProps>(
           </div>
         </button>
 
-        {/* Desktop Dropdown */}
-        {isOpen && !useMobileSheet && (
-          <div className="absolute z-50 w-full mt-2 bg-white bg-subtle-grain rounded-lg shadow-lg border border-paper-200 max-h-60 overflow-hidden animate-fade-in">
+      </div>
+
+      {/* Desktop Dropdown - rendered via portal to avoid overflow clipping */}
+      {isOpen && !useMobileSheet && (usePortal ? dropdownPosition : true) && (
+        usePortal ? createPortal(
+          <div
+            ref={dropdownRef}
+            className={`fixed z-[9999] bg-white bg-subtle-grain rounded-lg shadow-lg border border-paper-200 max-h-60 overflow-hidden animate-fade-in ${
+              dropdownPosition?.placement === 'top' ? 'origin-bottom' : 'origin-top'
+            }`}
+            style={{
+              top: dropdownPosition!.top,
+              left: dropdownPosition!.left,
+              width: dropdownPosition!.width,
+            }}
+          >
+            {/* Search Input */}
+            {searchable && (
+              <div className="p-2 border-b border-paper-200">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-400" />
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search..."
+                    className="w-full pl-9 pr-3 py-2 text-sm border border-paper-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-accent-400"
+                    role="searchbox"
+                    aria-label="Search options"
+                    aria-autocomplete="list"
+                    aria-controls={listboxId}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Options List */}
+            <div
+              ref={listRef}
+              id={listboxId}
+              className="overflow-y-auto"
+              style={{ maxHeight: useVirtualScrolling ? virtualHeight : '12rem' }}
+              onScroll={(e) => useVirtualScrolling && setScrollTop(e.currentTarget.scrollTop)}
+              role="listbox"
+              aria-label="Available options"
+              aria-multiselectable="false"
+            >
+              {renderOptionsContent(false)}
+            </div>
+          </div>,
+          document.body
+        ) : (
+          // Non-portal dropdown (inline, relative positioning)
+          <div
+            ref={dropdownRef}
+            className="absolute z-50 mt-1 w-full bg-white bg-subtle-grain rounded-lg shadow-lg border border-paper-200 max-h-60 overflow-hidden animate-fade-in"
+          >
             {/* Search Input */}
             {searchable && (
               <div className="p-2 border-b border-paper-200">
@@ -655,8 +769,8 @@ const Select = forwardRef<SelectHandle, SelectProps>(
               {renderOptionsContent(false)}
             </div>
           </div>
-        )}
-      </div>
+        )
+      )}
 
       {/* Mobile Bottom Sheet */}
       {isOpen && useMobileSheet && createPortal(

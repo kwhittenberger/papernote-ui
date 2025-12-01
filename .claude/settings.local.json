@@ -40,7 +40,9 @@
       "Bash(npm run lint:*)",
       "WebSearch",
       "mcp__filesystem__read_file",
-      "mcp__filesystem__list_directory"
+      "mcp__filesystem__list_directory",
+      "Bash(gh run view:*)",
+      "Bash(git tag:*)"
     ],
     "deny": [],
     "ask": []
