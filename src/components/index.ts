@@ -315,12 +315,27 @@ export type {
 export { default as DataTableCardView } from './DataTableCardView';
 export type { CardViewConfig, DataTableCardViewProps } from './DataTableCardView';
 
+// DataGrid (Excel-like grid with formulas)
+export { default as DataGrid } from './DataGrid';
+export type {
+  DataGridProps,
+  DataGridHandle,
+  DataGridColumn,
+  DataGridCell,
+  CellValue,
+  FrozenRowMode,
+} from './DataGrid';
+
 export { default as SwipeActions } from './SwipeActions';
 export type { SwipeActionsProps, SwipeAction } from './SwipeActions';
 
 // Spreadsheet
 export { Spreadsheet, SpreadsheetReport } from './Spreadsheet';
 export type { SpreadsheetProps, SpreadsheetCell, Matrix, CellBase } from './Spreadsheet';
+
+// ExcelTable has been moved to a separate package: @papernote/excel-table
+// This is due to Handsontable's commercial licensing requirements
+// See: https://github.com/kwhittenberger/papernote-ui/tree/main/packages/excel-table
 
 export { default as ExpandedRowEditForm } from './ExpandedRowEditForm';
 export type {
@@ -447,6 +462,21 @@ export type { ColumnResize, ColumnOrder } from '../utils/tableEnhancements';
 
 export { exportToExcel, exportDataTableToExcel, createMultiSheetExcel } from '../utils/excelExport';
 export type { ExcelColumn, ExportToExcelOptions, DataTableExportOptions, MultiSheetExcelOptions } from '../utils/excelExport';
+
+// Formula Definitions (for DataGrid intellisense)
+export {
+  FORMULA_DEFINITIONS,
+  FORMULA_NAMES,
+  FORMULA_CATEGORIES,
+  getFormulasByCategory,
+  searchFormulas,
+  getFormula,
+} from '../utils/formulaDefinitions';
+export type {
+  FormulaDefinition,
+  FormulaParameter,
+  FormulaCategory,
+} from '../utils/formulaDefinitions';
 
 // Hooks
 export { useColumnResize, useColumnReorder } from '../hooks/useTableEnhancements';
