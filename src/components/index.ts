@@ -201,8 +201,8 @@ export type { ExpandablePanelProps } from './ExpandablePanel';
 export { Show, Hide } from './ResponsiveUtilities';
 
 // Navigation Components
-export { default as Breadcrumbs } from './Breadcrumbs';
-export type { BreadcrumbsProps, BreadcrumbItem } from './Breadcrumbs';
+export { default as Breadcrumbs, useBreadcrumbReset } from './Breadcrumbs';
+export type { BreadcrumbsProps, BreadcrumbItem, BreadcrumbNavigationState } from './Breadcrumbs';
 
 export { default as Tabs } from './Tabs';
 export type { TabsProps, Tab } from './Tabs';

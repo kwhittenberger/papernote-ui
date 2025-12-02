@@ -305,6 +305,41 @@ When a component is missing:
 
 ## Recent Component Enhancements
 
+### Breadcrumbs Component (`src/components/Breadcrumbs.tsx`)
+**Same-Route Navigation & onClick Support**: Breadcrumbs now properly handle navigation to the current route and support custom click handlers.
+
+**Key Features:**
+- Detects same-route navigation and triggers state update with unique `breadcrumbReset` key
+- `onClick` prop for custom actions (analytics, logging, etc.)
+- `useBreadcrumbReset` hook for easy state reset in host components
+
+```typescript
+import { Breadcrumbs, useBreadcrumbReset } from 'notebook-ui';
+
+function ProductsPage() {
+  const [viewMode, setViewMode] = useState<'list' | 'detail'>('list');
+  
+  // Automatically reset to list view when breadcrumb is clicked
+  useBreadcrumbReset(() => setViewMode('list'));
+
+  const breadcrumbs = viewMode === 'list'
+    ? [{ label: 'Products' }]
+    : [
+        { label: 'Products', href: '/products' },  // Clicking resets viewMode
+        { label: 'Product Details' }
+      ];
+
+  return (
+    <>
+      <Breadcrumbs items={breadcrumbs} />
+      {viewMode === 'list' ? <ProductList /> : <ProductDetail />}
+    </>
+  );
+}
+```
+
+**Architectural Recommendation**: For new apps, prefer URL-based routing (`/products` vs `/products/:id`) over component state for view modes. This makes breadcrumbs work naturally without any hooks.
+
 ### Switch Component (`src/components/Switch.tsx`)
 **Loading State**: Added `loading` prop for async operations
 - Displays animated spinner (Loader2) inside slider
