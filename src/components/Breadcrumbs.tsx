@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation, useInRouterContext } from 'react-router-dom';
 import { ChevronRight, Home } from 'lucide-react';
 
 /** State passed during breadcrumb navigation */
@@ -14,6 +14,9 @@ export interface BreadcrumbNavigationState {
  * Hook to detect breadcrumb navigation and trigger callbacks.
  * Use this in host components to reset state when a breadcrumb is clicked.
  * 
+ * Note: This hook requires React Router context. If used outside a Router,
+ * it will be a no-op (the callback will never be called).
+ * 
  * @param onReset - Callback fired when breadcrumb navigation is detected
  * 
  * @example
@@ -27,17 +30,22 @@ export interface BreadcrumbNavigationState {
  * }
  */
 export function useBreadcrumbReset(onReset: () => void): void {
-  const location = useLocation();
+  const inRouter = useInRouterContext();
   const lastResetRef = useRef<number | null>(null);
+  
+  // Only use useLocation when inside Router context
+  const location = inRouter ? useLocation() : null;
 
   useEffect(() => {
+    if (!location) return;
+    
     const state = location.state as BreadcrumbNavigationState | null;
     
     if (state?.breadcrumbReset && state.breadcrumbReset !== lastResetRef.current) {
       lastResetRef.current = state.breadcrumbReset;
       onReset();
     }
-  }, [location.state, onReset]);
+  }, [location?.state, onReset, location]);
 }
 
 export interface BreadcrumbItem {
@@ -94,8 +102,11 @@ export interface BreadcrumbsProps {
  * }
  */
 export default function Breadcrumbs({ items, showHome = true }: BreadcrumbsProps) {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const inRouter = useInRouterContext();
+  
+  // Only use router hooks when inside Router context
+  const navigate = inRouter ? useNavigate() : null;
+  const location = inRouter ? useLocation() : null;
 
   /**
    * Handle breadcrumb click with same-route detection.
@@ -109,6 +120,9 @@ export default function Breadcrumbs({ items, showHome = true }: BreadcrumbsProps
   ) => {
     // Always call onClick if provided (for custom actions)
     onClick?.();
+
+    // If not in router context, let the browser handle navigation naturally
+    if (!navigate || !location) return;
 
     // Check if we're navigating to the same base path
     const targetPath = href.split('?')[0].split('#')[0];
@@ -128,18 +142,51 @@ export default function Breadcrumbs({ items, showHome = true }: BreadcrumbsProps
     // Different route - let the Link handle it normally
   };
 
+  // Helper to render a link - uses Link when in router, <a> when not
+  const renderLink = (
+    href: string,
+    children: React.ReactNode,
+    className: string,
+    onClick?: (e: React.MouseEvent) => void,
+    ariaLabel?: string
+  ) => {
+    if (inRouter) {
+      return (
+        <Link
+          to={href}
+          className={className}
+          onClick={onClick}
+          aria-label={ariaLabel}
+        >
+          {children}
+        </Link>
+      );
+    }
+    return (
+      <a
+        href={href}
+        className={className}
+        onClick={(e) => {
+          onClick?.(e);
+        }}
+        aria-label={ariaLabel}
+      >
+        {children}
+      </a>
+    );
+  };
+
   return (
     <nav aria-label="Breadcrumb" className="flex items-center space-x-2 text-sm">
       {showHome && (
         <>
-          <Link
-            to="/"
-            className="text-ink-500 hover:text-ink-900 transition-colors"
-            aria-label="Home"
-            onClick={(e) => handleBreadcrumbClick(e, '/')}
-          >
-            <Home className="h-4 w-4" />
-          </Link>
+          {renderLink(
+            '/',
+            <Home className="h-4 w-4" />,
+            'text-ink-500 hover:text-ink-900 transition-colors',
+            (e) => handleBreadcrumbClick(e, '/'),
+            'Home'
+          )}
           {items.length > 0 && <ChevronRight className="h-4 w-4 text-ink-400" />}
         </>
       )}
@@ -167,16 +214,13 @@ export default function Breadcrumbs({ items, showHome = true }: BreadcrumbsProps
             );
           }
 
-          // Has href - render as Link with same-route detection
+          // Has href - render as Link (or <a> if no router) with same-route detection
           if (item.href) {
-            return (
-              <Link
-                to={item.href}
-                onClick={(e) => handleBreadcrumbClick(e, item.href!, item.onClick)}
-                className="flex items-center gap-2 text-ink-500 hover:text-ink-900 hover:underline transition-colors"
-              >
-                {content}
-              </Link>
+            return renderLink(
+              item.href,
+              content,
+              'flex items-center gap-2 text-ink-500 hover:text-ink-900 hover:underline transition-colors',
+              (e) => handleBreadcrumbClick(e, item.href!, item.onClick)
             );
           }
 

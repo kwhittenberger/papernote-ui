@@ -1,0 +1,66 @@
+{
+  "name": "@papernote/excel-table",
+  "version": "1.0.0",
+  "description": "Excel-like spreadsheet component built on Handsontable - optional addon for @papernote/ui",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./styles": "./dist/styles.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "react",
+    "spreadsheet",
+    "excel",
+    "handsontable",
+    "papernote",
+    "notebook-ui"
+  ],
+  "author": "kwhittenberger",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kwhittenberger/papernote-ui.git",
+    "directory": "packages/excel-table"
+  },
+  "bugs": {
+    "url": "https://github.com/kwhittenberger/papernote-ui/issues"
+  },
+  "homepage": "https://github.com/kwhittenberger/papernote-ui/tree/main/packages/excel-table#readme",
+  "peerDependencies": {
+    "@papernote/ui": ">=1.0.0",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "dependencies": {
+    "@handsontable/react-wrapper": "^15.0.0",
+    "handsontable": "^15.0.0",
+    "hyperformula": "^2.7.1"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18",
+    "lucide-react": "^0.553.0",
+    "rollup": "^4.9.6",
+    "rollup-plugin-postcss": "^4.0.2",
+    "typescript": "^5.3.3"
+  }
+}

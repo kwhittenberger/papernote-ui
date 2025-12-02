@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 
 export interface CalendarEvent {
   date: Date;
@@ -14,6 +14,8 @@ export interface CalendarProps {
   value?: Date;
   /** Callback when date is selected */
   onChange?: (date: Date) => void;
+  /** Callback when displayed month changes (via navigation buttons or goToToday) */
+  onMonthChange?: (date: Date) => void;
   /** Events to display on calendar */
   events?: CalendarEvent[];
   /** Callback when event marker is clicked */
@@ -41,6 +43,7 @@ export interface CalendarProps {
 export default function Calendar({
   value,
   onChange,
+  onMonthChange,
   events = [],
   onEventClick,
   rangeMode = false,
@@ -200,25 +203,35 @@ export default function Calendar({
 
   // Navigate months
   const previousMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
+    const newMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1);
+    setCurrentMonth(newMonth);
+    onMonthChange?.(newMonth);
   };
 
   const nextMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
+    const newMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1);
+    setCurrentMonth(newMonth);
+    onMonthChange?.(newMonth);
   };
 
   // Navigate years
   const previousYear = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear() - 1, currentMonth.getMonth(), 1));
+    const newMonth = new Date(currentMonth.getFullYear() - 1, currentMonth.getMonth(), 1);
+    setCurrentMonth(newMonth);
+    onMonthChange?.(newMonth);
   };
 
   const nextYear = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear() + 1, currentMonth.getMonth(), 1));
+    const newMonth = new Date(currentMonth.getFullYear() + 1, currentMonth.getMonth(), 1);
+    setCurrentMonth(newMonth);
+    onMonthChange?.(newMonth);
   };
 
   // Go to today
   const goToToday = () => {
-    setCurrentMonth(new Date());
+    const today = new Date();
+    setCurrentMonth(today);
+    onMonthChange?.(today);
   };
 
   // Day names
@@ -244,8 +257,7 @@ export default function Calendar({
             className="p-1.5 hover:bg-paper-100 rounded transition-colors"
             aria-label="Previous year"
           >
-            <ChevronLeft className="h-4 w-4 text-ink-600" />
-            <ChevronLeft className="h-4 w-4 text-ink-600 -ml-3" />
+            <ChevronsLeft className="h-4 w-4 text-ink-600" />
           </button>
           <button
             onClick={previousMonth}
@@ -281,8 +293,7 @@ export default function Calendar({
             className="p-1.5 hover:bg-paper-100 rounded transition-colors"
             aria-label="Next year"
           >
-            <ChevronRight className="h-4 w-4 text-ink-600" />
-            <ChevronRight className="h-4 w-4 text-ink-600 -ml-3" />
+            <ChevronsRight className="h-4 w-4 text-ink-600" />
           </button>
         </div>
       </div>
