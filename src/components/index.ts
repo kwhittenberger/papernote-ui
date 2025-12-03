@@ -189,8 +189,8 @@ export type { ContextMenuProps } from './ContextMenu';
 export { default as ErrorBoundary } from './ErrorBoundary';
 export type { ErrorBoundaryProps } from './ErrorBoundary';
 
-export { default as BottomSheet } from './BottomSheet';
-export type { BottomSheetProps } from './BottomSheet';
+export { default as BottomSheet, BottomSheetHeader, BottomSheetContent, BottomSheetActions } from './BottomSheet';
+export type { BottomSheetProps, BottomSheetHeaderProps, BottomSheetContentProps, BottomSheetActionsProps } from './BottomSheet';
 
 export { default as Collapsible } from './Collapsible';
 export type { CollapsibleProps } from './Collapsible';
@@ -199,6 +199,19 @@ export { default as ExpandablePanel, ExpandablePanelSpacer, ExpandablePanelConta
 export type { ExpandablePanelProps } from './ExpandablePanel';
 
 export { Show, Hide } from './ResponsiveUtilities';
+
+// Mobile Components
+export { default as HorizontalScroll } from './HorizontalScroll';
+export type { HorizontalScrollProps } from './HorizontalScroll';
+
+export { default as SwipeableCard } from './SwipeableCard';
+export type { SwipeableCardProps, SwipeAction as SwipeableCardAction } from './SwipeableCard';
+
+export { default as NotificationBanner } from './NotificationBanner';
+export type { NotificationBannerProps, NotificationBannerAction } from './NotificationBanner';
+
+export { default as CompactStat } from './CompactStat';
+export type { CompactStatProps, CompactStatTrend } from './CompactStat';
 
 // Navigation Components
 export { default as Breadcrumbs, useBreadcrumbReset } from './Breadcrumbs';
@@ -262,7 +275,7 @@ export type { MobileHeaderProps } from './MobileHeader';
 export { default as FloatingActionButton, useFABScroll } from './FloatingActionButton';
 export type { FloatingActionButtonProps, FABAction } from './FloatingActionButton';
 
-export { default as PullToRefresh, usePullToRefresh } from './PullToRefresh';
+export { default as PullToRefresh } from './PullToRefresh';
 export type { PullToRefreshProps } from './PullToRefresh';
 
 // Logo

@@ -2,8 +2,8 @@
 export interface ProgressProps{
   /** Progress value (0-100) */
   value: number;
-  /** Progress variant */
-  variant?: 'linear' | 'circular';
+  /** Progress variant ('ring' is alias for 'circular') */
+  variant?: 'linear' | 'circular' | 'ring';
   /** Size variant */
   size?: 'sm' | 'md' | 'lg';
   /** Color variant */
@@ -48,8 +48,11 @@ export default function Progress({
     error: 'bg-error-100',
   };
 
+  // Normalize 'ring' to 'circular'
+  const normalizedVariant = variant === 'ring' ? 'circular' : variant;
+
   // Linear progress
-  if (variant === 'linear') {
+  if (normalizedVariant === 'linear') {
     const heightClasses = {
       sm: 'h-1',
       md: 'h-2',

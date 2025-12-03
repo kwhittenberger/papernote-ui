@@ -5,13 +5,21 @@ import React, { forwardRef } from 'react';
 
 type TextElement = 'p' | 'span' | 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'label';
 
+type TextSize = 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl';
+
 export interface TextProps extends Omit<React.HTMLAttributes<HTMLElement>, 'color'> {
   /** Text content */
   children: React.ReactNode;
   /** HTML element to render */
   as?: TextElement;
-  /** Size variant */
-  size?: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl';
+  /** Size variant (base size) */
+  size?: TextSize;
+  /** Size on small screens (640px+) - overrides base size */
+  smSize?: TextSize;
+  /** Size on medium screens (768px+) - overrides smaller breakpoints */
+  mdSize?: TextSize;
+  /** Size on large screens (1024px+) - overrides smaller breakpoints */
+  lgSize?: TextSize;
   /** Weight variant */
   weight?: 'normal' | 'medium' | 'semibold' | 'bold';
   /** Color variant */
@@ -58,6 +66,9 @@ export const Text = forwardRef<HTMLElement, TextProps>(({
   children,
   as: Component = 'p',
   size = 'base',
+  smSize,
+  mdSize,
+  lgSize,
   weight = 'normal',
   color = 'primary',
   align = 'left',
@@ -67,13 +78,41 @@ export const Text = forwardRef<HTMLElement, TextProps>(({
   className = '',
   ...htmlProps
 }, ref) => {
-  const sizeClasses = {
+  const sizeClasses: Record<TextSize, string> = {
     xs: 'text-xs',
     sm: 'text-sm',
     base: 'text-base',
     lg: 'text-lg',
     xl: 'text-xl',
     '2xl': 'text-2xl',
+  };
+
+  // Responsive size classes
+  const smSizeClasses: Record<TextSize, string> = {
+    xs: 'sm:text-xs',
+    sm: 'sm:text-sm',
+    base: 'sm:text-base',
+    lg: 'sm:text-lg',
+    xl: 'sm:text-xl',
+    '2xl': 'sm:text-2xl',
+  };
+
+  const mdSizeClasses: Record<TextSize, string> = {
+    xs: 'md:text-xs',
+    sm: 'md:text-sm',
+    base: 'md:text-base',
+    lg: 'md:text-lg',
+    xl: 'md:text-xl',
+    '2xl': 'md:text-2xl',
+  };
+
+  const lgSizeClasses: Record<TextSize, string> = {
+    xs: 'lg:text-xs',
+    sm: 'lg:text-sm',
+    base: 'lg:text-base',
+    lg: 'lg:text-lg',
+    xl: 'lg:text-xl',
+    '2xl': 'lg:text-2xl',
   };
 
   const weightClasses = {
@@ -118,6 +157,9 @@ export const Text = forwardRef<HTMLElement, TextProps>(({
   // Build class list
   const classes = [
     sizeClasses[size],
+    smSize ? smSizeClasses[smSize] : '',
+    mdSize ? mdSizeClasses[mdSize] : '',
+    lgSize ? lgSizeClasses[lgSize] : '',
     weightClasses[weight],
     colorClasses[color],
     alignClasses[align],

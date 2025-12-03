@@ -10,6 +10,8 @@ export interface BadgeProps {
   className?: string;
   /** Show as dot indicator (no text, just a colored dot) */
   dot?: boolean;
+  /** Use pill shape (more rounded, compact padding) for inline use */
+  pill?: boolean;
 }
 
 export default function Badge({
@@ -20,6 +22,7 @@ export default function Badge({
   onRemove,
   className = '',
   dot = false,
+  pill = false,
 }: BadgeProps) {
   const variantStyles = {
     success: 'bg-success-50 text-success-700 border-success-200',
@@ -41,6 +44,13 @@ export default function Badge({
     sm: 'px-2 py-0.5 text-xs gap-1',
     md: 'px-3 py-1 text-xs gap-1.5',
     lg: 'px-3 py-1.5 text-sm gap-2',
+  };
+
+  // Pill variant has tighter horizontal padding and fully rounded ends
+  const pillSizeStyles = {
+    sm: 'px-1.5 py-0.5 text-xs gap-1',
+    md: 'px-2 py-0.5 text-xs gap-1',
+    lg: 'px-2.5 py-1 text-sm gap-1.5',
   };
 
   const dotSizeStyles = {
@@ -74,9 +84,10 @@ export default function Badge({
   return (
     <span
       className={`
-        inline-flex items-center rounded-full border font-medium
+        inline-flex items-center border font-medium
+        ${pill ? 'rounded-full' : 'rounded-full'}
         ${variantStyles[variant]}
-        ${sizeStyles[size]}
+        ${pill ? pillSizeStyles[size] : sizeStyles[size]}
         ${className}
       `}
     >

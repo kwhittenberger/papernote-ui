@@ -1,136 +1,155 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Loader2, ArrowDown } from 'lucide-react';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
+import { Loader2, ArrowDown, Check } from 'lucide-react';
 
-/**
- * PullToRefresh component props
- */
 export interface PullToRefreshProps {
-  /** Content to wrap */
+  /** Content to wrap with pull-to-refresh functionality */
   children: React.ReactNode;
-  /** Async refresh handler - should return a Promise */
+  /** Async callback when refresh is triggered - should return when refresh is complete */
   onRefresh: () => Promise<void>;
+  /** Pixels to pull before triggering refresh */
+  threshold?: number;
   /** Disable pull-to-refresh */
   disabled?: boolean;
-  /** Pull distance required to trigger refresh (default: 80) */
-  pullThreshold?: number;
-  /** Maximum pull distance (default: 120) */
-  maxPull?: number;
-  /** Custom loading indicator */
-  loadingIndicator?: React.ReactNode;
-  /** Custom pull indicator */
-  pullIndicator?: React.ReactNode;
-  /** Additional class names for container */
+  /** Custom content shown while pulling */
+  pullingContent?: React.ReactNode;
+  /** Custom content shown when ready to release */
+  releaseContent?: React.ReactNode;
+  /** Custom content shown while refreshing */
+  refreshingContent?: React.ReactNode;
+  /** Custom content shown when refresh completes (briefly) */
+  completeContent?: React.ReactNode;
+  /** Additional class name for container */
   className?: string;
 }
 
-type RefreshState = 'idle' | 'pulling' | 'ready' | 'refreshing';
+type RefreshState = 'idle' | 'pulling' | 'ready' | 'refreshing' | 'complete';
 
 /**
- * PullToRefresh - Mobile pull-to-refresh gesture handler
- * 
- * Wraps content and provides native-feeling pull-to-refresh functionality.
- * Only activates when scrolled to top of content.
- * 
- * @example Basic usage
+ * PullToRefresh - Pull-down refresh indicator and handler for mobile lists
+ *
+ * Wraps content to enable pull-to-refresh behavior on mobile:
+ * - Pull down to trigger refresh
+ * - Visual feedback showing progress
+ * - Custom content for each state
+ *
+ * @example
  * ```tsx
- * <PullToRefresh onRefresh={async () => {
- *   await fetchLatestData();
- * }}>
- *   <div className="min-h-screen">
- *     {content}
- *   </div>
- * </PullToRefresh>
- * ```
- * 
- * @example With custom threshold
- * ```tsx
- * <PullToRefresh
- *   onRefresh={handleRefresh}
- *   pullThreshold={100}
- *   maxPull={150}
- * >
- *   {content}
+ * <PullToRefresh onRefresh={async () => { await syncData(); }}>
+ *   <TransactionList transactions={transactions} />
  * </PullToRefresh>
  * ```
  */
-export default function PullToRefresh({
+export function PullToRefresh({
   children,
   onRefresh,
+  threshold = 80,
   disabled = false,
-  pullThreshold = 80,
-  maxPull = 120,
-  loadingIndicator,
-  pullIndicator,
+  pullingContent,
+  releaseContent,
+  refreshingContent,
+  completeContent,
   className = '',
 }: PullToRefreshProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const [state, setState] = useState<RefreshState>('idle');
   const [pullDistance, setPullDistance] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
   const startY = useRef(0);
   const currentY = useRef(0);
+  const isDragging = useRef(false);
 
-  // Check if at top of scroll container
+  // Check if content is at top (can pull to refresh)
   const isAtTop = useCallback(() => {
     const container = containerRef.current;
     if (!container) return false;
-    return container.scrollTop <= 0;
+    
+    // Check if the scrollable content is at the top
+    const scrollableParent = container.querySelector('[data-ptr-scrollable]') || container;
+    return (scrollableParent as HTMLElement).scrollTop <= 0;
   }, []);
 
-  // Handle touch start
+  // Handle pull start
   const handleTouchStart = useCallback((e: TouchEvent) => {
-    if (disabled || state === 'refreshing' || !isAtTop()) return;
-    
+    if (disabled || state === 'refreshing') return;
+    if (!isAtTop()) return;
+
+    isDragging.current = true;
     startY.current = e.touches[0].clientY;
-    currentY.current = startY.current;
+    currentY.current = e.touches[0].clientY;
   }, [disabled, state, isAtTop]);
 
-  // Handle touch move
+  // Handle pull move
   const handleTouchMove = useCallback((e: TouchEvent) => {
-    if (disabled || state === 'refreshing') return;
-    if (startY.current === 0) return;
+    if (!isDragging.current || disabled || state === 'refreshing') return;
 
     currentY.current = e.touches[0].clientY;
-    const diff = currentY.current - startY.current;
+    const delta = currentY.current - startY.current;
 
-    // Only allow pulling down when at top
-    if (diff > 0 && isAtTop()) {
-      // Apply resistance - pull slows down as distance increases
-      const resistance = 0.5;
-      const adjustedPull = Math.min(diff * resistance, maxPull);
-      
-      setPullDistance(adjustedPull);
-      setState(adjustedPull >= pullThreshold ? 'ready' : 'pulling');
-
-      // Prevent default scroll when pulling
-      if (adjustedPull > 0) {
-        e.preventDefault();
-      }
+    // Only activate pull-to-refresh when pulling down
+    if (delta < 0) {
+      isDragging.current = false;
+      setPullDistance(0);
+      setState('idle');
+      return;
     }
-  }, [disabled, state, isAtTop, maxPull, pullThreshold]);
 
-  // Handle touch end
+    // Check if we're at the top before allowing pull
+    if (!isAtTop()) {
+      isDragging.current = false;
+      return;
+    }
+
+    // Apply resistance to pull
+    const resistance = 0.5;
+    const resistedDelta = delta * resistance;
+    const maxPull = threshold * 2;
+    const clampedDelta = Math.min(resistedDelta, maxPull);
+
+    setPullDistance(clampedDelta);
+
+    // Update state based on pull distance
+    if (clampedDelta >= threshold) {
+      setState('ready');
+    } else if (clampedDelta > 0) {
+      setState('pulling');
+    }
+
+    // Prevent default scroll when pulling
+    if (delta > 0 && isAtTop()) {
+      e.preventDefault();
+    }
+  }, [disabled, state, threshold, isAtTop]);
+
+  // Handle pull end
   const handleTouchEnd = useCallback(async () => {
-    if (disabled || state === 'refreshing') return;
+    if (!isDragging.current) return;
+    isDragging.current = false;
 
-    if (state === 'ready') {
+    if (state === 'ready' && pullDistance >= threshold) {
       setState('refreshing');
-      setPullDistance(pullThreshold); // Hold at threshold while refreshing
+      setPullDistance(threshold * 0.6); // Settle at a smaller height while refreshing
 
       try {
         await onRefresh();
+        setState('complete');
+        
+        // Show complete state briefly
+        setTimeout(() => {
+          setState('idle');
+          setPullDistance(0);
+        }, 500);
       } catch (error) {
         console.error('Refresh failed:', error);
+        setState('idle');
+        setPullDistance(0);
       }
-
+    } else {
+      // Snap back
       setState('idle');
+      setPullDistance(0);
     }
+  }, [state, pullDistance, threshold, onRefresh]);
 
-    setPullDistance(0);
-    startY.current = 0;
-    currentY.current = 0;
-  }, [disabled, state, pullThreshold, onRefresh]);
-
-  // Attach touch listeners
+  // Attach touch event listeners
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -146,65 +165,84 @@ export default function PullToRefresh({
     };
   }, [handleTouchStart, handleTouchMove, handleTouchEnd]);
 
-  // Calculate indicator opacity and rotation
-  const progress = Math.min(pullDistance / pullThreshold, 1);
-  const rotation = progress * 180;
+  // Calculate progress percentage
+  const progress = Math.min(1, pullDistance / threshold);
 
-  // Default loading indicator
-  const defaultLoadingIndicator = (
-    <Loader2 className="h-6 w-6 text-accent-600 animate-spin" />
-  );
-
-  // Default pull indicator
-  const defaultPullIndicator = (
-    <div
-      className={`
-        transition-transform duration-200
-        ${state === 'ready' ? 'text-accent-600' : 'text-ink-400'}
-      `}
-      style={{ transform: `rotate(${rotation}deg)` }}
-    >
-      <ArrowDown className="h-6 w-6" />
+  // Default content for each state
+  const defaultPullingContent = (
+    <div className="flex flex-col items-center gap-1">
+      <ArrowDown 
+        className="h-5 w-5 text-ink-400 transition-transform duration-200"
+        style={{ transform: `rotate(${progress * 180}deg)` }}
+      />
+      <span className="text-xs text-ink-500">Pull to refresh</span>
     </div>
   );
 
+  const defaultReleaseContent = (
+    <div className="flex flex-col items-center gap-1">
+      <ArrowDown 
+        className="h-5 w-5 text-accent-500 rotate-180"
+      />
+      <span className="text-xs text-accent-600 font-medium">Release to refresh</span>
+    </div>
+  );
+
+  const defaultRefreshingContent = (
+    <div className="flex flex-col items-center gap-1">
+      <Loader2 className="h-5 w-5 text-accent-500 animate-spin" />
+      <span className="text-xs text-ink-500">Refreshing...</span>
+    </div>
+  );
+
+  const defaultCompleteContent = (
+    <div className="flex flex-col items-center gap-1">
+      <Check className="h-5 w-5 text-success-500" />
+      <span className="text-xs text-success-600">Done!</span>
+    </div>
+  );
+
+  // Get content based on current state
+  const getIndicatorContent = () => {
+    switch (state) {
+      case 'pulling':
+        return pullingContent || defaultPullingContent;
+      case 'ready':
+        return releaseContent || defaultReleaseContent;
+      case 'refreshing':
+        return refreshingContent || defaultRefreshingContent;
+      case 'complete':
+        return completeContent || defaultCompleteContent;
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div
+    <div 
       ref={containerRef}
-      className={`relative overflow-auto ${className}`}
-      style={{ touchAction: pullDistance > 0 ? 'none' : 'auto' }}
+      className={`relative overflow-hidden ${className}`}
     >
       {/* Pull indicator */}
       <div
         className={`
-          absolute left-0 right-0 flex items-center justify-center
-          transition-all duration-200 overflow-hidden
-          ${state === 'idle' && pullDistance === 0 ? 'opacity-0' : 'opacity-100'}
+          absolute top-0 left-0 right-0
+          flex items-center justify-center
+          bg-paper-50
+          transition-all duration-200 ease-out
+          ${state === 'idle' ? 'opacity-0' : 'opacity-100'}
         `}
         style={{
-          height: `${pullDistance}px`,
-          top: 0,
-          zIndex: 10,
+          height: pullDistance,
+          transform: state === 'idle' ? 'translateY(-100%)' : 'translateY(0)',
         }}
       >
-        <div
-          className={`
-            w-10 h-10 rounded-full bg-white shadow-md
-            flex items-center justify-center
-            transition-transform duration-200
-            ${state === 'refreshing' ? 'scale-100' : progress < 0.3 ? 'scale-75' : 'scale-100'}
-          `}
-        >
-          {state === 'refreshing'
-            ? (loadingIndicator || defaultLoadingIndicator)
-            : (pullIndicator || defaultPullIndicator)
-          }
-        </div>
+        {getIndicatorContent()}
       </div>
 
       {/* Content wrapper */}
       <div
-        className="transition-transform duration-200"
+        className="transition-transform duration-200 ease-out"
         style={{
           transform: `translateY(${pullDistance}px)`,
         }}
@@ -215,80 +253,4 @@ export default function PullToRefresh({
   );
 }
 
-/**
- * usePullToRefresh - Hook for custom pull-to-refresh implementations
- * 
- * @example
- * ```tsx
- * const { pullDistance, isRefreshing, bind } = usePullToRefresh({
- *   onRefresh: async () => {
- *     await fetchData();
- *   }
- * });
- * 
- * return (
- *   <div {...bind}>
- *     {isRefreshing && <Spinner />}
- *     {content}
- *   </div>
- * );
- * ```
- */
-export function usePullToRefresh({
-  onRefresh,
-  pullThreshold = 80,
-  maxPull = 120,
-  disabled = false,
-}: {
-  onRefresh: () => Promise<void>;
-  pullThreshold?: number;
-  maxPull?: number;
-  disabled?: boolean;
-}) {
-  const [pullDistance, setPullDistance] = useState(0);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const startY = useRef(0);
-
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    if (disabled || isRefreshing) return;
-    startY.current = e.touches[0].clientY;
-  }, [disabled, isRefreshing]);
-
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    if (disabled || isRefreshing || startY.current === 0) return;
-
-    const diff = e.touches[0].clientY - startY.current;
-    if (diff > 0) {
-      const adjustedPull = Math.min(diff * 0.5, maxPull);
-      setPullDistance(adjustedPull);
-    }
-  }, [disabled, isRefreshing, maxPull]);
-
-  const handleTouchEnd = useCallback(async () => {
-    if (disabled || isRefreshing) return;
-
-    if (pullDistance >= pullThreshold) {
-      setIsRefreshing(true);
-      try {
-        await onRefresh();
-      } finally {
-        setIsRefreshing(false);
-      }
-    }
-
-    setPullDistance(0);
-    startY.current = 0;
-  }, [disabled, isRefreshing, pullDistance, pullThreshold, onRefresh]);
-
-  return {
-    pullDistance,
-    isRefreshing,
-    isReady: pullDistance >= pullThreshold,
-    progress: Math.min(pullDistance / pullThreshold, 1),
-    bind: {
-      onTouchStart: handleTouchStart,
-      onTouchMove: handleTouchMove,
-      onTouchEnd: handleTouchEnd,
-    },
-  };
-}
+export default PullToRefresh;

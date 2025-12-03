@@ -1123,6 +1123,190 @@ const [columns, setColumns] = useState<KanbanColumn[]>([
 
 Features: HTML5 drag-and-drop, column card limits, priority badges, tags, assignee avatars, custom card rendering
 
+## Mobile-First Components (v1.8.0+)
+
+New components designed for mobile-first/Assistant-first user experiences:
+
+### BottomSheet
+Mobile-friendly modal that slides up from the bottom:
+```tsx
+import { BottomSheet, BottomSheetHeader, BottomSheetContent, BottomSheetActions } from 'notebook-ui';
+
+// With built-in header
+<BottomSheet
+  open={isOpen}           // or isOpen={isOpen} for Modal compatibility
+  onClose={() => setIsOpen(false)}
+  title="Transaction Details"
+  height="lg"             // 'auto' | 'sm' | 'md' | 'lg' | 'full' | number | string
+  showHandle              // drag handle for swipe-to-dismiss
+  showCloseButton         // X button in header
+>
+  <BottomSheetContent>
+    {content}
+  </BottomSheetContent>
+  <BottomSheetActions>
+    <Button fullWidth>Approve</Button>
+  </BottomSheetActions>
+</BottomSheet>
+
+// Custom header with sub-components
+<BottomSheet open={isOpen} onClose={onClose}>
+  <BottomSheetHeader>
+    <Text weight="bold">Custom Header</Text>
+  </BottomSheetHeader>
+  <BottomSheetContent>{content}</BottomSheetContent>
+</BottomSheet>
+```
+
+Features: Swipe-to-dismiss, snap points, height presets, built-in or custom headers, keyboard escape support
+
+### HorizontalScroll
+Horizontally scrollable container with peek indicators for carousels:
+```tsx
+import { HorizontalScroll } from 'notebook-ui';
+
+<HorizontalScroll
+  gap="md"                // 'none' | 'sm' | 'md' | 'lg' | number
+  peekAmount={24}         // pixels of next item visible
+  showIndicators          // dot indicators
+  snapToItem              // snap scroll to item boundaries
+  showArrows="hover"      // 'hover' | 'always' | 'never'
+>
+  <Card>Bill 1</Card>
+  <Card>Bill 2</Card>
+  <Card>Bill 3</Card>
+</HorizontalScroll>
+```
+
+Features: Touch momentum, peek hint, snap scrolling, navigation arrows on desktop
+
+### SwipeableCard
+Card with swipe-to-action functionality for approval workflows:
+```tsx
+import { SwipeableCard } from 'notebook-ui';
+import { Check, MoreHorizontal } from 'lucide-react';
+
+<SwipeableCard
+  onSwipeRight={() => handleApprove()}
+  onSwipeLeft={() => handleShowOptions()}
+  rightAction={{
+    icon: <Check />,
+    color: 'success',
+    label: 'Approve'
+  }}
+  leftAction={{
+    icon: <MoreHorizontal />,
+    color: 'neutral',
+    label: 'Options'
+  }}
+  swipeThreshold={100}    // pixels before action triggers
+  hapticFeedback          // vibrate on mobile
+>
+  <TransactionContent />
+</SwipeableCard>
+```
+
+Features: Touch/mouse gestures, haptic feedback, visual action indicators, configurable thresholds
+
+### NotificationBanner
+Dismissible banner for important alerts:
+```tsx
+import { NotificationBanner } from 'notebook-ui';
+import { DollarSign } from 'lucide-react';
+
+<NotificationBanner
+  variant="warning"       // 'info' | 'success' | 'warning' | 'error'
+  icon={<DollarSign />}   // custom icon (optional)
+  title="Found $33.98 in potential savings"
+  description="Tap to review"
+  action={{
+    label: "Review",
+    onClick: handleReview
+  }}
+  onDismiss={() => setShowBanner(false)}
+  dismissible             // swipeable on mobile
+  sticky                  // stick to top on scroll
+/>
+```
+
+Features: Swipe-to-dismiss, variant colors, action buttons, sticky positioning
+
+### CompactStat
+Mobile-optimized stat display with optional trend:
+```tsx
+import { CompactStat } from 'notebook-ui';
+
+<Grid columns={2} gap="sm">
+  <CompactStat
+    value="$62,329"
+    label="Net Worth"
+    trend={{
+      direction: 'up',
+      value: '+$1,247',
+      color: 'success'
+    }}
+    size="md"             // 'sm' | 'md' | 'lg'
+    align="center"        // 'left' | 'center' | 'right'
+  />
+  <CompactStat
+    value="$4,521"
+    label="Monthly Income"
+  />
+</Grid>
+```
+
+Features: Trend indicators, responsive sizing, color-coded trends
+
+### PullToRefresh
+Pull-down refresh for mobile lists:
+```tsx
+import { PullToRefresh } from 'notebook-ui';
+
+<PullToRefresh
+  onRefresh={async () => { await syncData(); }}
+  threshold={80}          // pixels to pull
+  pullingContent={<Text>Pull to refresh</Text>}
+  releaseContent={<Text>Release to refresh</Text>}
+  refreshingContent={<Spinner />}
+>
+  <TransactionList transactions={transactions} />
+</PullToRefresh>
+```
+
+Features: Custom content for each state, configurable threshold, async refresh handling
+
+### Component Enhancements for Mobile
+
+**Stack** - Added `tight` spacing (4px):
+```tsx
+<Stack gap="tight">{/* 4px gap for mobile density */}</Stack>
+```
+
+**Card** - Compact variant updated to 12px padding:
+```tsx
+<Card variant="compact">{/* 12px padding */}</Card>
+```
+
+**Badge** - Added `pill` variant:
+```tsx
+<Badge pill variant="success">+12%</Badge>
+```
+
+**Text** - Added responsive size props:
+```tsx
+<Text size="xl" mdSize="2xl" lgSize="3xl">Responsive heading</Text>
+```
+
+**Progress** - Added `ring` as alias for `circular`:
+```tsx
+<Progress value={72} variant="ring" showLabel />
+```
+
+**Touch-Friendly Sizing** - Automatic on touch devices:
+- Buttons: min 48px touch target
+- Inputs: min 48px height
+- Checkboxes/Radios: min 24px
+
 ## Critical Integration Rules
 
 Per D:/repos/NOTEBOOK-UI-INTEGRATION-STANDARDS.md:
