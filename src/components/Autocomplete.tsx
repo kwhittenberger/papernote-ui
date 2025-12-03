@@ -12,6 +12,8 @@ export interface AutocompleteOption {
   label: string;
   description?: string;
   metadata?: Record<string, unknown>;
+  /** If true, renders as a non-selectable section header */
+  isHeader?: boolean;
 }
 
 export interface AutocompleteProps {
@@ -30,6 +32,8 @@ export interface AutocompleteProps {
   maxResults?: number;
   clearable?: boolean;
   className?: string;
+  /** Show static options dropdown on focus when input is empty. Default: true */
+  showOptionsOnFocus?: boolean;
 }
 
 const Autocomplete = forwardRef<AutocompleteHandle, AutocompleteProps>(({
@@ -48,6 +52,7 @@ const Autocomplete = forwardRef<AutocompleteHandle, AutocompleteProps>(({
   maxResults = 10,
   clearable = true,
   className = '',
+  showOptionsOnFocus = true,
 }, ref) => {
   const [isOpen, setIsOpen] = useState(false);
   const [filteredOptions, setFilteredOptions] = useState<AutocompleteOption[]>([]);
@@ -61,6 +66,30 @@ const Autocomplete = forwardRef<AutocompleteHandle, AutocompleteProps>(({
   const labelId = useId();
   const listboxId = useId();
   const errorId = useId();
+
+  // Helper to find next selectable (non-header) index
+  const findNextSelectableIndex = (currentIndex: number, optionsList: AutocompleteOption[]): number => {
+    for (let i = currentIndex + 1; i < optionsList.length; i++) {
+      if (!optionsList[i].isHeader) return i;
+    }
+    return currentIndex; // Stay at current if no next selectable
+  };
+
+  // Helper to find previous selectable (non-header) index
+  const findPrevSelectableIndex = (currentIndex: number, optionsList: AutocompleteOption[]): number => {
+    for (let i = currentIndex - 1; i >= 0; i--) {
+      if (!optionsList[i].isHeader) return i;
+    }
+    return -1; // Go to -1 if no previous selectable
+  };
+
+  // Helper to find first selectable (non-header) index
+  const findFirstSelectableIndex = (optionsList: AutocompleteOption[]): number => {
+    for (let i = 0; i < optionsList.length; i++) {
+      if (!optionsList[i].isHeader) return i;
+    }
+    return -1;
+  };
 
   // Expose methods via ref
   useImperativeHandle(ref, () => ({
@@ -97,8 +126,8 @@ const Autocomplete = forwardRef<AutocompleteHandle, AutocompleteProps>(({
         const results = await onSearch(query);
         setFilteredOptions(results.slice(0, maxResults));
         setIsOpen(results.length > 0);
-        // Auto-highlight first result for keyboard navigation
-        setHighlightedIndex(results.length > 0 ? 0 : -1);
+        // Auto-highlight first selectable (non-header) result
+        setHighlightedIndex(findFirstSelectableIndex(results.slice(0, maxResults)));
       } catch (err) {
         console.error('Autocomplete search error:', err);
         setFilteredOptions([]);
@@ -112,8 +141,17 @@ const Autocomplete = forwardRef<AutocompleteHandle, AutocompleteProps>(({
       const filtered = filterOptions(query);
       setFilteredOptions(filtered);
       setIsOpen(filtered.length > 0);
-      // Auto-highlight first result for keyboard navigation
-      setHighlightedIndex(filtered.length > 0 ? 0 : -1);
+      // Auto-highlight first selectable (non-header) result
+      setHighlightedIndex(findFirstSelectableIndex(filtered));
+    }
+  };
+
+  // Show static options (for focus/arrow down when input is empty)
+  const showStaticOptions = () => {
+    if (options.length > 0) {
+      setFilteredOptions(options.slice(0, maxResults));
+      setIsOpen(true);
+      setHighlightedIndex(findFirstSelectableIndex(options.slice(0, maxResults)));
     }
   };
 
@@ -160,7 +198,10 @@ const Autocomplete = forwardRef<AutocompleteHandle, AutocompleteProps>(({
         // If we have cached results from a previous search, show them
         if (filteredOptions.length > 0) {
           setIsOpen(true);
-          setHighlightedIndex(0);
+          setHighlightedIndex(findFirstSelectableIndex(filteredOptions));
+        } else if (value.length < minChars && options.length > 0) {
+          // Show static options when input is empty/below minChars
+          showStaticOptions();
         } else if (value.length >= minChars) {
           // Otherwise trigger a new search
           handleSearch(value);
@@ -172,18 +213,20 @@ const Autocomplete = forwardRef<AutocompleteHandle, AutocompleteProps>(({
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setHighlightedIndex((prev) =>
-          prev < filteredOptions.length - 1 ? prev + 1 : prev
-        );
+        setHighlightedIndex((prev) => findNextSelectableIndex(prev, filteredOptions));
         break;
       case 'ArrowUp':
         e.preventDefault();
-        setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : -1));
+        setHighlightedIndex((prev) => findPrevSelectableIndex(prev, filteredOptions));
         break;
       case 'Enter':
         e.preventDefault();
         if (highlightedIndex >= 0 && highlightedIndex < filteredOptions.length) {
-          handleSelect(filteredOptions[highlightedIndex]);
+          const option = filteredOptions[highlightedIndex];
+          // Don't select headers
+          if (!option.isHeader) {
+            handleSelect(option);
+          }
         }
         break;
       case 'Escape':
@@ -245,7 +288,15 @@ const Autocomplete = forwardRef<AutocompleteHandle, AutocompleteProps>(({
           value={value}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
-          onFocus={() => value.length >= minChars && handleSearch(value)}
+          onFocus={() => {
+            if (showOptionsOnFocus && value.length < minChars && options.length > 0) {
+              // Show static options when input is empty/below minChars
+              showStaticOptions();
+            } else if (value.length >= minChars) {
+              // Trigger search if we have enough chars
+              handleSearch(value);
+            }
+          }}
           placeholder={placeholder}
           disabled={disabled}
           className={`
@@ -295,27 +346,39 @@ const Autocomplete = forwardRef<AutocompleteHandle, AutocompleteProps>(({
           aria-label="Search results"
         >
           {filteredOptions.map((option, index) => (
-            <button
-              key={option.value}
-              id={`autocomplete-option-${index}`}
-              type="button"
-              onClick={() => handleSelect(option)}
-              onMouseEnter={() => setHighlightedIndex(index)}
-              role="option"
-              aria-selected={highlightedIndex === index}
-              className={`
-                w-full text-left px-3 py-2 transition-colors
-                ${highlightedIndex === index
-                  ? 'bg-accent-50'
-                  : 'hover:bg-paper-50'
-                }
-              `}
-            >
-              <div className="text-sm font-medium text-ink-900">{option.label}</div>
-              {option.description && (
-                <div className="text-xs text-ink-600 mt-0.5">{option.description}</div>
-              )}
-            </button>
+            option.isHeader ? (
+              // Render section header (non-selectable)
+              <div
+                key={`header-${option.value}`}
+                className="px-3 py-2 text-xs font-semibold text-ink-500 uppercase tracking-wide bg-paper-50 border-t border-paper-200 first:border-t-0 first:rounded-t-lg cursor-default"
+                role="presentation"
+              >
+                {option.label}
+              </div>
+            ) : (
+              // Render selectable option
+              <button
+                key={option.value}
+                id={`autocomplete-option-${index}`}
+                type="button"
+                onClick={() => handleSelect(option)}
+                onMouseEnter={() => setHighlightedIndex(index)}
+                role="option"
+                aria-selected={highlightedIndex === index}
+                className={`
+                  w-full text-left px-3 py-2 transition-colors
+                  ${highlightedIndex === index
+                    ? 'bg-accent-50'
+                    : 'hover:bg-paper-50'
+                  }
+                `}
+              >
+                <div className="text-sm font-medium text-ink-900">{option.label}</div>
+                {option.description && (
+                  <div className="text-xs text-ink-600 mt-0.5">{option.description}</div>
+                )}
+              </button>
+            )
           ))}
         </div>
       )}
