@@ -1,5 +1,7 @@
 # Bug Report: FormWizard Next Button Disabled Until Step Already Completed
 
+## Status: ✅ RESOLVED in v1.7.4
+
 ## Summary
 
 The FormWizard component's "Next" button is disabled until the current step is already marked as completed, making it impossible for users to advance through the wizard.
