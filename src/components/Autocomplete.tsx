@@ -97,10 +97,13 @@ const Autocomplete = forwardRef<AutocompleteHandle, AutocompleteProps>(({
         const results = await onSearch(query);
         setFilteredOptions(results.slice(0, maxResults));
         setIsOpen(results.length > 0);
+        // Auto-highlight first result for keyboard navigation
+        setHighlightedIndex(results.length > 0 ? 0 : -1);
       } catch (err) {
         console.error('Autocomplete search error:', err);
         setFilteredOptions([]);
         setIsOpen(false);
+        setHighlightedIndex(-1);
       } finally {
         setLoading(false);
       }
@@ -109,6 +112,8 @@ const Autocomplete = forwardRef<AutocompleteHandle, AutocompleteProps>(({
       const filtered = filterOptions(query);
       setFilteredOptions(filtered);
       setIsOpen(filtered.length > 0);
+      // Auto-highlight first result for keyboard navigation
+      setHighlightedIndex(filtered.length > 0 ? 0 : -1);
     }
   };
 
@@ -151,7 +156,15 @@ const Autocomplete = forwardRef<AutocompleteHandle, AutocompleteProps>(({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!isOpen) {
       if (e.key === 'ArrowDown') {
-        handleSearch(value);
+        e.preventDefault();
+        // If we have cached results from a previous search, show them
+        if (filteredOptions.length > 0) {
+          setIsOpen(true);
+          setHighlightedIndex(0);
+        } else if (value.length >= minChars) {
+          // Otherwise trigger a new search
+          handleSearch(value);
+        }
       }
       return;
     }
