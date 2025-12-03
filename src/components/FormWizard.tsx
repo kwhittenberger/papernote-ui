@@ -68,8 +68,11 @@ export default function FormWizard({
         setIsSubmitting(false);
       }
     } else {
-      // Go to next step
-      goToStep(currentStep + 1);
+      // Advance to next step directly (don't use goToStep which checks completedSteps
+      // before React has re-rendered with the updated state)
+      const nextStepIndex = currentStep + 1;
+      setCurrentStep(nextStepIndex);
+      onStepChange?.(nextStepIndex);
     }
   };
 
