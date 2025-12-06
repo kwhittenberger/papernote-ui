@@ -1,54 +1,112 @@
-import { useEffect, useRef, useState, ReactNode, useId } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 
 export interface BottomSheetProps {
-  isOpen: boolean;
+  /** Whether the bottom sheet is open (alias: isOpen) */
+  open?: boolean;
+  /** Whether the bottom sheet is open (alias for open, for Modal compatibility) */
+  isOpen?: boolean;
+  /** Callback when the sheet should close */
   onClose: () => void;
-  children: ReactNode;
+  /** Content of the bottom sheet */
+  children: React.ReactNode;
+  /** Title displayed in header (if provided, renders built-in header) */
   title?: string;
-  height?: 'sm' | 'md' | 'lg' | 'full' | string;
-  showHandle?: boolean;
-  showCloseButton?: boolean;
+  /** Height of the sheet - 'auto' adjusts to content, 'sm'/'md'/'lg'/'full' presets, or specify px/% */
+  height?: 'auto' | 'sm' | 'md' | 'lg' | 'full' | number | string;
+  /** Maximum height of the sheet */
+  maxHeight?: string;
+  /** Snap points for partial expansion (e.g., ['50%', '90%']) */
+  snapPoints?: string[];
+  /** Close when clicking overlay */
   closeOnOverlayClick?: boolean;
+  /** Close when pressing Escape */
   closeOnEscape?: boolean;
-  snapPoints?: number[]; // Snap heights as percentages (e.g., [25, 50, 90])
+  /** Show drag handle at top */
+  showHandle?: boolean;
+  /** Show close button in header (requires title) */
+  showCloseButton?: boolean;
+  /** Prevent body scroll when open */
+  preventScroll?: boolean;
+  /** Additional class name */
   className?: string;
 }
 
-const heightPresets = {
-  sm: '33vh',
-  md: '50vh',
-  lg: '75vh',
-  full: '90vh',
-};
+export interface BottomSheetHeaderProps {
+  children: React.ReactNode;
+  className?: string;
+}
 
-export default function BottomSheet({
+export interface BottomSheetContentProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export interface BottomSheetActionsProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+/**
+ * BottomSheet - Mobile-friendly modal that slides up from the bottom
+ *
+ * Designed for mobile contexts with touch-friendly interactions:
+ * - Drag handle for swipe-to-dismiss
+ * - Snap points for partial expansion
+ * - Sticky action area at thumb zone
+ *
+ * @example
+ * ```tsx
+ * <BottomSheet open={isOpen} onClose={() => setIsOpen(false)}>
+ *   <BottomSheetHeader>
+ *     <Text weight="bold">Transaction Details</Text>
+ *   </BottomSheetHeader>
+ *   <BottomSheetContent>
+ *     {content}
+ *   </BottomSheetContent>
+ *   <BottomSheetActions>
+ *     <Button fullWidth>Approve</Button>
+ *   </BottomSheetActions>
+ * </BottomSheet>
+ * ```
+ */
+export function BottomSheet({
+  open,
   isOpen,
   onClose,
   children,
   title,
-  height = 'md',
-  showHandle = true,
-  showCloseButton = true,
+  height = 'auto',
+  maxHeight = '90vh',
+  snapPoints,
   closeOnOverlayClick = true,
   closeOnEscape = true,
-
+  showHandle = true,
+  showCloseButton = true,
+  preventScroll = true,
   className = '',
 }: BottomSheetProps) {
-  const titleId = useId();
+  // Support both 'open' and 'isOpen' props for flexibility
+  const isSheetOpen = open ?? isOpen ?? false;
+
+  // Height presets for convenience
+  const heightPresets: Record<string, string> = {
+    sm: '40vh',
+    md: '60vh',
+    lg: '80vh',
+    full: '100vh',
+  };
+  const sheetRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
-  const [currentHeight] = useState<string>(
-    typeof height === 'string' && height in heightPresets
-      ? heightPresets[height as keyof typeof heightPresets]
-      : height
-  );
-  const sheetRef = useRef<HTMLDivElement>(null);
-  const startYRef = useRef<number>(0);
+  const [currentSnapIndex, setCurrentSnapIndex] = useState(snapPoints?.length ? snapPoints.length - 1 : 0);
+  const startY = useRef(0);
+  const startOffset = useRef(0);
 
-  // Close on Escape
+  // Handle escape key
   useEffect(() => {
-    if (!isOpen || !closeOnEscape) return;
+    if (!isSheetOpen || !closeOnEscape) return;
 
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -58,130 +116,164 @@ export default function BottomSheet({
 
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [isOpen, closeOnEscape, onClose]);
+  }, [open, closeOnEscape, onClose]);
 
-  // Prevent body scroll when open
+  // Prevent body scroll
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+    if (!isSheetOpen || !preventScroll) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
 
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = originalOverflow;
     };
-  }, [isOpen]);
+  }, [open, preventScroll]);
 
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    if (closeOnOverlayClick && e.target === e.currentTarget) {
-      onClose();
-    }
-  };
-
-  const handleDragStart = (e: React.TouchEvent | React.MouseEvent) => {
+  // Handle drag start
+  const handleDragStart = useCallback((clientY: number) => {
     setIsDragging(true);
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    startYRef.current = clientY;
-  };
+    startY.current = clientY;
+    startOffset.current = dragOffset;
+  }, [dragOffset]);
 
-  const handleDragMove = (e: TouchEvent | MouseEvent) => {
+  // Handle drag move
+  const handleDragMove = useCallback((clientY: number) => {
     if (!isDragging) return;
+    
+    const delta = clientY - startY.current;
+    const newOffset = Math.max(0, startOffset.current + delta);
+    setDragOffset(newOffset);
+  }, [isDragging]);
 
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    const offset = clientY - startYRef.current;
-
-    // Only allow dragging down
-    if (offset > 0) {
-      setDragOffset(offset);
-    }
-  };
-
-  const handleDragEnd = () => {
+  // Handle drag end
+  const handleDragEnd = useCallback(() => {
+    if (!isDragging) return;
     setIsDragging(false);
 
-    // Close if dragged down more than 150px
-    if (dragOffset > 150) {
-      onClose();
+    const threshold = 100; // pixels to trigger close
+    
+    if (dragOffset > threshold) {
+      // If we have snap points, snap to next lower point or close
+      if (snapPoints && currentSnapIndex > 0) {
+        setCurrentSnapIndex(currentSnapIndex - 1);
+        setDragOffset(0);
+      } else {
+        onClose();
+        setDragOffset(0);
+      }
+    } else {
+      // Snap back
+      setDragOffset(0);
     }
+  }, [isDragging, dragOffset, snapPoints, currentSnapIndex, onClose]);
 
-    setDragOffset(0);
+  // Touch event handlers
+  const handleTouchStart = (e: React.TouchEvent) => {
+    handleDragStart(e.touches[0].clientY);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    handleDragMove(e.touches[0].clientY);
+  };
+
+  const handleTouchEnd = () => {
+    handleDragEnd();
+  };
+
+  // Mouse event handlers (for desktop testing)
+  const handleMouseDown = (e: React.MouseEvent) => {
+    handleDragStart(e.clientY);
   };
 
   useEffect(() => {
     if (!isDragging) return;
 
-    const handleMove = (e: TouchEvent | MouseEvent) => handleDragMove(e);
-    const handleEnd = () => handleDragEnd();
+    const handleMouseMove = (e: MouseEvent) => {
+      handleDragMove(e.clientY);
+    };
 
-    document.addEventListener('touchmove', handleMove);
-    document.addEventListener('mousemove', handleMove);
-    document.addEventListener('touchend', handleEnd);
-    document.addEventListener('mouseup', handleEnd);
+    const handleMouseUp = () => {
+      handleDragEnd();
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
 
     return () => {
-      document.removeEventListener('touchmove', handleMove);
-      document.removeEventListener('mousemove', handleMove);
-      document.removeEventListener('touchend', handleEnd);
-      document.removeEventListener('mouseup', handleEnd);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging, dragOffset]);
+  }, [isDragging, handleDragMove, handleDragEnd]);
 
-  if (!isOpen) return null;
+  // Calculate height based on snap points or presets
+  const getSheetHeight = () => {
+    if (snapPoints && snapPoints[currentSnapIndex]) {
+      return snapPoints[currentSnapIndex];
+    }
+    if (typeof height === 'number') {
+      return `${height}px`;
+    }
+    // Check for preset heights
+    if (typeof height === 'string' && heightPresets[height]) {
+      return heightPresets[height];
+    }
+    return height;
+  };
 
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-end"
-      onClick={handleOverlayClick}
-    >
+  if (!isSheetOpen) return null;
+
+  const sheetContent = (
+    <div className="fixed inset-0 z-50">
       {/* Overlay */}
       <div
         className={`
           absolute inset-0 bg-black/50 transition-opacity duration-300
-          ${isOpen ? 'opacity-100' : 'opacity-0'}
+          ${isSheetOpen ? 'opacity-100' : 'opacity-0'}
         `}
+        onClick={closeOnOverlayClick ? onClose : undefined}
+        aria-hidden="true"
       />
 
       {/* Sheet */}
       <div
         ref={sheetRef}
         className={`
-          relative w-full bg-white rounded-t-2xl shadow-2xl
+          absolute bottom-0 left-0 right-0
+          bg-white rounded-t-2xl shadow-2xl
           transition-transform duration-300 ease-out
-          ${isOpen ? 'translate-y-0' : 'translate-y-full'}
+          ${isDragging ? 'transition-none' : ''}
           ${className}
         `}
         style={{
-          height: currentHeight,
+          height: getSheetHeight(),
+          maxHeight,
           transform: `translateY(${dragOffset}px)`,
         }}
         role="dialog"
         aria-modal="true"
-        aria-labelledby={title ? titleId : undefined}
       >
-        {/* Handle */}
+        {/* Drag Handle */}
         {showHandle && (
           <div
-            className="py-3 cursor-grab active:cursor-grabbing"
-            onTouchStart={handleDragStart}
-            onMouseDown={handleDragStart}
+            className="flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onMouseDown={handleMouseDown}
           >
-            <div className="w-12 h-1.5 bg-ink-300 rounded-full mx-auto" />
+            <div className="w-10 h-1 bg-paper-300 rounded-full" />
           </div>
         )}
 
-        {/* Header */}
-        {(title || showCloseButton) && (
-          <div className="px-6 py-4 border-b border-ink-200 flex items-center justify-between">
-            {title && (
-              <h2 id={titleId} className="text-lg font-semibold text-ink-900">
-                {title}
-              </h2>
-            )}
+        {/* Built-in header with title (when title prop is provided) */}
+        {title && (
+          <div className="flex items-center justify-between px-4 py-3 border-b border-paper-200">
+            <h2 className="text-lg font-medium text-ink-900">{title}</h2>
             {showCloseButton && (
               <button
                 onClick={onClose}
-                className="text-ink-400 hover:text-ink-600 transition-colors ml-auto"
+                className="p-1 rounded-full text-ink-500 hover:text-ink-700 hover:bg-paper-100 transition-colors"
                 aria-label="Close"
               >
                 <X className="h-5 w-5" />
@@ -190,11 +282,48 @@ export default function BottomSheet({
           </div>
         )}
 
-        {/* Content */}
-        <div className="overflow-y-auto flex-1 p-6">
+        {/* Content wrapper with flex layout */}
+        <div className="flex flex-col h-full overflow-hidden">
           {children}
         </div>
       </div>
     </div>
   );
+
+  return createPortal(sheetContent, document.body);
 }
+
+/**
+ * BottomSheetHeader - Header section with title and optional close button
+ */
+export function BottomSheetHeader({ children, className = '' }: BottomSheetHeaderProps) {
+  return (
+    <div className={`flex items-center justify-between px-4 py-3 border-b border-paper-200 ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+/**
+ * BottomSheetContent - Scrollable content area
+ */
+export function BottomSheetContent({ children, className = '' }: BottomSheetContentProps) {
+  return (
+    <div className={`flex-1 overflow-y-auto px-4 py-4 ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+/**
+ * BottomSheetActions - Sticky footer for action buttons (thumb zone)
+ */
+export function BottomSheetActions({ children, className = '' }: BottomSheetActionsProps) {
+  return (
+    <div className={`flex flex-col gap-2 px-4 py-4 border-t border-paper-200 bg-white ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+export default BottomSheet;

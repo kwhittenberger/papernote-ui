@@ -1,8 +1,12 @@
 import { ReactNode } from 'react';
 import Page from './Page';
+import { PageHeaderAction } from './PageHeader';
+import Button from './Button';
+import Stack from './Stack';
+import Text from './Text';
 
 export interface PageLayoutProps {
-  /** Page title displayed at the top */
+  /** Page title displayed at the top (also used for document title) */
   title: string;
   /** Optional subtitle/description text below the title */
   description?: string;
@@ -16,6 +20,10 @@ export interface PageLayoutProps {
   maxWidth?: '4xl' | '5xl' | '6xl' | '7xl' | 'full';
   /** Fix all margins/padding instead of responsive (default: false) */
   fixed?: boolean;
+  /** Page-level action buttons rendered inline with title */
+  actions?: PageHeaderAction[];
+  /** Custom content to render on the right (instead of actions) */
+  rightContent?: ReactNode;
 }
 
 /**
@@ -46,6 +54,21 @@ export interface PageLayoutProps {
  * </PageLayout>
  * ```
  *
+ * @example With actions
+ * ```tsx
+ * <PageLayout
+ *   title="Products"
+ *   description="Manage your product catalog"
+ *   headerContent={<Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Products' }]} />}
+ *   actions={[
+ *     { id: 'export', label: 'Export', icon: <Download />, onClick: handleExport, variant: 'ghost' },
+ *     { id: 'add', label: 'Add Product', icon: <Plus />, onClick: handleAdd, variant: 'primary' },
+ *   ]}
+ * >
+ *   <DataTable data={products} columns={columns} />
+ * </PageLayout>
+ * ```
+ *
  * @example With Layout for sidebar and gutter
  * ```tsx
  * <Layout sidebar={<Sidebar items={items} />}>
@@ -62,7 +85,9 @@ export function PageLayout({
   className = '',
   headerContent,
   maxWidth = '7xl',
-  fixed = false
+  fixed = false,
+  actions,
+  rightContent,
 }: PageLayoutProps) {
   // Responsive padding classes - fixed left/top, responsive right/bottom
   const paddingClasses = fixed
@@ -85,10 +110,32 @@ export function PageLayout({
       <div className={`${paddingClasses} ${maxWidthClasses[maxWidth]} mx-auto ${className}`}>
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-ink-900 mb-2">{title}</h1>
-          {description && (
-            <p className="text-ink-600">{description}</p>
-          )}
+          <Stack direction="horizontal" justify="between" align="start" gap="md">
+            <div className="min-w-0 flex-1">
+              <Text as="h1" size="2xl" weight="bold" className="text-3xl mb-2">{title}</Text>
+              {description && (
+                <Text color="muted">{description}</Text>
+              )}
+            </div>
+            {(actions || rightContent) && (
+              <Stack direction="horizontal" gap="sm" className="flex-shrink-0">
+                {rightContent}
+                {actions?.map((action) => (
+                  <Button
+                    key={action.id}
+                    variant={action.variant || 'secondary'}
+                    icon={action.icon}
+                    onClick={action.onClick}
+                    disabled={action.disabled}
+                    loading={action.loading}
+                    className={action.hideOnMobile ? 'hidden sm:inline-flex' : ''}
+                  >
+                    {action.label}
+                  </Button>
+                ))}
+              </Stack>
+            )}
+          </Stack>
         </div>
 
         {children}

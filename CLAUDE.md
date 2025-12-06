@@ -305,6 +305,86 @@ When a component is missing:
 
 ## Recent Component Enhancements
 
+### PageLayout Component (`src/components/PageLayout.tsx`)
+**Actions Support**: Added `actions` and `rightContent` props for page-level action buttons, eliminating the need to use PageHeader separately for pages with actions.
+
+**Key Features:**
+- `actions` prop accepts `PageHeaderAction[]` for rendering action buttons inline with title
+- `rightContent` prop for custom right-aligned content (alternative to actions)
+- Uses Button component with full support for variants, icons, loading, and disabled states
+- `hideOnMobile` support for responsive action visibility
+- Eliminates duplicate title issue when previously using PageLayout + PageHeader together
+
+```typescript
+import { PageLayout } from 'notebook-ui';
+import { Plus, Download } from 'lucide-react';
+
+<PageLayout
+  title="Products"
+  description="Manage your product catalog"
+  headerContent={<Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Products' }]} />}
+  actions={[
+    { id: 'export', label: 'Export', icon: <Download className="h-4 w-4" />, onClick: handleExport, variant: 'ghost' },
+    { id: 'add', label: 'Add Product', icon: <Plus className="h-4 w-4" />, onClick: handleAdd, variant: 'primary' },
+  ]}
+>
+  <DataTable data={products} columns={columns} />
+</PageLayout>
+```
+
+**Migration from PageHeader:**
+```typescript
+// Before (duplicate titles)
+<PageLayout title="Products">
+  <PageHeader title="Products" actions={actions} breadcrumbs={crumbs} />
+  {content}
+</PageLayout>
+
+// After (single source of truth)
+<PageLayout
+  title="Products"
+  actions={actions}
+  headerContent={<Breadcrumbs items={crumbs} />}
+>
+  {content}
+</PageLayout>
+```
+
+### Breadcrumbs Component (`src/components/Breadcrumbs.tsx`)
+**Same-Route Navigation & onClick Support**: Breadcrumbs now properly handle navigation to the current route and support custom click handlers.
+
+**Key Features:**
+- Detects same-route navigation and triggers state update with unique `breadcrumbReset` key
+- `onClick` prop for custom actions (analytics, logging, etc.)
+- `useBreadcrumbReset` hook for easy state reset in host components
+
+```typescript
+import { Breadcrumbs, useBreadcrumbReset } from 'notebook-ui';
+
+function ProductsPage() {
+  const [viewMode, setViewMode] = useState<'list' | 'detail'>('list');
+  
+  // Automatically reset to list view when breadcrumb is clicked
+  useBreadcrumbReset(() => setViewMode('list'));
+
+  const breadcrumbs = viewMode === 'list'
+    ? [{ label: 'Products' }]
+    : [
+        { label: 'Products', href: '/products' },  // Clicking resets viewMode
+        { label: 'Product Details' }
+      ];
+
+  return (
+    <>
+      <Breadcrumbs items={breadcrumbs} />
+      {viewMode === 'list' ? <ProductList /> : <ProductDetail />}
+    </>
+  );
+}
+```
+
+**Architectural Recommendation**: For new apps, prefer URL-based routing (`/products` vs `/products/:id`) over component state for view modes. This makes breadcrumbs work naturally without any hooks.
+
 ### Switch Component (`src/components/Switch.tsx`)
 **Loading State**: Added `loading` prop for async operations
 - Displays animated spinner (Loader2) inside slider
@@ -1087,6 +1167,190 @@ const [columns, setColumns] = useState<KanbanColumn[]>([
 ```
 
 Features: HTML5 drag-and-drop, column card limits, priority badges, tags, assignee avatars, custom card rendering
+
+## Mobile-First Components (v1.8.0+)
+
+New components designed for mobile-first/Assistant-first user experiences:
+
+### BottomSheet
+Mobile-friendly modal that slides up from the bottom:
+```tsx
+import { BottomSheet, BottomSheetHeader, BottomSheetContent, BottomSheetActions } from 'notebook-ui';
+
+// With built-in header
+<BottomSheet
+  open={isOpen}           // or isOpen={isOpen} for Modal compatibility
+  onClose={() => setIsOpen(false)}
+  title="Transaction Details"
+  height="lg"             // 'auto' | 'sm' | 'md' | 'lg' | 'full' | number | string
+  showHandle              // drag handle for swipe-to-dismiss
+  showCloseButton         // X button in header
+>
+  <BottomSheetContent>
+    {content}
+  </BottomSheetContent>
+  <BottomSheetActions>
+    <Button fullWidth>Approve</Button>
+  </BottomSheetActions>
+</BottomSheet>
+
+// Custom header with sub-components
+<BottomSheet open={isOpen} onClose={onClose}>
+  <BottomSheetHeader>
+    <Text weight="bold">Custom Header</Text>
+  </BottomSheetHeader>
+  <BottomSheetContent>{content}</BottomSheetContent>
+</BottomSheet>
+```
+
+Features: Swipe-to-dismiss, snap points, height presets, built-in or custom headers, keyboard escape support
+
+### HorizontalScroll
+Horizontally scrollable container with peek indicators for carousels:
+```tsx
+import { HorizontalScroll } from 'notebook-ui';
+
+<HorizontalScroll
+  gap="md"                // 'none' | 'sm' | 'md' | 'lg' | number
+  peekAmount={24}         // pixels of next item visible
+  showIndicators          // dot indicators
+  snapToItem              // snap scroll to item boundaries
+  showArrows="hover"      // 'hover' | 'always' | 'never'
+>
+  <Card>Bill 1</Card>
+  <Card>Bill 2</Card>
+  <Card>Bill 3</Card>
+</HorizontalScroll>
+```
+
+Features: Touch momentum, peek hint, snap scrolling, navigation arrows on desktop
+
+### SwipeableCard
+Card with swipe-to-action functionality for approval workflows:
+```tsx
+import { SwipeableCard } from 'notebook-ui';
+import { Check, MoreHorizontal } from 'lucide-react';
+
+<SwipeableCard
+  onSwipeRight={() => handleApprove()}
+  onSwipeLeft={() => handleShowOptions()}
+  rightAction={{
+    icon: <Check />,
+    color: 'success',
+    label: 'Approve'
+  }}
+  leftAction={{
+    icon: <MoreHorizontal />,
+    color: 'neutral',
+    label: 'Options'
+  }}
+  swipeThreshold={100}    // pixels before action triggers
+  hapticFeedback          // vibrate on mobile
+>
+  <TransactionContent />
+</SwipeableCard>
+```
+
+Features: Touch/mouse gestures, haptic feedback, visual action indicators, configurable thresholds
+
+### NotificationBanner
+Dismissible banner for important alerts:
+```tsx
+import { NotificationBanner } from 'notebook-ui';
+import { DollarSign } from 'lucide-react';
+
+<NotificationBanner
+  variant="warning"       // 'info' | 'success' | 'warning' | 'error'
+  icon={<DollarSign />}   // custom icon (optional)
+  title="Found $33.98 in potential savings"
+  description="Tap to review"
+  action={{
+    label: "Review",
+    onClick: handleReview
+  }}
+  onDismiss={() => setShowBanner(false)}
+  dismissible             // swipeable on mobile
+  sticky                  // stick to top on scroll
+/>
+```
+
+Features: Swipe-to-dismiss, variant colors, action buttons, sticky positioning
+
+### CompactStat
+Mobile-optimized stat display with optional trend:
+```tsx
+import { CompactStat } from 'notebook-ui';
+
+<Grid columns={2} gap="sm">
+  <CompactStat
+    value="$62,329"
+    label="Net Worth"
+    trend={{
+      direction: 'up',
+      value: '+$1,247',
+      color: 'success'
+    }}
+    size="md"             // 'sm' | 'md' | 'lg'
+    align="center"        // 'left' | 'center' | 'right'
+  />
+  <CompactStat
+    value="$4,521"
+    label="Monthly Income"
+  />
+</Grid>
+```
+
+Features: Trend indicators, responsive sizing, color-coded trends
+
+### PullToRefresh
+Pull-down refresh for mobile lists:
+```tsx
+import { PullToRefresh } from 'notebook-ui';
+
+<PullToRefresh
+  onRefresh={async () => { await syncData(); }}
+  threshold={80}          // pixels to pull
+  pullingContent={<Text>Pull to refresh</Text>}
+  releaseContent={<Text>Release to refresh</Text>}
+  refreshingContent={<Spinner />}
+>
+  <TransactionList transactions={transactions} />
+</PullToRefresh>
+```
+
+Features: Custom content for each state, configurable threshold, async refresh handling
+
+### Component Enhancements for Mobile
+
+**Stack** - Added `tight` spacing (4px):
+```tsx
+<Stack gap="tight">{/* 4px gap for mobile density */}</Stack>
+```
+
+**Card** - Compact variant updated to 12px padding:
+```tsx
+<Card variant="compact">{/* 12px padding */}</Card>
+```
+
+**Badge** - Added `pill` variant:
+```tsx
+<Badge pill variant="success">+12%</Badge>
+```
+
+**Text** - Added responsive size props:
+```tsx
+<Text size="xl" mdSize="2xl" lgSize="3xl">Responsive heading</Text>
+```
+
+**Progress** - Added `ring` as alias for `circular`:
+```tsx
+<Progress value={72} variant="ring" showLabel />
+```
+
+**Touch-Friendly Sizing** - Automatic on touch devices:
+- Buttons: min 48px touch target
+- Inputs: min 48px height
+- Checkboxes/Radios: min 24px
 
 ## Critical Integration Rules
 

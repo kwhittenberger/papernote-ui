@@ -34,7 +34,6 @@ export default function FormWizard({
 
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === steps.length - 1;
-  const canGoNext = allowSkip || completedSteps.has(currentStep);
 
   // Go to specific step
   const goToStep = (stepIndex: number) => {
@@ -69,8 +68,11 @@ export default function FormWizard({
         setIsSubmitting(false);
       }
     } else {
-      // Go to next step
-      goToStep(currentStep + 1);
+      // Advance to next step directly (don't use goToStep which checks completedSteps
+      // before React has re-rendered with the updated state)
+      const nextStepIndex = currentStep + 1;
+      setCurrentStep(nextStepIndex);
+      onStepChange?.(nextStepIndex);
     }
   };
 
@@ -191,7 +193,7 @@ export default function FormWizard({
         <button
           type="button"
           onClick={nextStep}
-          disabled={!allowSkip && !canGoNext && !isLastStep || isSubmitting}
+          disabled={isSubmitting}
           className="px-4 py-2 text-sm font-medium text-white bg-accent-500 rounded-lg hover:bg-accent-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
         >
           {isSubmitting ? 'Submitting...' : isLastStep ? 'Complete' : 'Next'}

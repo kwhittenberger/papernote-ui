@@ -3,7 +3,7 @@
 
 import React, { forwardRef } from 'react';
 
-type SpacingValue = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+type SpacingValue = 'none' | 'tight' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export interface StackProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Content to stack */
@@ -31,6 +31,7 @@ export interface StackProps extends React.HTMLAttributes<HTMLDivElement> {
  * 
  * Spacing scale (use either `spacing` or `gap` prop - they're aliases):
  * - none: 0
+ * - tight: 0.25rem (1) - for mobile-density layouts
  * - xs: 0.5rem (2)
  * - sm: 0.75rem (3)
  * - md: 1.5rem (6)
@@ -69,6 +70,7 @@ export const Stack = forwardRef<HTMLDivElement, StackProps>(({
   const spacingClasses = {
     vertical: {
       none: '',
+      tight: 'space-y-1',  // 4px - for mobile-density layouts
       xs: 'space-y-2',
       sm: 'space-y-3',
       md: 'space-y-6',
@@ -77,6 +79,7 @@ export const Stack = forwardRef<HTMLDivElement, StackProps>(({
     },
     horizontal: {
       none: '',
+      tight: 'space-x-1',  // 4px - for mobile-density layouts
       xs: 'space-x-2',
       sm: 'space-x-3',
       md: 'space-x-6',

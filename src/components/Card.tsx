@@ -76,7 +76,7 @@ const Card = forwardRef<HTMLDivElement, CardProps>(({
 
   const variantStyles = {
     default: 'rounded-xl shadow-lg p-8',
-    compact: 'rounded-lg shadow-md p-5',
+    compact: 'rounded-lg shadow-md p-3',  // 12px padding for mobile-density layouts
     flat: 'rounded-lg p-5',
   };
 

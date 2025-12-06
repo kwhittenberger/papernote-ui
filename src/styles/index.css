@@ -586,3 +586,35 @@
 .animate-slide-in-bottom {
   animation: slideInBottom 0.3s ease-out;
 }
+
+/* Touch-friendly sizing for coarse pointer devices (touch screens) */
+@media (pointer: coarse) {
+  /* Ensure buttons meet 48px minimum touch target on touch devices */
+  .btn,
+  button.touch-friendly,
+  .touch-target {
+    min-height: 48px;
+    min-width: 48px;
+  }
+
+  /* Larger tap targets for inputs on touch devices */
+  .input,
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="search"],
+  select,
+  textarea {
+    min-height: 48px;
+  }
+
+  /* Larger checkbox/radio hit areas */
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-width: 24px;
+    min-height: 24px;
+  }
+}
