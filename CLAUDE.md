@@ -305,6 +305,51 @@ When a component is missing:
 
 ## Recent Component Enhancements
 
+### PageLayout Component (`src/components/PageLayout.tsx`)
+**Actions Support**: Added `actions` and `rightContent` props for page-level action buttons, eliminating the need to use PageHeader separately for pages with actions.
+
+**Key Features:**
+- `actions` prop accepts `PageHeaderAction[]` for rendering action buttons inline with title
+- `rightContent` prop for custom right-aligned content (alternative to actions)
+- Uses Button component with full support for variants, icons, loading, and disabled states
+- `hideOnMobile` support for responsive action visibility
+- Eliminates duplicate title issue when previously using PageLayout + PageHeader together
+
+```typescript
+import { PageLayout } from 'notebook-ui';
+import { Plus, Download } from 'lucide-react';
+
+<PageLayout
+  title="Products"
+  description="Manage your product catalog"
+  headerContent={<Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Products' }]} />}
+  actions={[
+    { id: 'export', label: 'Export', icon: <Download className="h-4 w-4" />, onClick: handleExport, variant: 'ghost' },
+    { id: 'add', label: 'Add Product', icon: <Plus className="h-4 w-4" />, onClick: handleAdd, variant: 'primary' },
+  ]}
+>
+  <DataTable data={products} columns={columns} />
+</PageLayout>
+```
+
+**Migration from PageHeader:**
+```typescript
+// Before (duplicate titles)
+<PageLayout title="Products">
+  <PageHeader title="Products" actions={actions} breadcrumbs={crumbs} />
+  {content}
+</PageLayout>
+
+// After (single source of truth)
+<PageLayout
+  title="Products"
+  actions={actions}
+  headerContent={<Breadcrumbs items={crumbs} />}
+>
+  {content}
+</PageLayout>
+```
+
 ### Breadcrumbs Component (`src/components/Breadcrumbs.tsx`)
 **Same-Route Navigation & onClick Support**: Breadcrumbs now properly handle navigation to the current route and support custom click handlers.
 
