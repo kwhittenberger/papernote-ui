@@ -104,10 +104,10 @@ export function PageLayout({
 
   return (
     <Page padding="none" maxWidth={maxWidth} fixed={fixed}>
-      {/* Content before title (e.g., ControlBar) */}
-      {headerContent}
-
       <div className={`${paddingClasses} ${maxWidthClasses[maxWidth]} mx-auto ${className}`}>
+        {/* Content before title (e.g., Breadcrumbs) */}
+        {headerContent && <div className="mb-4">{headerContent}</div>}
+
         {/* Header */}
         <div className="mb-8">
           <Stack direction="horizontal" justify="between" align="start" gap="md">
