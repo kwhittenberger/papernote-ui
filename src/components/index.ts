@@ -316,6 +316,10 @@ export type { SearchBarProps } from './SearchBar';
 export { default as NotificationIndicator } from './NotificationIndicator';
 export type { NotificationIndicatorProps } from './NotificationIndicator';
 
+// Notification Bell (dropdown with notification list)
+export { default as NotificationBell } from './NotificationBell';
+export type { NotificationBellProps, NotificationItem, NotificationBellPosition, NotificationBellStyle } from './NotificationBell';
+
 // Data Table
 export { default as DataTable } from './DataTable';
 export type {

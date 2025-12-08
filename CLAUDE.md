@@ -846,6 +846,56 @@ interface Command {
 
 5. **Grouping**: Commands with a `group` property are organized under labeled sections
 
+### NotificationBell
+
+Bell icon with badge and dropdown for displaying notifications:
+```tsx
+import { NotificationBell, NotificationItem } from 'notebook-ui';
+
+const notifications: NotificationItem[] = [
+  {
+    id: '1',
+    title: 'Payment due',
+    message: 'Your electricity bill is due in 3 days',
+    type: 'warning',
+    priority: 'high',
+    createdAt: new Date(),
+    isRead: false,
+    actionUrl: '/bills/electricity',
+  },
+];
+
+<NotificationBell
+  notifications={notifications}
+  onMarkAsRead={(id) => markAsRead(id)}
+  onMarkAllRead={() => markAllRead()}
+  onNotificationClick={(n) => navigate(n.actionUrl)}
+  onViewAll={() => navigate('/notifications')}
+  dropdownPosition="left"     // 'left' | 'right'
+  size="md"                   // 'sm' | 'md' | 'lg'
+  maxHeight="400px"           // scrollable list height
+/>
+```
+
+**Features:**
+- Bell icon with unread count badge (auto-calculated or explicit)
+- Dropdown panel with notification list
+- Type-colored dot badges (info/success/warning/error)
+- Priority styling (urgent = red left border)
+- Mark as read (single/all) actions
+- "View all" footer link
+- Loading and empty states
+- Time ago formatting
+- Keyboard accessible (Escape to close)
+
+**Notification Types:**
+| Type | Color | Use Case |
+|------|-------|----------|
+| info | blue | General updates |
+| success | green | Completed actions |
+| warning | yellow | Attention needed |
+| error | red | Failures, urgent |
+
 ### Component Polish Enhancements
 
 #### Textarea Resize Control
