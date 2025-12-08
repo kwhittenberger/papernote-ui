@@ -4,6 +4,7 @@ import NotificationBell, { NotificationItem } from './NotificationBell';
 import Stack from './Stack';
 import Text from './Text';
 import Box from './Box';
+import { MessageCircle, Inbox, BellRing, Mail } from 'lucide-react';
 
 const meta = {
   title: 'Components/NotificationBell',
@@ -756,4 +757,74 @@ export const OutlinedInHeader: Story = {
       </div>
     );
   },
+};
+
+export const CustomIcon: Story = {
+  render: () => (
+    <Stack direction="horizontal" spacing="xl" align="center">
+      <Stack align="center" spacing="sm">
+        <NotificationBell
+          notifications={sampleNotifications}
+          unreadCount={3}
+          icon={<MessageCircle className="h-5 w-5 text-ink-600" />}
+          onViewAll={() => {}}
+        />
+        <Text size="xs" color="muted">Message icon</Text>
+      </Stack>
+      <Stack align="center" spacing="sm">
+        <NotificationBell
+          notifications={sampleNotifications}
+          unreadCount={5}
+          icon={<Inbox className="h-5 w-5 text-ink-600" />}
+          onViewAll={() => {}}
+        />
+        <Text size="xs" color="muted">Inbox icon</Text>
+      </Stack>
+      <Stack align="center" spacing="sm">
+        <NotificationBell
+          notifications={sampleNotifications}
+          unreadCount={2}
+          icon={<BellRing className="h-5 w-5 text-ink-600" />}
+          onViewAll={() => {}}
+        />
+        <Text size="xs" color="muted">Bell ring icon</Text>
+      </Stack>
+      <Stack align="center" spacing="sm">
+        <NotificationBell
+          notifications={sampleNotifications}
+          unreadCount={8}
+          icon={<Mail className="h-5 w-5 text-ink-600" />}
+          onViewAll={() => {}}
+        />
+        <Text size="xs" color="muted">Mail icon</Text>
+      </Stack>
+    </Stack>
+  ),
+};
+
+export const CustomIconOutlined: Story = {
+  render: () => (
+    <Stack direction="horizontal" spacing="xl" align="center">
+      <Stack align="center" spacing="sm">
+        <NotificationBell
+          notifications={sampleNotifications}
+          unreadCount={3}
+          bellStyle="outlined"
+          icon={<MessageCircle className="h-5 w-5 text-ink-600" />}
+          onViewAll={() => {}}
+        />
+        <Text size="xs" color="muted">Outlined message</Text>
+      </Stack>
+      <Stack align="center" spacing="sm">
+        <NotificationBell
+          notifications={sampleNotifications}
+          unreadCount={5}
+          bellStyle="outlined"
+          icon={<Mail className="h-5 w-5 text-ink-600" />}
+          onViewAll={() => {}}
+        />
+        <Text size="xs" color="muted">Outlined mail</Text>
+      </Stack>
+    </Stack>
+  ),
 };

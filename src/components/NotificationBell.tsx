@@ -89,6 +89,11 @@ export interface NotificationBellProps {
    * - 'outlined': Visible border/container with subtle background
    */
   bellStyle?: NotificationBellStyle;
+  /**
+   * Custom icon to use instead of the default bell
+   * Use this to provide your own notification icon
+   */
+  icon?: React.ReactNode;
 }
 
 /**
@@ -206,6 +211,7 @@ export default function NotificationBell({
   variant = 'compact',
   showUnreadInHeader = false,
   bellStyle = 'ghost',
+  icon: customIcon,
 }: NotificationBellProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -266,6 +272,9 @@ export default function NotificationBell({
     lg: 'p-4',
   };
 
+  // Default bell icon or custom icon
+  const bellIcon = customIcon || <Bell className={`${iconSizes[size]} text-ink-600`} />;
+
   // Trigger button
   const triggerButton = bellStyle === 'outlined' ? (
     <div className="relative inline-block">
@@ -286,7 +295,7 @@ export default function NotificationBell({
             : 'Notifications'
         }
       >
-        <Bell className={`${iconSizes[size]} text-ink-600`} />
+        {bellIcon}
       </button>
       {unreadCount > 0 && (
         <span
@@ -310,6 +319,7 @@ export default function NotificationBell({
       iconOnly
       size={size}
       disabled={disabled}
+      icon={bellIcon}
       badge={unreadCount > 0 ? unreadCount : undefined}
       badgeVariant="error"
       aria-label={
@@ -318,9 +328,7 @@ export default function NotificationBell({
           : 'Notifications'
       }
       className={className}
-    >
-      <Bell className={iconSizes[size]} />
-    </Button>
+    />  
   );
 
   // Header title with optional unread count
