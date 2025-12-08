@@ -217,8 +217,8 @@ export type { CompactStatProps, CompactStatTrend } from './CompactStat';
 export { default as Breadcrumbs, useBreadcrumbReset } from './Breadcrumbs';
 export type { BreadcrumbsProps, BreadcrumbItem, BreadcrumbNavigationState } from './Breadcrumbs';
 
-export { default as Tabs } from './Tabs';
-export type { TabsProps, Tab } from './Tabs';
+export { default as Tabs, TabsRoot, TabsList, TabsTrigger, TabsContent } from './Tabs';
+export type { TabsProps, Tab, TabsRootProps, TabsListProps, TabsTriggerProps, TabsContentProps } from './Tabs';
 
 export { default as Pagination } from './Pagination';
 export type { PaginationProps } from './Pagination';
