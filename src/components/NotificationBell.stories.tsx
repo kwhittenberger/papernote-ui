@@ -227,6 +227,48 @@ export const Default: Story = {
   },
 };
 
+export const Playground: Story = {
+  args: {
+    notifications: sampleNotifications,
+    variant: 'compact',
+    bellStyle: 'ghost',
+    dropdownPosition: 'bottom-right',
+    size: 'md',
+    showUnreadInHeader: false,
+    loading: false,
+    disabled: false,
+    maxHeight: '400px',
+    emptyMessage: 'No notifications',
+    viewAllText: 'View all notifications',
+  },
+  render: (args) => {
+    const [notifications, setNotifications] = useState(args.notifications);
+
+    const handleMarkAsRead = (id: string) => {
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+      );
+    };
+
+    const handleMarkAllRead = () => {
+      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    };
+
+    return (
+      <div style={{ padding: '250px', display: 'flex', justifyContent: 'center', minHeight: '600px' }}>
+        <NotificationBell
+          {...args}
+          notifications={notifications}
+          onMarkAsRead={handleMarkAsRead}
+          onMarkAllRead={handleMarkAllRead}
+          onNotificationClick={(n) => alert(`Navigate to: ${n.actionUrl}`)}
+          onViewAll={() => alert('View all notifications')}
+        />
+      </div>
+    );
+  },
+};
+
 export const DetailedVariant: Story = {
   render: () => {
     const [notifications, setNotifications] = useState(bankingNotifications);

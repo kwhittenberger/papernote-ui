@@ -138,19 +138,23 @@ const defaultTypeLabels: Record<NotificationItem['type'], string> = {
 
 /**
  * Map dropdown position to Popover placement
+ * - bottom-right: Below bell, dropdown's right edge aligns with bell
+ * - bottom-left: Below bell, dropdown's left edge aligns with bell
+ * - top-right: Above bell, dropdown's right edge aligns with bell
+ * - top-left: Above bell, dropdown's left edge aligns with bell
  */
 function getPopoverPlacement(position: NotificationBellPosition): 'bottom-start' | 'bottom-end' | 'top-start' | 'top-end' {
   switch (position) {
     case 'bottom-right':
     case 'right':
-      return 'bottom-start';
+      return 'bottom-start'; // Below, extends to the right
     case 'bottom-left':
     case 'left':
-      return 'bottom-end';
+      return 'bottom-end'; // Below, extends to the left
     case 'top-right':
-      return 'top-start';
+      return 'top-start'; // Above, extends to the right
     case 'top-left':
-      return 'top-end';
+      return 'top-end'; // Above, extends to the left
     default:
       return 'bottom-start';
   }
