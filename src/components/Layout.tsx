@@ -92,7 +92,7 @@ export const Layout: React.FC<LayoutProps> = ({
         {sidebar}
 
         {/* Gutter area - between sidebar and content with page navigation */}
-        <div className="w-8 h-full bg-paper-100 flex-shrink-0 relative flex items-center justify-center">
+        <div className="w-8 h-full bg-paper-100 flex-shrink-0 relative z-10 flex items-start justify-center pt-32">
           <PageNavigation sections={sections} />
         </div>
 
