@@ -46,8 +46,10 @@ export interface DataTableColumn<T> {
   sortable?: boolean;
   /** Additional CSS classes for column cells */
   className?: string;
-  /** Text alignment in column */
+  /** Horizontal text alignment in column */
   align?: 'left' | 'center' | 'right';
+  /** Vertical alignment of cell content - useful when rows have varying heights */
+  verticalAlign?: 'top' | 'middle' | 'bottom';
 }
 
 /**
@@ -426,6 +428,10 @@ function getColumnStyle<T>(column: DataTableColumn<T>, dynamicWidth?: number): R
   
   if (column.align) {
     style.textAlign = column.align;
+  }
+  
+  if (column.verticalAlign) {
+    style.verticalAlign = column.verticalAlign;
   }
   
   return style;
