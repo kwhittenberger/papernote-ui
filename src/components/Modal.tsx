@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useId } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { useIsMobile } from '../hooks/useResponsive';
 import BottomSheet from './BottomSheet';
@@ -185,7 +186,7 @@ export default function Modal({
 
   // Render as BottomSheet on mobile
   if (useBottomSheet) {
-    return (
+    return createPortal(
       <BottomSheet
         isOpen={isOpen}
         onClose={onClose}
@@ -195,12 +196,13 @@ export default function Modal({
         showCloseButton={showCloseButton}
       >
         {children}
-      </BottomSheet>
+      </BottomSheet>,
+      document.body
     );
   }
 
   // Render as standard modal on desktop
-  return (
+  const modalContent = (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900 bg-opacity-50 backdrop-blur-sm animate-fade-in"
       onMouseDown={handleBackdropMouseDown}
@@ -241,6 +243,8 @@ export default function Modal({
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }
 
 export function ModalFooter({ children }: { children: React.ReactNode }) {
