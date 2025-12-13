@@ -46,7 +46,9 @@
       "Bash(npm uninstall:*)",
       "mcp__filesystem__read_text_file",
       "Bash(node:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "WebFetch(domain:github.com)",
+      "mcp__filesystem__move_file"
     ],
     "deny": [],
     "ask": []
