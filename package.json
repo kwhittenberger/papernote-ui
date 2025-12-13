@@ -1,6 +1,6 @@
 {
   "name": "@papernote/ui",
-  "version": "1.10.3",
+  "version": "1.10.4",
   "type": "module",
   "description": "A modern React component library with a paper notebook aesthetic - minimal, professional, and expressive",
   "main": "dist/index.js",
