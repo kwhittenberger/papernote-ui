@@ -1429,7 +1429,7 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
               </th>
             )}
             {allActions.length > 0 && (
-              <th className={`sticky left-0 bg-paper-100 px-0.5 ${currentDensity.header} text-center text-xs font-medium text-ink-700 uppercase tracking-wider border-b ${borderColor} z-20 ${bordered ? `border ${borderColor}` : ''}`} style={{ width: '28px' }}>
+              <th className={`sticky left-0 bg-paper-100 text-center text-xs font-medium text-ink-700 uppercase tracking-wider border-b ${borderColor} z-20 ${bordered ? `border ${borderColor}` : ''}`} style={{ width: '28px', padding: '0' }}>
                 {/* Actions column header */}
               </th>
             )}

@@ -42,6 +42,9 @@ export type { DateRangePickerProps, DateRange, DateRangePickerHandle } from './D
 export { default as DateTimePicker } from './DateTimePicker';
 export type { DateTimePickerProps } from './DateTimePicker';
 
+export { default as TimezoneSelector, getLocalTimezone, isValidTimezone } from './TimezoneSelector';
+export type { TimezoneSelectorProps, TimezoneOption, TimezoneRegion } from './TimezoneSelector';
+
 export { default as Combobox } from './Combobox';
 export type { ComboboxProps, ComboboxOption, ComboboxHandle } from './Combobox';
 
