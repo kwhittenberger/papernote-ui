@@ -12,6 +12,10 @@ export interface BadgeProps {
   dot?: boolean;
   /** Use pill shape (more rounded, compact padding) for inline use */
   pill?: boolean;
+  /** Truncate text with ellipsis if it overflows (requires maxWidth) */
+  truncate?: boolean;
+  /** Maximum width for the badge (useful with truncate), e.g. '150px' or '10rem' */
+  maxWidth?: string;
 }
 
 export default function Badge({
@@ -23,6 +27,8 @@ export default function Badge({
   className = '',
   dot = false,
   pill = false,
+  truncate = false,
+  maxWidth,
 }: BadgeProps) {
   const variantStyles = {
     success: 'bg-success-50 text-success-700 border-success-200',
@@ -84,19 +90,21 @@ export default function Badge({
   return (
     <span
       className={`
-        inline-flex items-center border font-medium
+        inline-flex items-center border font-medium whitespace-nowrap
         ${pill ? 'rounded-full' : 'rounded-full'}
         ${variantStyles[variant]}
         ${pill ? pillSizeStyles[size] : sizeStyles[size]}
+        ${truncate ? 'max-w-full overflow-hidden' : ''}
         ${className}
       `}
+      style={maxWidth ? { maxWidth } : undefined}
     >
-      {icon && <span className={iconSize[size]}>{icon}</span>}
-      <span>{children}</span>
+      {icon && <span className={`${iconSize[size]} flex-shrink-0`}>{icon}</span>}
+      <span className={truncate ? 'truncate' : ''}>{children}</span>
       {onRemove && (
         <button
           onClick={onRemove}
-          className="ml-1 hover:opacity-70 transition-opacity"
+          className="ml-1 hover:opacity-70 transition-opacity flex-shrink-0"
           aria-label="Remove badge"
         >
           <X className={iconSize[size]} />
