@@ -443,7 +443,7 @@
     z-index: 10;
     background-color: #fafaf9;
     backdrop-filter: blur(8px);
-    padding: 4px 8px !important;
+    /* padding controlled by component density classes (currentDensity.header) */
     height: 28px !important;
     min-height: 28px !important;
     max-height: 28px !important;

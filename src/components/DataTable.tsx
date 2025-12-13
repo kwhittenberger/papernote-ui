@@ -1433,12 +1433,16 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
                 {/* Actions column header */}
               </th>
             )}
-            {visibleColumns.map((column) => {
+            {visibleColumns.map((column, colIdx) => {
               const columnKey = String(column.key);
               const dynamicWidth = columnWidths[columnKey];
               const thRef = useRef<HTMLTableCellElement>(null);
               const isDragging = draggingColumn === columnKey;
               const isDragOver = dragOverColumn === columnKey;
+
+              // Reduce left padding on first column when there are action buttons (match body cells)
+              const isFirstColumn = colIdx === 0;
+              const headerPaddingClass = isFirstColumn && allActions.length > 0 ? 'pl-3' : '';
 
               return (
                 <th
@@ -1450,7 +1454,7 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
                   onDragEnd={handleDragEnd}
                   onDrop={(e) => reorderable && handleDrop(e, columnKey)}
                   className={`
-                    ${currentDensity.header} text-left border-b ${borderColor} ${bordered ? `border ${borderColor}` : ''} relative
+                    ${currentDensity.header} ${headerPaddingClass} text-left border-b ${borderColor} ${bordered ? `border ${borderColor}` : ''} relative
                     ${reorderable ? 'cursor-move' : ''}
                     ${isDragging ? 'opacity-50' : ''}
                     ${isDragOver ? 'bg-accent-100' : ''}
