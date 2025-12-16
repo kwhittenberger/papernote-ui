@@ -116,11 +116,13 @@ export function SwipeableListItem({
   const [activeDirection, setActiveDirection] = useState<'left' | 'right' | null>(null);
   const [loadingActionId, setLoadingActionId] = useState<string | null>(null);
   const [focusedActionIndex, setFocusedActionIndex] = useState<number>(-1);
+  const [isCommitted, setIsCommitted] = useState(false); // Tracks if past full-swipe threshold
   
   const startX = useRef(0);
   const startY = useRef(0);
   const startTime = useRef(0);
   const isHorizontalSwipe = useRef<boolean | null>(null);
+  const wasCommitted = useRef(false); // Track previous committed state for haptic
 
   // Calculate total widths
   const leftActionsWidth = leftActions.length * actionWidth;
@@ -143,6 +145,8 @@ export function SwipeableListItem({
     setOffsetX(0);
     setActiveDirection(null);
     setFocusedActionIndex(-1);
+    setIsCommitted(false);
+    wasCommitted.current = false;
     onSwipeChange?.(null);
   }, [onSwipeChange]);
 
@@ -191,6 +195,7 @@ export function SwipeableListItem({
     if (isHorizontalSwipe.current !== true) return;
 
     let newOffset = deltaX;
+    const containerWidth = containerRef.current?.offsetWidth || 300;
     
     // Swiping left (reveals left actions on right side)
     if (deltaX < 0) {
@@ -198,7 +203,7 @@ export function SwipeableListItem({
         newOffset = deltaX * 0.2; // Heavy resistance if no actions
       } else {
         const maxSwipe = fullSwipe 
-          ? -(containerRef.current?.offsetWidth || 300) 
+          ? -containerWidth 
           : -leftActionsWidth;
         newOffset = Math.max(maxSwipe, deltaX);
         
@@ -219,7 +224,7 @@ export function SwipeableListItem({
         newOffset = deltaX * 0.2; // Heavy resistance if no actions
       } else {
         const maxSwipe = fullSwipe 
-          ? (containerRef.current?.offsetWidth || 300) 
+          ? containerWidth 
           : rightActionsWidth;
         newOffset = Math.min(maxSwipe, deltaX);
         
@@ -235,8 +240,22 @@ export function SwipeableListItem({
       }
     }
 
+    // Check if we've crossed the full-swipe threshold
+    if (fullSwipe) {
+      const swipePercentage = Math.abs(newOffset) / containerWidth;
+      const nowCommitted = swipePercentage >= fullSwipeThreshold;
+      
+      // Haptic feedback when crossing threshold (both directions)
+      if (nowCommitted !== wasCommitted.current) {
+        triggerHaptic(nowCommitted ? 'heavy' : 'light');
+        wasCommitted.current = nowCommitted;
+      }
+      
+      setIsCommitted(nowCommitted);
+    }
+
     setOffsetX(newOffset);
-  }, [isDragging, disabled, loadingActionId, leftActions.length, rightActions.length, leftActionsWidth, rightActionsWidth, fullSwipe, activeDirection, onSwipeChange]);
+  }, [isDragging, disabled, loadingActionId, leftActions.length, rightActions.length, leftActionsWidth, rightActionsWidth, fullSwipe, fullSwipeThreshold, activeDirection, onSwipeChange, triggerHaptic]);
 
   // Handle drag end
   const handleDragEnd = useCallback(() => {
@@ -247,11 +266,21 @@ export function SwipeableListItem({
     const velocity = Math.abs(offsetX) / (Date.now() - startTime.current);
     const containerWidth = containerRef.current?.offsetWidth || 300;
     
-    // Check for full swipe trigger
-    if (fullSwipe) {
+    // Check for full swipe trigger - use isCommitted state for more reliable detection
+    if (fullSwipe && isCommitted) {
+      if (offsetX < 0 && leftActions.length > 0) {
+        executeAction(leftActions[0]);
+        return;
+      } else if (offsetX > 0 && rightActions.length > 0) {
+        executeAction(rightActions[0]);
+        return;
+      }
+    }
+    
+    // Also check velocity-based trigger for quick swipes
+    if (fullSwipe && velocity > 0.5) {
       const swipePercentage = Math.abs(offsetX) / containerWidth;
-      
-      if (swipePercentage >= fullSwipeThreshold || velocity > 0.5) {
+      if (swipePercentage >= fullSwipeThreshold * 0.5) { // Lower threshold for fast swipes
         if (offsetX < 0 && leftActions.length > 0) {
           executeAction(leftActions[0]);
           return;
@@ -261,6 +290,10 @@ export function SwipeableListItem({
         }
       }
     }
+    
+    // Reset committed state
+    setIsCommitted(false);
+    wasCommitted.current = false;
 
     // Snap to open or closed position
     const threshold = actionWidth * 0.5;
@@ -280,7 +313,7 @@ export function SwipeableListItem({
     } else {
       resetPosition();
     }
-  }, [isDragging, offsetX, fullSwipe, fullSwipeThreshold, leftActions, rightActions, leftActionsWidth, rightActionsWidth, actionWidth, executeAction, resetPosition, onSwipeChange]);
+  }, [isDragging, offsetX, fullSwipe, fullSwipeThreshold, isCommitted, leftActions, rightActions, leftActionsWidth, rightActionsWidth, actionWidth, executeAction, resetPosition, onSwipeChange]);
 
   // Touch event handlers
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -478,8 +511,49 @@ export function SwipeableListItem({
         </div>
       )}
 
-      {/* Full swipe indicator overlay */}
-      {fullSwipe && fullSwipeProgress > 0.3 && (
+      {/* Committed full-swipe indicator - shows action that will trigger on release */}
+      {fullSwipe && isCommitted && isDragging && (
+        <div 
+          className={`
+            absolute inset-0 z-10 flex items-center
+            ${offsetX > 0 ? 'justify-start pl-6' : 'justify-end pr-6'}
+            ${offsetX > 0 && rightActions.length > 0 
+              ? getColorClasses(rightActions[0].color).bg 
+              : offsetX < 0 && leftActions.length > 0 
+                ? getColorClasses(leftActions[0].color).bg 
+                : ''}
+            transition-opacity duration-150
+          `}
+        >
+          {offsetX > 0 && rightActions.length > 0 && (() => {
+            const action = rightActions[0];
+            const IconComponent = action.icon;
+            return (
+              <div className="flex items-center gap-3 text-white animate-pulse">
+                <IconComponent className="h-8 w-8" />
+                <span className="text-lg font-semibold uppercase tracking-wide">
+                  Release to {action.label}
+                </span>
+              </div>
+            );
+          })()}
+          {offsetX < 0 && leftActions.length > 0 && (() => {
+            const action = leftActions[0];
+            const IconComponent = action.icon;
+            return (
+              <div className="flex items-center gap-3 text-white animate-pulse">
+                <span className="text-lg font-semibold uppercase tracking-wide">
+                  Release to {action.label}
+                </span>
+                <IconComponent className="h-8 w-8" />
+              </div>
+            );
+          })()}
+        </div>
+      )}
+
+      {/* Full swipe progress indicator (before committed) */}
+      {fullSwipe && fullSwipeProgress > 0.3 && !isCommitted && (
         <div 
           className={`
             absolute inset-0 pointer-events-none

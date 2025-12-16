@@ -233,7 +233,7 @@ export const MultipleActions: Story = {
 };
 
 /**
- * Full swipe to trigger action
+ * Full swipe to trigger action - swipe past threshold and release
  */
 export const FullSwipe: Story = {
   render: () => {
@@ -241,14 +241,31 @@ export const FullSwipe: Story = {
       { id: 1, text: 'Review pull request', done: false },
       { id: 2, text: 'Update documentation', done: false },
       { id: 3, text: 'Fix CI pipeline', done: false },
+      { id: 4, text: 'Write unit tests', done: false },
     ]);
 
     return (
       <Stack gap="md">
-        <div className="p-3 bg-success-50 border border-success-200 rounded-lg">
-          <Text size="sm" className="text-success-800">
-            <strong>Full swipe enabled:</strong> Swipe all the way right to complete, or all the way left to delete.
-          </Text>
+        <div className="p-4 bg-accent-50 border border-accent-200 rounded-lg">
+          <Stack gap="sm">
+            <Text size="sm" weight="semibold" className="text-accent-800">
+              Full Swipe Mode
+            </Text>
+            <Text size="sm" className="text-accent-700">
+              Swipe past the threshold (40%) and the action will trigger automatically when you release. 
+              Watch for the "Release to..." indicator and haptic feedback.
+            </Text>
+            <Stack direction="horizontal" gap="md" className="mt-2">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-success-500" />
+                <Text size="xs" className="text-ink-600">Swipe right → Done</Text>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-error-500" />
+                <Text size="xs" className="text-ink-600">Swipe left → Delete</Text>
+              </div>
+            </Stack>
+          </Stack>
         </div>
         <Stack gap="none" className="border border-paper-200 rounded-lg overflow-hidden">
           {todos.map((todo) => (
@@ -263,8 +280,8 @@ export const FullSwipe: Story = {
                   color: 'success', 
                   label: 'Done', 
                   onClick: async () => {
-                    await new Promise(r => setTimeout(r, 500));
-                    setTodos(todos.filter(t => t.id !== todo.id));
+                    await new Promise(r => setTimeout(r, 300));
+                    setTodos(prev => prev.filter(t => t.id !== todo.id));
                   }
                 }
               ]}
@@ -274,7 +291,7 @@ export const FullSwipe: Story = {
                   icon: Trash, 
                   color: 'destructive', 
                   label: 'Delete', 
-                  onClick: () => setTodos(todos.filter(t => t.id !== todo.id))
+                  onClick: () => setTodos(prev => prev.filter(t => t.id !== todo.id))
                 }
               ]}
             >
