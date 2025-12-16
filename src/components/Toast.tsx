@@ -4,6 +4,11 @@ import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react';
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 export type ToastPosition = 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center' | 'bottom-center';
 
+export interface ToastAction {
+  label: string;
+  onClick: () => void;
+}
+
 export interface ToastProps {
   id: string;
   type: ToastType;
@@ -11,6 +16,8 @@ export interface ToastProps {
   message: string;
   duration?: number;
   onClose: (id: string) => void;
+  /** Optional action button (e.g., Undo) */
+  action?: ToastAction;
 }
 
 const toastStyles: Record<ToastType, { bg: string; border: string; icon: React.ReactNode }> = {
@@ -36,7 +43,7 @@ const toastStyles: Record<ToastType, { bg: string; border: string; icon: React.R
   },
 };
 
-export default function Toast({ id, type, title, message, duration = 5000, onClose }: ToastProps) {
+export default function Toast({ id, type, title, message, duration = 5000, onClose, action }: ToastProps) {
   const [isExiting, setIsExiting] = useState(false);
   const styles = toastStyles[type];
 
@@ -46,6 +53,13 @@ export default function Toast({ id, type, title, message, duration = 5000, onClo
       onClose(id);
     }, 300); // Match animation duration
   }, [id, onClose]);
+
+  const handleAction = useCallback(() => {
+    if (action) {
+      action.onClick();
+      handleClose();
+    }
+  }, [action, handleClose]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -66,6 +80,14 @@ export default function Toast({ id, type, title, message, duration = 5000, onClo
         <div className="flex-1 min-w-0">
           <h4 className="text-sm font-medium text-ink-900 mb-1">{title}</h4>
           <p className="text-sm text-ink-600">{message}</p>
+          {action && (
+            <button
+              onClick={handleAction}
+              className="mt-2 text-sm font-medium text-accent-600 hover:text-accent-700 transition-colors"
+            >
+              {action.label}
+            </button>
+          )}
         </div>
         <button
           onClick={handleClose}

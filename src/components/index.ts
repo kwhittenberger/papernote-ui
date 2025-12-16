@@ -84,7 +84,7 @@ export type { TextProps } from './Text';
 
 // Feedback Components
 export { default as Toast, ToastContainer } from './Toast';
-export type { ToastProps, ToastType } from './Toast';
+export type { ToastProps, ToastType, ToastAction } from './Toast';
 
 export { default as Alert } from './Alert';
 export type { AlertProps } from './Alert';
@@ -209,6 +209,9 @@ export type { HorizontalScrollProps } from './HorizontalScroll';
 
 export { default as SwipeableCard } from './SwipeableCard';
 export type { SwipeableCardProps, SwipeAction as SwipeableCardAction } from './SwipeableCard';
+
+export { default as SwipeableListItem } from './SwipeableListItem';
+export type { SwipeableListItemProps, SwipeListAction } from './SwipeableListItem';
 
 export { default as NotificationBanner } from './NotificationBanner';
 export type { NotificationBannerProps, NotificationBannerAction } from './NotificationBanner';
