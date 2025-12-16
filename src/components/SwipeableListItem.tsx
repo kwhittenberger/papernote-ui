@@ -6,15 +6,19 @@ import { Loader2 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 /**
- * Action configuration for swipe gestures
+ * Single action configuration for swipe gestures
  */
 export interface SwipeListAction {
+  /** Unique identifier for the action */
+  id: string;
   /** Background color variant or custom Tailwind class */
-  color: 'destructive' | 'warning' | 'success' | 'primary' | string;
+  color: 'destructive' | 'warning' | 'success' | 'primary' | 'neutral' | string;
   /** Lucide icon to display */
   icon: LucideIcon;
-  /** Label for accessibility */
+  /** Label shown below icon */
   label: string;
+  /** Click handler (can be async) */
+  onClick: () => void | Promise<void>;
 }
 
 /**
@@ -23,82 +27,104 @@ export interface SwipeListAction {
 export interface SwipeableListItemProps {
   /** List item content */
   children: React.ReactNode;
-  /** Handler called when swiped right past threshold (can be async) */
-  onSwipeRight?: () => void | Promise<void>;
-  /** Handler called when swiped left past threshold (can be async) */
-  onSwipeLeft?: () => void | Promise<void>;
-  /** Right swipe action configuration (revealed when swiping right) */
-  rightAction?: SwipeListAction;
-  /** Left swipe action configuration (revealed when swiping left) */
-  leftAction?: SwipeListAction;
-  /** Pixels of swipe before action triggers (default: 100) */
-  swipeThreshold?: number;
+  /** Actions shown when swiping left (appear on right side) */
+  leftActions?: SwipeListAction[];
+  /** Actions shown when swiping right (appear on left side) */
+  rightActions?: SwipeListAction[];
+  /** Width per action button in pixels (default: 72) */
+  actionWidth?: number;
+  /** Enable full swipe to trigger first action (default: false) */
+  fullSwipe?: boolean;
+  /** Full swipe threshold as percentage of container width (default: 0.5) */
+  fullSwipeThreshold?: number;
   /** Disable swipe interactions */
   disabled?: boolean;
   /** Additional class name */
   className?: string;
+  /** Callback when swipe state changes */
+  onSwipeChange?: (direction: 'left' | 'right' | null) => void;
 }
 
 // Color classes for action backgrounds
-const getColorClass = (color: SwipeListAction['color']): string => {
-  const colorMap: Record<string, string> = {
-    destructive: 'bg-error-500',
-    warning: 'bg-warning-500',
-    success: 'bg-success-500',
-    primary: 'bg-accent-500',
+const getColorClasses = (color: SwipeListAction['color']): { bg: string; hover: string } => {
+  const colorMap: Record<string, { bg: string; hover: string }> = {
+    destructive: { bg: 'bg-gradient-to-r from-error-500 to-error-600', hover: 'hover:from-error-600 hover:to-error-700' },
+    warning: { bg: 'bg-gradient-to-r from-warning-500 to-warning-600', hover: 'hover:from-warning-600 hover:to-warning-700' },
+    success: { bg: 'bg-gradient-to-r from-success-500 to-success-600', hover: 'hover:from-success-600 hover:to-success-700' },
+    primary: { bg: 'bg-gradient-to-r from-accent-500 to-accent-600', hover: 'hover:from-accent-600 hover:to-accent-700' },
+    neutral: { bg: 'bg-gradient-to-r from-paper-400 to-paper-500', hover: 'hover:from-paper-500 hover:to-paper-600' },
   };
-  return colorMap[color] || color;
+  return colorMap[color] || { bg: color, hover: '' };
 };
 
 /**
- * SwipeableListItem - List item with swipe-to-action functionality
+ * SwipeableListItem - List item with swipe-to-reveal action buttons
  *
- * Designed for mobile workflows with keyboard accessibility:
- * - Swipe right to approve/confirm
- * - Swipe left to dismiss/delete
- * - Arrow keys for keyboard navigation
+ * Features:
+ * - Multiple actions per side (like email apps)
+ * - Full swipe to trigger primary action
+ * - Keyboard accessibility (Arrow keys + Tab + Enter)
  * - Async callback support with loading state
+ * - Haptic feedback on mobile
+ * - Smooth animations and visual polish
  *
- * @example
+ * @example Single action per side
  * ```tsx
  * <SwipeableListItem
- *   onSwipeRight={() => handleApprove()}
- *   onSwipeLeft={() => handleDismiss()}
- *   rightAction={{
- *     icon: Check,
- *     color: 'success',
- *     label: 'Approve'
- *   }}
- *   leftAction={{
- *     icon: X,
- *     color: 'destructive',
- *     label: 'Dismiss'
- *   }}
+ *   rightActions={[
+ *     { id: 'approve', icon: Check, color: 'success', label: 'Approve', onClick: handleApprove }
+ *   ]}
+ *   leftActions={[
+ *     { id: 'delete', icon: Trash, color: 'destructive', label: 'Delete', onClick: handleDelete }
+ *   ]}
  * >
  *   <div className="p-4">List item content</div>
+ * </SwipeableListItem>
+ * ```
+ *
+ * @example Multiple actions (email-style)
+ * ```tsx
+ * <SwipeableListItem
+ *   leftActions={[
+ *     { id: 'delete', icon: Trash, color: 'destructive', label: 'Delete', onClick: handleDelete },
+ *     { id: 'archive', icon: Archive, color: 'warning', label: 'Archive', onClick: handleArchive },
+ *   ]}
+ *   rightActions={[
+ *     { id: 'read', icon: Mail, color: 'primary', label: 'Read', onClick: handleRead },
+ *     { id: 'star', icon: Star, color: 'warning', label: 'Star', onClick: handleStar },
+ *   ]}
+ *   fullSwipe
+ * >
+ *   <EmailListItem />
  * </SwipeableListItem>
  * ```
  */
 export function SwipeableListItem({
   children,
-  onSwipeRight,
-  onSwipeLeft,
-  rightAction,
-  leftAction,
-  swipeThreshold = 100,
+  leftActions = [],
+  rightActions = [],
+  actionWidth = 72,
+  fullSwipe = false,
+  fullSwipeThreshold = 0.5,
   disabled = false,
   className = '',
+  onSwipeChange,
 }: SwipeableListItemProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [offsetX, setOffsetX] = useState(0);
-  const [isTriggered, setIsTriggered] = useState<'left' | 'right' | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [keyboardDirection, setKeyboardDirection] = useState<'left' | 'right' | null>(null);
+  const [activeDirection, setActiveDirection] = useState<'left' | 'right' | null>(null);
+  const [loadingActionId, setLoadingActionId] = useState<string | null>(null);
+  const [focusedActionIndex, setFocusedActionIndex] = useState<number>(-1);
   
   const startX = useRef(0);
   const startY = useRef(0);
+  const startTime = useRef(0);
   const isHorizontalSwipe = useRef<boolean | null>(null);
+
+  // Calculate total widths
+  const leftActionsWidth = leftActions.length * actionWidth;
+  const rightActionsWidth = rightActions.length * actionWidth;
 
   // Trigger haptic feedback
   const triggerHaptic = useCallback((style: 'light' | 'medium' | 'heavy' = 'medium') => {
@@ -112,44 +138,41 @@ export function SwipeableListItem({
     }
   }, []);
 
-  // Execute action with async support
-  const executeAction = useCallback(async (direction: 'left' | 'right') => {
-    const handler = direction === 'right' ? onSwipeRight : onSwipeLeft;
-    if (!handler) return;
+  // Reset position
+  const resetPosition = useCallback(() => {
+    setOffsetX(0);
+    setActiveDirection(null);
+    setFocusedActionIndex(-1);
+    onSwipeChange?.(null);
+  }, [onSwipeChange]);
 
-    setIsLoading(true);
+  // Execute action with async support
+  const executeAction = useCallback(async (action: SwipeListAction) => {
+    setLoadingActionId(action.id);
     triggerHaptic('heavy');
-    
-    // Animate out
-    const slideDistance = direction === 'right' ? window.innerWidth : -window.innerWidth;
-    setOffsetX(slideDistance);
 
     try {
-      await handler();
+      await action.onClick();
     } finally {
-      // Reset state after animation
-      setTimeout(() => {
-        setOffsetX(0);
-        setIsTriggered(null);
-        setIsLoading(false);
-        setKeyboardDirection(null);
-      }, 200);
+      setLoadingActionId(null);
+      resetPosition();
     }
-  }, [onSwipeRight, onSwipeLeft, triggerHaptic]);
+  }, [triggerHaptic, resetPosition]);
 
   // Handle drag start
   const handleDragStart = useCallback((clientX: number, clientY: number) => {
-    if (disabled || isLoading) return;
+    if (disabled || loadingActionId) return;
     
     setIsDragging(true);
     startX.current = clientX;
     startY.current = clientY;
+    startTime.current = Date.now();
     isHorizontalSwipe.current = null;
-  }, [disabled, isLoading]);
+  }, [disabled, loadingActionId]);
 
   // Handle drag move
   const handleDragMove = useCallback((clientX: number, clientY: number) => {
-    if (!isDragging || disabled || isLoading) return;
+    if (!isDragging || disabled || loadingActionId) return;
 
     const deltaX = clientX - startX.current;
     const deltaY = clientY - startY.current;
@@ -167,63 +190,97 @@ export function SwipeableListItem({
     // Only process horizontal swipes
     if (isHorizontalSwipe.current !== true) return;
 
-    // Check if we should allow this direction
-    const canSwipeRight = onSwipeRight !== undefined && rightAction !== undefined;
-    const canSwipeLeft = onSwipeLeft !== undefined && leftAction !== undefined;
-
     let newOffset = deltaX;
     
-    // Limit swipe direction based on available actions
-    if (!canSwipeRight && deltaX > 0) newOffset = 0;
-    if (!canSwipeLeft && deltaX < 0) newOffset = 0;
-
-    // Add resistance when exceeding threshold
-    const maxSwipe = swipeThreshold * 1.5;
-    if (Math.abs(newOffset) > swipeThreshold) {
-      const overflow = Math.abs(newOffset) - swipeThreshold;
-      const resistance = overflow * 0.3;
-      newOffset = newOffset > 0 
-        ? swipeThreshold + resistance 
-        : -(swipeThreshold + resistance);
-      newOffset = Math.max(-maxSwipe, Math.min(maxSwipe, newOffset));
+    // Swiping left (reveals left actions on right side)
+    if (deltaX < 0) {
+      if (leftActions.length === 0) {
+        newOffset = deltaX * 0.2; // Heavy resistance if no actions
+      } else {
+        const maxSwipe = fullSwipe 
+          ? -(containerRef.current?.offsetWidth || 300) 
+          : -leftActionsWidth;
+        newOffset = Math.max(maxSwipe, deltaX);
+        
+        // Apply resistance past the action buttons
+        if (newOffset < -leftActionsWidth && !fullSwipe) {
+          const overSwipe = newOffset + leftActionsWidth;
+          newOffset = -leftActionsWidth + overSwipe * 0.3;
+        }
+      }
+      if (activeDirection !== 'left') {
+        setActiveDirection('left');
+        onSwipeChange?.('left');
+      }
+    }
+    // Swiping right (reveals right actions on left side)
+    else if (deltaX > 0) {
+      if (rightActions.length === 0) {
+        newOffset = deltaX * 0.2; // Heavy resistance if no actions
+      } else {
+        const maxSwipe = fullSwipe 
+          ? (containerRef.current?.offsetWidth || 300) 
+          : rightActionsWidth;
+        newOffset = Math.min(maxSwipe, deltaX);
+        
+        // Apply resistance past the action buttons
+        if (newOffset > rightActionsWidth && !fullSwipe) {
+          const overSwipe = newOffset - rightActionsWidth;
+          newOffset = rightActionsWidth + overSwipe * 0.3;
+        }
+      }
+      if (activeDirection !== 'right') {
+        setActiveDirection('right');
+        onSwipeChange?.('right');
+      }
     }
 
     setOffsetX(newOffset);
-
-    // Check for threshold crossing and trigger haptic
-    const newTriggered = Math.abs(newOffset) >= swipeThreshold
-      ? (newOffset > 0 ? 'right' : 'left')
-      : null;
-
-    if (newTriggered !== isTriggered) {
-      if (newTriggered) {
-        triggerHaptic('medium');
-      }
-      setIsTriggered(newTriggered);
-    }
-  }, [isDragging, disabled, isLoading, onSwipeRight, onSwipeLeft, rightAction, leftAction, swipeThreshold, isTriggered, triggerHaptic]);
+  }, [isDragging, disabled, loadingActionId, leftActions.length, rightActions.length, leftActionsWidth, rightActionsWidth, fullSwipe, activeDirection, onSwipeChange]);
 
   // Handle drag end
   const handleDragEnd = useCallback(() => {
     if (!isDragging) return;
     
     setIsDragging(false);
-
-    // Check if action should be triggered
-    if (Math.abs(offsetX) >= swipeThreshold) {
-      if (offsetX > 0 && onSwipeRight && rightAction) {
-        executeAction('right');
-        return;
-      } else if (offsetX < 0 && onSwipeLeft && leftAction) {
-        executeAction('left');
-        return;
+    
+    const velocity = Math.abs(offsetX) / (Date.now() - startTime.current);
+    const containerWidth = containerRef.current?.offsetWidth || 300;
+    
+    // Check for full swipe trigger
+    if (fullSwipe) {
+      const swipePercentage = Math.abs(offsetX) / containerWidth;
+      
+      if (swipePercentage >= fullSwipeThreshold || velocity > 0.5) {
+        if (offsetX < 0 && leftActions.length > 0) {
+          executeAction(leftActions[0]);
+          return;
+        } else if (offsetX > 0 && rightActions.length > 0) {
+          executeAction(rightActions[0]);
+          return;
+        }
       }
     }
 
-    // Snap back
-    setOffsetX(0);
-    setIsTriggered(null);
-  }, [isDragging, offsetX, swipeThreshold, onSwipeRight, onSwipeLeft, rightAction, leftAction, executeAction]);
+    // Snap to open or closed position
+    const threshold = actionWidth * 0.5;
+    if (Math.abs(offsetX) >= threshold || velocity > 0.3) {
+      // Snap open
+      if (offsetX < 0 && leftActions.length > 0) {
+        setOffsetX(-leftActionsWidth);
+        setActiveDirection('left');
+        onSwipeChange?.('left');
+      } else if (offsetX > 0 && rightActions.length > 0) {
+        setOffsetX(rightActionsWidth);
+        setActiveDirection('right');
+        onSwipeChange?.('right');
+      } else {
+        resetPosition();
+      }
+    } else {
+      resetPosition();
+    }
+  }, [isDragging, offsetX, fullSwipe, fullSwipeThreshold, leftActions, rightActions, leftActionsWidth, rightActionsWidth, actionWidth, executeAction, resetPosition, onSwipeChange]);
 
   // Touch event handlers
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -232,8 +289,6 @@ export function SwipeableListItem({
 
   const handleTouchMove = (e: React.TouchEvent) => {
     handleDragMove(e.touches[0].clientX, e.touches[0].clientY);
-    
-    // Prevent vertical scroll if horizontal swipe
     if (isHorizontalSwipe.current === true) {
       e.preventDefault();
     }
@@ -243,7 +298,7 @@ export function SwipeableListItem({
     handleDragEnd();
   };
 
-  // Mouse event handlers (for desktop testing)
+  // Mouse event handlers
   const handleMouseDown = (e: React.MouseEvent) => {
     handleDragStart(e.clientX, e.clientY);
   };
@@ -268,150 +323,190 @@ export function SwipeableListItem({
     };
   }, [isDragging, handleDragMove, handleDragEnd]);
 
-  // Keyboard event handlers
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (disabled || isLoading) return;
+  // Close on outside click
+  useEffect(() => {
+    if (activeDirection === null) return;
 
-    const canSwipeRight = onSwipeRight !== undefined && rightAction !== undefined;
-    const canSwipeLeft = onSwipeLeft !== undefined && leftAction !== undefined;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        resetPosition();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [activeDirection, resetPosition]);
+
+  // Keyboard navigation
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (disabled || loadingActionId) return;
+
+    const currentActions = activeDirection === 'left' ? leftActions : 
+                          activeDirection === 'right' ? rightActions : [];
 
     switch (e.key) {
       case 'ArrowRight':
-        if (canSwipeRight) {
-          e.preventDefault();
-          setKeyboardDirection('right');
-          setOffsetX(swipeThreshold);
-          setIsTriggered('right');
-          triggerHaptic('medium');
+        e.preventDefault();
+        if (activeDirection === null && rightActions.length > 0) {
+          setOffsetX(rightActionsWidth);
+          setActiveDirection('right');
+          setFocusedActionIndex(0);
+          onSwipeChange?.('right');
+          triggerHaptic('light');
+        } else if (activeDirection === 'right' && focusedActionIndex < rightActions.length - 1) {
+          setFocusedActionIndex(prev => prev + 1);
+        } else if (activeDirection === 'left') {
+          resetPosition();
         }
         break;
       case 'ArrowLeft':
-        if (canSwipeLeft) {
+        e.preventDefault();
+        if (activeDirection === null && leftActions.length > 0) {
+          setOffsetX(-leftActionsWidth);
+          setActiveDirection('left');
+          setFocusedActionIndex(0);
+          onSwipeChange?.('left');
+          triggerHaptic('light');
+        } else if (activeDirection === 'left' && focusedActionIndex < leftActions.length - 1) {
+          setFocusedActionIndex(prev => prev + 1);
+        } else if (activeDirection === 'right') {
+          resetPosition();
+        }
+        break;
+      case 'Tab':
+        if (activeDirection !== null && currentActions.length > 0) {
           e.preventDefault();
-          setKeyboardDirection('left');
-          setOffsetX(-swipeThreshold);
-          setIsTriggered('left');
-          triggerHaptic('medium');
+          if (e.shiftKey) {
+            setFocusedActionIndex(prev => prev <= 0 ? currentActions.length - 1 : prev - 1);
+          } else {
+            setFocusedActionIndex(prev => prev >= currentActions.length - 1 ? 0 : prev + 1);
+          }
         }
         break;
       case 'Enter':
-        if (keyboardDirection) {
+      case ' ':
+        if (activeDirection !== null && focusedActionIndex >= 0 && focusedActionIndex < currentActions.length) {
           e.preventDefault();
-          executeAction(keyboardDirection);
+          executeAction(currentActions[focusedActionIndex]);
         }
         break;
       case 'Escape':
-        if (keyboardDirection) {
+        if (activeDirection !== null) {
           e.preventDefault();
-          setKeyboardDirection(null);
-          setOffsetX(0);
-          setIsTriggered(null);
+          resetPosition();
         }
         break;
     }
-  }, [disabled, isLoading, onSwipeRight, onSwipeLeft, rightAction, leftAction, swipeThreshold, keyboardDirection, executeAction, triggerHaptic]);
+  }, [disabled, loadingActionId, activeDirection, leftActions, rightActions, leftActionsWidth, rightActionsWidth, focusedActionIndex, executeAction, resetPosition, onSwipeChange, triggerHaptic]);
 
-  // Reset keyboard state on blur
-  const handleBlur = useCallback(() => {
-    if (keyboardDirection) {
-      setKeyboardDirection(null);
-      setOffsetX(0);
-      setIsTriggered(null);
-    }
-  }, [keyboardDirection]);
-
-  // Calculate action opacity based on swipe distance
-  const rightActionOpacity = offsetX > 0 ? Math.min(1, offsetX / swipeThreshold) : 0;
-  const leftActionOpacity = offsetX < 0 ? Math.min(1, Math.abs(offsetX) / swipeThreshold) : 0;
+  // Render action button
+  const renderActionButton = (action: SwipeListAction, index: number, side: 'left' | 'right') => {
+    const { bg, hover } = getColorClasses(action.color);
+    const isLoading = loadingActionId === action.id;
+    const isFocused = activeDirection === side && focusedActionIndex === index;
+    const IconComponent = action.icon;
+    
+    return (
+      <button
+        key={action.id}
+        onClick={(e) => {
+          e.stopPropagation();
+          executeAction(action);
+        }}
+        disabled={!!loadingActionId}
+        className={`
+          flex flex-col items-center justify-center gap-1
+          h-full text-white
+          ${bg} ${hover}
+          transition-all duration-150 ease-out
+          focus:outline-none
+          ${isFocused ? 'ring-2 ring-white ring-inset scale-105' : ''}
+          ${isLoading ? 'opacity-75' : 'active:scale-95'}
+          disabled:cursor-not-allowed
+        `}
+        style={{ width: actionWidth }}
+        aria-label={action.label}
+      >
+        <div className={`transition-transform duration-200 ${isFocused ? 'scale-110' : ''}`}>
+          {isLoading ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : (
+            <IconComponent className="h-5 w-5" />
+          )}
+        </div>
+        <span className="text-[10px] font-medium uppercase tracking-wide opacity-90">
+          {action.label}
+        </span>
+      </button>
+    );
+  };
 
   // Build aria-label
   const ariaLabel = [
     'Swipeable list item.',
-    rightAction && onSwipeRight ? `Swipe right or press Arrow Right to ${rightAction.label}.` : '',
-    leftAction && onSwipeLeft ? `Swipe left or press Arrow Left to ${leftAction.label}.` : '',
-    keyboardDirection ? `Press Enter to confirm or Escape to cancel.` : '',
+    rightActions.length > 0 ? `Swipe right for ${rightActions.map(a => a.label).join(', ')}.` : '',
+    leftActions.length > 0 ? `Swipe left for ${leftActions.map(a => a.label).join(', ')}.` : '',
   ].filter(Boolean).join(' ');
+
+  // Calculate visual progress for full swipe indicator
+  const fullSwipeProgress = fullSwipe 
+    ? Math.min(1, Math.abs(offsetX) / ((containerRef.current?.offsetWidth || 300) * fullSwipeThreshold))
+    : 0;
 
   return (
     <div 
       ref={containerRef}
       className={`relative overflow-hidden ${className}`}
     >
-      {/* Right action background (revealed when swiping right) */}
-      {rightAction && onSwipeRight && (
+      {/* Right actions (revealed when swiping right) */}
+      {rightActions.length > 0 && (
         <div
-          className={`
-            absolute inset-y-0 left-0 flex items-center justify-start pl-6
-            ${getColorClass(rightAction.color)}
-            transition-opacity duration-100
-          `}
-          style={{
-            opacity: rightActionOpacity,
-            width: Math.abs(offsetX) + 20,
-          }}
-          aria-hidden="true"
+          className="absolute left-0 top-0 bottom-0 flex shadow-inner"
+          style={{ width: rightActionsWidth }}
         >
-          <div 
-            className={`
-              text-white transform transition-transform duration-200
-              ${isTriggered === 'right' ? 'scale-125' : 'scale-100'}
-            `}
-          >
-            {isLoading && isTriggered === 'right' ? (
-              <Loader2 className="h-6 w-6 animate-spin" />
-            ) : (
-              <rightAction.icon className="h-6 w-6" />
-            )}
-          </div>
+          {rightActions.map((action, index) => renderActionButton(action, index, 'right'))}
         </div>
       )}
 
-      {/* Left action background (revealed when swiping left) */}
-      {leftAction && onSwipeLeft && (
+      {/* Left actions (revealed when swiping left) */}
+      {leftActions.length > 0 && (
         <div
-          className={`
-            absolute inset-y-0 right-0 flex items-center justify-end pr-6
-            ${getColorClass(leftAction.color)}
-            transition-opacity duration-100
-          `}
-          style={{
-            opacity: leftActionOpacity,
-            width: Math.abs(offsetX) + 20,
-          }}
-          aria-hidden="true"
+          className="absolute right-0 top-0 bottom-0 flex shadow-inner"
+          style={{ width: leftActionsWidth }}
         >
-          <div 
-            className={`
-              text-white transform transition-transform duration-200
-              ${isTriggered === 'left' ? 'scale-125' : 'scale-100'}
-            `}
-          >
-            {isLoading && isTriggered === 'left' ? (
-              <Loader2 className="h-6 w-6 animate-spin" />
-            ) : (
-              <leftAction.icon className="h-6 w-6" />
-            )}
-          </div>
+          {leftActions.map((action, index) => renderActionButton(action, index, 'left'))}
         </div>
       )}
 
-      {/* List item content */}
+      {/* Full swipe indicator overlay */}
+      {fullSwipe && fullSwipeProgress > 0.3 && (
+        <div 
+          className={`
+            absolute inset-0 pointer-events-none
+            ${offsetX > 0 ? 'bg-gradient-to-r from-success-500/20 to-transparent' : 'bg-gradient-to-l from-error-500/20 to-transparent'}
+          `}
+          style={{ opacity: fullSwipeProgress }}
+        />
+      )}
+
+      {/* Main content */}
       <div
         className={`
           relative bg-white
+          ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}
           ${isDragging ? '' : 'transition-transform duration-200 ease-out'}
           ${disabled ? 'opacity-50 pointer-events-none' : ''}
-          ${keyboardDirection ? 'ring-2 ring-accent-500 ring-inset' : ''}
+          ${isDragging ? 'shadow-lg' : activeDirection ? 'shadow-md' : ''}
         `}
         style={{
           transform: `translateX(${offsetX}px)`,
+          touchAction: 'pan-y',
         }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
         onMouseDown={handleMouseDown}
         onKeyDown={handleKeyDown}
-        onBlur={handleBlur}
         role="button"
         aria-label={ariaLabel}
         tabIndex={disabled ? -1 : 0}

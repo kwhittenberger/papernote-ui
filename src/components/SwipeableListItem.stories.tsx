@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { SwipeableListItem } from './SwipeableListItem';
-import { Check, X, Archive, Trash, Star, Mail, MailOpen } from 'lucide-react';
+import { Check, X, Archive, Trash, Star, Mail, MailOpen, Flag, Clock, Pin, Bell, BellOff, Edit, MoreHorizontal } from 'lucide-react';
 import Stack from './Stack';
 import Text from './Text';
 import Badge from './Badge';
@@ -14,25 +14,28 @@ const meta: Meta<typeof SwipeableListItem> = {
     docs: {
       description: {
         component: `
-A list item component with swipe-to-action functionality for mobile touch gestures.
+A list item component with swipe-to-reveal action buttons for mobile touch gestures.
 
 ## Features
-- **Touch gestures**: Swipe left or right to reveal actions
-- **Mouse support**: Works with mouse drag for desktop testing
-- **Keyboard accessible**: Arrow keys to preview, Enter to confirm, Escape to cancel
-- **Async support**: Handles async callbacks with loading state
-- **Haptic feedback**: Vibration on mobile devices
+- **Multiple actions per side** - Like email apps, reveal multiple action buttons
+- **Full swipe mode** - Swipe all the way to trigger primary action
+- **Touch & mouse support** - Works on mobile and desktop
+- **Keyboard accessible** - Arrow keys, Tab, Enter, Escape
+- **Async support** - Loading states for async operations
+- **Haptic feedback** - Vibration on mobile devices
+- **Polished visuals** - Gradients, shadows, smooth animations
 
-## Accessibility
-- Use Arrow Left/Right to simulate swipe direction
-- Press Enter to confirm the action when highlighted
-- Press Escape to cancel and reset
+## Keyboard Navigation
+- **Arrow Left/Right** - Open action panels
+- **Tab** - Navigate between actions
+- **Enter/Space** - Execute focused action
+- **Escape** - Close and reset
 
 ## Use Cases
-- Email/message lists (mark read, delete, archive)
-- Transaction approvals (approve, reject)
-- Todo lists (complete, delete)
-- Notification management (dismiss, action)
+- Email/message lists (mark read, delete, archive, flag)
+- Transaction approvals (approve, reject, defer)
+- Todo lists (complete, delete, snooze)
+- Notification management (dismiss, mute, pin)
         `,
       },
     },
@@ -44,16 +47,6 @@ A list item component with swipe-to-action functionality for mobile touch gestur
       </div>
     ),
   ],
-  argTypes: {
-    swipeThreshold: {
-      control: { type: 'range', min: 50, max: 200, step: 10 },
-      description: 'Pixels of swipe before action triggers',
-    },
-    disabled: {
-      control: 'boolean',
-      description: 'Disable swipe interactions',
-    },
-  },
 };
 
 export default meta;
@@ -63,25 +56,34 @@ type Story = StoryObj<typeof SwipeableListItem>;
 const ListItemContent = ({ 
   title, 
   subtitle, 
-  badge 
+  badge,
+  avatar,
 }: { 
   title: string; 
   subtitle: string; 
   badge?: string;
+  avatar?: string;
 }) => (
-  <div className="p-4 border-b border-paper-200">
-    <Stack direction="horizontal" justify="between" align="center">
-      <Stack gap="xs">
-        <Text weight="medium">{title}</Text>
-        <Text size="sm" className="text-ink-400">{subtitle}</Text>
+  <div className="p-4 border-b border-paper-200 bg-white">
+    <Stack direction="horizontal" gap="md" align="center">
+      {avatar && (
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center text-white font-medium">
+          {avatar}
+        </div>
+      )}
+      <Stack gap="xs" className="flex-1 min-w-0">
+        <Stack direction="horizontal" justify="between" align="center">
+          <Text weight="medium" className="truncate">{title}</Text>
+          {badge && <Badge variant="info" size="sm">{badge}</Badge>}
+        </Stack>
+        <Text size="sm" className="text-ink-500 truncate">{subtitle}</Text>
       </Stack>
-      {badge && <Badge variant="info">{badge}</Badge>}
     </Stack>
   </div>
 );
 
 /**
- * Default example with both swipe directions
+ * Default with single action per side
  */
 export const Default: Story = {
   render: () => {
@@ -91,33 +93,35 @@ export const Default: Story = {
       { id: 3, title: 'Categorize transaction', subtitle: '$89.99 - Unknown merchant' },
     ]);
 
-    const handleApprove = (id: number) => {
-      console.log('Approved:', id);
-      setItems(items.filter(item => item.id !== id));
-    };
-
-    const handleDismiss = (id: number) => {
-      console.log('Dismissed:', id);
-      setItems(items.filter(item => item.id !== id));
-    };
-
     return (
-      <Stack gap="none">
+      <Stack gap="none" className="border border-paper-200 rounded-lg overflow-hidden">
         {items.map((item) => (
           <SwipeableListItem
             key={item.id}
-            onSwipeRight={() => handleApprove(item.id)}
-            onSwipeLeft={() => handleDismiss(item.id)}
-            rightAction={{
-              icon: Check,
-              color: 'success',
-              label: 'Approve',
-            }}
-            leftAction={{
-              icon: X,
-              color: 'destructive',
-              label: 'Dismiss',
-            }}
+            rightActions={[
+              { 
+                id: 'approve', 
+                icon: Check, 
+                color: 'success', 
+                label: 'Approve', 
+                onClick: () => {
+                  console.log('Approved:', item.id);
+                  setItems(items.filter(i => i.id !== item.id));
+                }
+              }
+            ]}
+            leftActions={[
+              { 
+                id: 'dismiss', 
+                icon: X, 
+                color: 'destructive', 
+                label: 'Dismiss', 
+                onClick: () => {
+                  console.log('Dismissed:', item.id);
+                  setItems(items.filter(i => i.id !== item.id));
+                }
+              }
+            ]}
           >
             <ListItemContent title={item.title} subtitle={item.subtitle} />
           </SwipeableListItem>
@@ -133,82 +137,202 @@ export const Default: Story = {
 };
 
 /**
- * Right swipe only (approve action)
+ * Multiple actions per side (email-style)
  */
-export const RightSwipeOnly: Story = {
-  render: () => (
-    <SwipeableListItem
-      onSwipeRight={() => console.log('Approved!')}
-      rightAction={{
-        icon: Check,
-        color: 'success',
-        label: 'Approve',
-      }}
-    >
-      <ListItemContent 
-        title="Swipe right to approve" 
-        subtitle="Only right swipe is enabled"
-        badge="Pending"
-      />
-    </SwipeableListItem>
-  ),
-};
-
-/**
- * Left swipe only (delete action)
- */
-export const LeftSwipeOnly: Story = {
-  render: () => (
-    <SwipeableListItem
-      onSwipeLeft={() => console.log('Deleted!')}
-      leftAction={{
-        icon: Trash,
-        color: 'destructive',
-        label: 'Delete',
-      }}
-    >
-      <ListItemContent 
-        title="Swipe left to delete" 
-        subtitle="Only left swipe is enabled"
-      />
-    </SwipeableListItem>
-  ),
-};
-
-/**
- * With async callbacks showing loading state
- */
-export const AsyncCallbacks: Story = {
+export const MultipleActions: Story = {
   render: () => {
-    const [status, setStatus] = useState<string>('Ready');
+    const [emails, setEmails] = useState([
+      { id: 1, from: 'JD', name: 'John Doe', subject: 'Q4 Budget Review Meeting', time: '10:30 AM', unread: true, starred: false },
+      { id: 2, from: 'TS', name: 'Team Slack', subject: 'New message in #general', time: '9:15 AM', unread: true, starred: false },
+      { id: 3, from: 'HR', name: 'HR Department', subject: 'Holiday Schedule Update', time: 'Yesterday', unread: false, starred: true },
+    ]);
 
-    const handleAsyncAction = async (action: string) => {
+    const toggleStar = (id: number) => {
+      setEmails(emails.map(e => e.id === id ? { ...e, starred: !e.starred } : e));
+    };
+
+    const markRead = (id: number) => {
+      setEmails(emails.map(e => e.id === id ? { ...e, unread: false } : e));
+    };
+
+    return (
+      <Stack gap="none" className="border border-paper-200 rounded-lg overflow-hidden shadow-sm">
+        <div className="bg-paper-100 px-4 py-2 border-b border-paper-200">
+          <Text size="sm" weight="medium" className="text-ink-600">Inbox</Text>
+        </div>
+        {emails.map((email) => (
+          <SwipeableListItem
+            key={email.id}
+            rightActions={[
+              { 
+                id: 'read', 
+                icon: email.unread ? MailOpen : Mail, 
+                color: 'primary', 
+                label: email.unread ? 'Read' : 'Unread', 
+                onClick: () => markRead(email.id)
+              },
+              { 
+                id: 'star', 
+                icon: Star, 
+                color: 'warning', 
+                label: email.starred ? 'Unstar' : 'Star', 
+                onClick: () => toggleStar(email.id)
+              },
+            ]}
+            leftActions={[
+              { 
+                id: 'delete', 
+                icon: Trash, 
+                color: 'destructive', 
+                label: 'Delete', 
+                onClick: () => setEmails(emails.filter(e => e.id !== email.id))
+              },
+              { 
+                id: 'archive', 
+                icon: Archive, 
+                color: 'neutral', 
+                label: 'Archive', 
+                onClick: () => setEmails(emails.filter(e => e.id !== email.id))
+              },
+            ]}
+          >
+            <div className="p-4 border-b border-paper-100 bg-white">
+              <Stack direction="horizontal" gap="md" align="start">
+                <div className={`
+                  w-10 h-10 rounded-full flex items-center justify-center text-white font-medium text-sm
+                  ${email.unread ? 'bg-gradient-to-br from-accent-500 to-accent-700' : 'bg-paper-400'}
+                `}>
+                  {email.from}
+                </div>
+                <Stack gap="xs" className="flex-1 min-w-0">
+                  <Stack direction="horizontal" justify="between" align="center">
+                    <Stack direction="horizontal" gap="sm" align="center">
+                      {email.unread && (
+                        <div className="w-2 h-2 rounded-full bg-accent-500" />
+                      )}
+                      <Text weight={email.unread ? 'semibold' : 'normal'} className="truncate">
+                        {email.name}
+                      </Text>
+                    </Stack>
+                    <Stack direction="horizontal" gap="sm" align="center">
+                      {email.starred && <Star className="h-4 w-4 text-warning-500 fill-warning-500" />}
+                      <Text size="xs" className="text-ink-400">{email.time}</Text>
+                    </Stack>
+                  </Stack>
+                  <Text size="sm" className={email.unread ? 'text-ink-700' : 'text-ink-400'}>
+                    {email.subject}
+                  </Text>
+                </Stack>
+              </Stack>
+            </div>
+          </SwipeableListItem>
+        ))}
+      </Stack>
+    );
+  },
+};
+
+/**
+ * Full swipe to trigger action
+ */
+export const FullSwipe: Story = {
+  render: () => {
+    const [todos, setTodos] = useState([
+      { id: 1, text: 'Review pull request', done: false },
+      { id: 2, text: 'Update documentation', done: false },
+      { id: 3, text: 'Fix CI pipeline', done: false },
+    ]);
+
+    return (
+      <Stack gap="md">
+        <div className="p-3 bg-success-50 border border-success-200 rounded-lg">
+          <Text size="sm" className="text-success-800">
+            <strong>Full swipe enabled:</strong> Swipe all the way right to complete, or all the way left to delete.
+          </Text>
+        </div>
+        <Stack gap="none" className="border border-paper-200 rounded-lg overflow-hidden">
+          {todos.map((todo) => (
+            <SwipeableListItem
+              key={todo.id}
+              fullSwipe
+              fullSwipeThreshold={0.4}
+              rightActions={[
+                { 
+                  id: 'complete', 
+                  icon: Check, 
+                  color: 'success', 
+                  label: 'Done', 
+                  onClick: async () => {
+                    await new Promise(r => setTimeout(r, 500));
+                    setTodos(todos.filter(t => t.id !== todo.id));
+                  }
+                }
+              ]}
+              leftActions={[
+                { 
+                  id: 'delete', 
+                  icon: Trash, 
+                  color: 'destructive', 
+                  label: 'Delete', 
+                  onClick: () => setTodos(todos.filter(t => t.id !== todo.id))
+                }
+              ]}
+            >
+              <div className="p-4 border-b border-paper-100 bg-white">
+                <Stack direction="horizontal" gap="md" align="center">
+                  <div className="w-5 h-5 rounded border-2 border-paper-300" />
+                  <Text>{todo.text}</Text>
+                </Stack>
+              </div>
+            </SwipeableListItem>
+          ))}
+          {todos.length === 0 && (
+            <div className="p-8 text-center text-ink-400">
+              All tasks completed! 🎉
+            </div>
+          )}
+        </Stack>
+      </Stack>
+    );
+  },
+};
+
+/**
+ * With async loading states
+ */
+export const AsyncActions: Story = {
+  render: () => {
+    const [status, setStatus] = useState<string>('');
+
+    const simulateAsync = async (action: string) => {
       setStatus(`Processing ${action}...`);
       await new Promise(resolve => setTimeout(resolve, 1500));
       setStatus(`${action} complete!`);
-      setTimeout(() => setStatus('Ready'), 2000);
+      setTimeout(() => setStatus(''), 2000);
     };
 
     return (
       <Stack gap="md">
-        <Text size="sm" className="text-ink-500">Status: {status}</Text>
+        {status && (
+          <div className="p-3 bg-accent-50 border border-accent-200 rounded-lg">
+            <Text size="sm" className="text-accent-800">{status}</Text>
+          </div>
+        )}
         <SwipeableListItem
-          onSwipeRight={() => handleAsyncAction('approval')}
-          onSwipeLeft={() => handleAsyncAction('rejection')}
-          rightAction={{
-            icon: Check,
-            color: 'success',
-            label: 'Approve',
-          }}
-          leftAction={{
-            icon: X,
-            color: 'destructive',
-            label: 'Reject',
-          }}
+          rightActions={[
+            { id: 'approve', icon: Check, color: 'success', label: 'Approve', onClick: () => simulateAsync('Approval') },
+            { id: 'flag', icon: Flag, color: 'warning', label: 'Flag', onClick: () => simulateAsync('Flagging') },
+          ]}
+          leftActions={[
+            { id: 'reject', icon: X, color: 'destructive', label: 'Reject', onClick: () => simulateAsync('Rejection') },
+            { id: 'defer', icon: Clock, color: 'neutral', label: 'Defer', onClick: () => simulateAsync('Deferral') },
+          ]}
         >
           <ListItemContent 
-            title="Async action demo" 
-            subtitle="Watch for loading spinner during action"
+            avatar="TX"
+            title="Transaction #12345" 
+            subtitle="$2,500.00 - Pending review"
+            badge="Pending"
           />
         </SwipeableListItem>
       </Stack>
@@ -217,132 +341,72 @@ export const AsyncCallbacks: Story = {
 };
 
 /**
- * Disabled state
+ * Notifications example with varied actions
  */
-export const Disabled: Story = {
-  render: () => (
-    <SwipeableListItem
-      onSwipeRight={() => console.log('Approved!')}
-      onSwipeLeft={() => console.log('Dismissed!')}
-      rightAction={{
-        icon: Check,
-        color: 'success',
-        label: 'Approve',
-      }}
-      leftAction={{
-        icon: X,
-        color: 'destructive',
-        label: 'Dismiss',
-      }}
-      disabled
-    >
-      <ListItemContent 
-        title="Disabled list item" 
-        subtitle="Swipe gestures are disabled"
-      />
-    </SwipeableListItem>
-  ),
-};
-
-/**
- * Custom colors
- */
-export const CustomColors: Story = {
-  render: () => (
-    <Stack gap="none">
-      <SwipeableListItem
-        onSwipeRight={() => console.log('Starred!')}
-        onSwipeLeft={() => console.log('Archived!')}
-        rightAction={{
-          icon: Star,
-          color: 'warning',
-          label: 'Star',
-        }}
-        leftAction={{
-          icon: Archive,
-          color: 'primary',
-          label: 'Archive',
-        }}
-      >
-        <ListItemContent 
-          title="Custom action colors" 
-          subtitle="Warning (star) and Primary (archive)"
-        />
-      </SwipeableListItem>
-    </Stack>
-  ),
-};
-
-/**
- * Email inbox example
- */
-export const EmailInbox: Story = {
+export const Notifications: Story = {
   render: () => {
-    const [emails, setEmails] = useState([
-      { id: 1, from: 'boss@company.com', subject: 'Q4 Budget Review', time: '10:30 AM', unread: true },
-      { id: 2, from: 'team@company.com', subject: 'Sprint Planning Notes', time: '9:15 AM', unread: true },
-      { id: 3, from: 'hr@company.com', subject: 'Holiday Schedule Update', time: 'Yesterday', unread: false },
+    const [notifications, setNotifications] = useState([
+      { id: 1, title: 'New comment on your post', subtitle: 'Sarah replied to your question', time: '2m ago', pinned: false },
+      { id: 2, title: 'Meeting reminder', subtitle: 'Team standup in 15 minutes', time: '15m ago', pinned: true },
+      { id: 3, title: 'Weekly report ready', subtitle: 'Your analytics report is available', time: '1h ago', pinned: false },
     ]);
 
     return (
-      <Stack gap="none" className="border border-paper-200 rounded-lg overflow-hidden">
-        {emails.map((email) => (
+      <Stack gap="none" className="border border-paper-200 rounded-lg overflow-hidden shadow-sm">
+        <div className="bg-paper-100 px-4 py-2 border-b border-paper-200 flex justify-between items-center">
+          <Text size="sm" weight="medium" className="text-ink-600">Notifications</Text>
+          <Badge variant="primary" size="sm">{notifications.length}</Badge>
+        </div>
+        {notifications.map((notif) => (
           <SwipeableListItem
-            key={email.id}
-            onSwipeRight={() => {
-              console.log('Marked as read:', email.id);
-              setEmails(emails.map(e => 
-                e.id === email.id ? { ...e, unread: false } : e
-              ));
-            }}
-            onSwipeLeft={() => {
-              console.log('Deleted:', email.id);
-              setEmails(emails.filter(e => e.id !== email.id));
-            }}
-            rightAction={{
-              icon: email.unread ? MailOpen : Mail,
-              color: 'primary',
-              label: email.unread ? 'Mark as read' : 'Mark as unread',
-            }}
-            leftAction={{
-              icon: Trash,
-              color: 'destructive',
-              label: 'Delete',
-            }}
+            key={notif.id}
+            rightActions={[
+              { 
+                id: 'pin', 
+                icon: Pin, 
+                color: notif.pinned ? 'warning' : 'neutral', 
+                label: notif.pinned ? 'Unpin' : 'Pin', 
+                onClick: () => setNotifications(notifications.map(n => 
+                  n.id === notif.id ? { ...n, pinned: !n.pinned } : n
+                ))
+              },
+            ]}
+            leftActions={[
+              { 
+                id: 'dismiss', 
+                icon: X, 
+                color: 'destructive', 
+                label: 'Dismiss', 
+                onClick: () => setNotifications(notifications.filter(n => n.id !== notif.id))
+              },
+              { 
+                id: 'mute', 
+                icon: BellOff, 
+                color: 'neutral', 
+                label: 'Mute', 
+                onClick: () => console.log('Muted')
+              },
+            ]}
           >
-            <div className="p-4 border-b border-paper-100">
-              <Stack direction="horizontal" justify="between" align="start">
+            <div className="p-4 border-b border-paper-100 bg-white">
+              <Stack direction="horizontal" gap="md" align="start">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center">
+                  <Bell className="h-5 w-5 text-white" />
+                </div>
                 <Stack gap="xs" className="flex-1 min-w-0">
-                  <Stack direction="horizontal" gap="sm" align="center">
-                    {email.unread && (
-                      <div className="w-2 h-2 rounded-full bg-accent-500 flex-shrink-0" />
-                    )}
-                    <Text 
-                      weight={email.unread ? 'semibold' : 'normal'}
-                      className="truncate"
-                    >
-                      {email.from}
-                    </Text>
+                  <Stack direction="horizontal" justify="between" align="center">
+                    <Stack direction="horizontal" gap="sm" align="center">
+                      {notif.pinned && <Pin className="h-3 w-3 text-warning-500" />}
+                      <Text weight="medium" size="sm">{notif.title}</Text>
+                    </Stack>
+                    <Text size="xs" className="text-ink-400">{notif.time}</Text>
                   </Stack>
-                  <Text 
-                    size="sm" 
-                    className={email.unread ? 'text-ink-700' : 'text-ink-400'}
-                  >
-                    {email.subject}
-                  </Text>
+                  <Text size="sm" className="text-ink-500">{notif.subtitle}</Text>
                 </Stack>
-                <Text size="xs" className="text-ink-400 flex-shrink-0 ml-2">
-                  {email.time}
-                </Text>
               </Stack>
             </div>
           </SwipeableListItem>
         ))}
-        {emails.length === 0 && (
-          <div className="p-8 text-center text-ink-400">
-            Inbox empty!
-          </div>
-        )}
       </Stack>
     );
   },
@@ -355,32 +419,44 @@ export const KeyboardNavigation: Story = {
   render: () => (
     <Stack gap="md">
       <div className="p-4 bg-paper-100 rounded-lg">
-        <Text size="sm" weight="medium">Keyboard Instructions:</Text>
-        <ul className="mt-2 text-sm text-ink-600 space-y-1">
-          <li>• <kbd className="px-1 bg-paper-200 rounded">Tab</kbd> to focus the item</li>
-          <li>• <kbd className="px-1 bg-paper-200 rounded">→</kbd> to preview right action</li>
-          <li>• <kbd className="px-1 bg-paper-200 rounded">←</kbd> to preview left action</li>
-          <li>• <kbd className="px-1 bg-paper-200 rounded">Enter</kbd> to confirm</li>
-          <li>• <kbd className="px-1 bg-paper-200 rounded">Esc</kbd> to cancel</li>
-        </ul>
+        <Text size="sm" weight="medium" className="mb-3">Keyboard Controls:</Text>
+        <div className="grid grid-cols-2 gap-2 text-sm">
+          <div className="flex items-center gap-2">
+            <kbd className="px-2 py-1 bg-paper-200 rounded text-xs font-mono">→</kbd>
+            <span className="text-ink-600">Open right actions</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <kbd className="px-2 py-1 bg-paper-200 rounded text-xs font-mono">←</kbd>
+            <span className="text-ink-600">Open left actions</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <kbd className="px-2 py-1 bg-paper-200 rounded text-xs font-mono">Tab</kbd>
+            <span className="text-ink-600">Navigate actions</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <kbd className="px-2 py-1 bg-paper-200 rounded text-xs font-mono">Enter</kbd>
+            <span className="text-ink-600">Execute action</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <kbd className="px-2 py-1 bg-paper-200 rounded text-xs font-mono">Esc</kbd>
+            <span className="text-ink-600">Close / Reset</span>
+          </div>
+        </div>
       </div>
       <SwipeableListItem
-        onSwipeRight={() => alert('Approved via keyboard!')}
-        onSwipeLeft={() => alert('Dismissed via keyboard!')}
-        rightAction={{
-          icon: Check,
-          color: 'success',
-          label: 'Approve',
-        }}
-        leftAction={{
-          icon: X,
-          color: 'destructive',
-          label: 'Dismiss',
-        }}
+        rightActions={[
+          { id: 'edit', icon: Edit, color: 'primary', label: 'Edit', onClick: () => alert('Edit!') },
+          { id: 'star', icon: Star, color: 'warning', label: 'Star', onClick: () => alert('Star!') },
+        ]}
+        leftActions={[
+          { id: 'delete', icon: Trash, color: 'destructive', label: 'Delete', onClick: () => alert('Delete!') },
+          { id: 'archive', icon: Archive, color: 'neutral', label: 'Archive', onClick: () => alert('Archive!') },
+        ]}
       >
         <ListItemContent 
-          title="Focus me and use arrow keys" 
-          subtitle="Then press Enter to confirm or Escape to cancel"
+          avatar="KB"
+          title="Focus me and use keyboard" 
+          subtitle="Press arrow keys to reveal actions, Tab to navigate"
         />
       </SwipeableListItem>
     </Stack>
@@ -388,55 +464,51 @@ export const KeyboardNavigation: Story = {
 };
 
 /**
- * Multiple items in a list
+ * Disabled state
  */
-export const MultipleItems: Story = {
-  render: () => {
-    const [todos, setTodos] = useState([
-      { id: 1, text: 'Review pull request', done: false },
-      { id: 2, text: 'Update documentation', done: false },
-      { id: 3, text: 'Fix CI pipeline', done: false },
-      { id: 4, text: 'Deploy to staging', done: false },
-      { id: 5, text: 'Write unit tests', done: false },
-    ]);
+export const Disabled: Story = {
+  render: () => (
+    <SwipeableListItem
+      disabled
+      rightActions={[
+        { id: 'approve', icon: Check, color: 'success', label: 'Approve', onClick: () => {} }
+      ]}
+      leftActions={[
+        { id: 'dismiss', icon: X, color: 'destructive', label: 'Dismiss', onClick: () => {} }
+      ]}
+    >
+      <ListItemContent 
+        avatar="DI"
+        title="Disabled list item" 
+        subtitle="Swipe gestures are disabled"
+      />
+    </SwipeableListItem>
+  ),
+};
 
-    const handleComplete = (id: number) => {
-      setTodos(todos.map(t => 
-        t.id === id ? { ...t, done: true } : t
-      ));
-    };
-
-    const handleDelete = (id: number) => {
-      setTodos(todos.filter(t => t.id !== id));
-    };
-
-    return (
-      <Stack gap="none" className="border border-paper-200 rounded-lg overflow-hidden">
-        {todos.map((todo) => (
-          <SwipeableListItem
-            key={todo.id}
-            onSwipeRight={() => handleComplete(todo.id)}
-            onSwipeLeft={() => handleDelete(todo.id)}
-            rightAction={{
-              icon: Check,
-              color: 'success',
-              label: 'Complete',
-            }}
-            leftAction={{
-              icon: Trash,
-              color: 'destructive',
-              label: 'Delete',
-            }}
-            disabled={todo.done}
-          >
-            <div className={`p-4 border-b border-paper-100 ${todo.done ? 'bg-paper-50' : ''}`}>
-              <Text className={todo.done ? 'line-through text-ink-400' : ''}>
-                {todo.text}
-              </Text>
-            </div>
-          </SwipeableListItem>
-        ))}
-      </Stack>
-    );
-  },
+/**
+ * Custom action width
+ */
+export const CustomActionWidth: Story = {
+  render: () => (
+    <Stack gap="md">
+      <Text size="sm" className="text-ink-500">Wider action buttons (96px each)</Text>
+      <SwipeableListItem
+        actionWidth={96}
+        rightActions={[
+          { id: 'approve', icon: Check, color: 'success', label: 'Approve', onClick: () => {} },
+        ]}
+        leftActions={[
+          { id: 'delete', icon: Trash, color: 'destructive', label: 'Delete', onClick: () => {} },
+          { id: 'archive', icon: Archive, color: 'warning', label: 'Archive', onClick: () => {} },
+        ]}
+      >
+        <ListItemContent 
+          avatar="CW"
+          title="Wider action buttons" 
+          subtitle="actionWidth={96}"
+        />
+      </SwipeableListItem>
+    </Stack>
+  ),
 };
