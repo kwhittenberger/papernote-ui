@@ -33,7 +33,7 @@ export interface SwipeableListItemProps {
   rightActions?: SwipeListAction[];
   /** Width per action button in pixels (default: 72) */
   actionWidth?: number;
-  /** Enable full swipe to trigger first action (default: false) */
+  /** Enable full swipe to trigger first action (default: true) */
   fullSwipe?: boolean;
   /** Full swipe threshold as percentage of container width (default: 0.5) */
   fullSwipeThreshold?: number;
@@ -104,7 +104,7 @@ export function SwipeableListItem({
   leftActions = [],
   rightActions = [],
   actionWidth = 72,
-  fullSwipe = false,
+  fullSwipe = true,
   fullSwipeThreshold = 0.5,
   disabled = false,
   className = '',
