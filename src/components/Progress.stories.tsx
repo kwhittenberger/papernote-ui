@@ -410,3 +410,119 @@ export const MultipleProgress: Story = {
     </div>
   ),
 };
+
+export const WithMilestones: Story = {
+  args: {
+    value: 65,
+    milestones: [25, 50, 75, 100],
+  },
+};
+
+export const WithMilestoneLabels: Story = {
+  args: {
+    value: 75,
+    milestones: [25, 50, 75, 100],
+    showMilestoneLabels: true,
+  },
+};
+
+export const CircularWithMilestones: Story = {
+  args: {
+    value: 60,
+    variant: 'circular',
+    milestones: [25, 50, 75, 100],
+    showLabel: true,
+  },
+};
+
+export const CircularWithMilestoneLabels: Story = {
+  args: {
+    value: 80,
+    variant: 'circular',
+    milestones: [25, 50, 75, 100],
+    showMilestoneLabels: true,
+    showLabel: true,
+  },
+};
+
+export const BudgetTracker: Story = {
+  render: () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', width: '100%' }}>
+      <div>
+        <div style={{ fontSize: '0.875rem', marginBottom: '0.5rem', color: '#64748b' }}>Monthly Budget</div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+          <span style={{ fontWeight: 500 }}>$2,250 / $3,000</span>
+          <span style={{ color: '#f59e0b' }}>75% used</span>
+        </div>
+        <Progress
+          value={75}
+          color="warning"
+          milestones={[25, 50, 75, 100]}
+          showMilestoneLabels
+        />
+      </div>
+      <div>
+        <div style={{ fontSize: '0.875rem', marginBottom: '0.5rem', color: '#64748b' }}>Savings Goal</div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+          <span style={{ fontWeight: 500 }}>$4,500 / $10,000</span>
+          <span style={{ color: '#3b82f6' }}>45% complete</span>
+        </div>
+        <Progress
+          value={45}
+          color="primary"
+          milestones={[25, 50, 75, 100]}
+          showMilestoneLabels
+        />
+      </div>
+    </div>
+  ),
+};
+
+export const GoalProgress: Story = {
+  render: () => (
+    <div style={{ display: 'flex', gap: '3rem', alignItems: 'center' }}>
+      <div style={{ textAlign: 'center' }}>
+        <Progress
+          value={85}
+          variant="circular"
+          size="lg"
+          color="success"
+          milestones={[25, 50, 75, 100]}
+          showLabel
+        />
+        <div style={{ fontSize: '0.875rem', color: '#64748b', marginTop: '0.5rem' }}>Sales Target</div>
+      </div>
+      <div style={{ textAlign: 'center' }}>
+        <Progress
+          value={60}
+          variant="circular"
+          size="lg"
+          color="primary"
+          milestones={[25, 50, 75, 100]}
+          showLabel
+        />
+        <div style={{ fontSize: '0.875rem', color: '#64748b', marginTop: '0.5rem' }}>Project Completion</div>
+      </div>
+      <div style={{ textAlign: 'center' }}>
+        <Progress
+          value={30}
+          variant="circular"
+          size="lg"
+          color="warning"
+          milestones={[25, 50, 75, 100]}
+          showLabel
+        />
+        <div style={{ fontSize: '0.875rem', color: '#64748b', marginTop: '0.5rem' }}>Sprint Progress</div>
+      </div>
+    </div>
+  ),
+};
+
+export const CustomMilestones: Story = {
+  args: {
+    value: 70,
+    milestones: [10, 30, 50, 80, 100],
+    showMilestoneLabels: true,
+    color: 'success',
+  },
+};
