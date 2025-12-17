@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import DataTable from './DataTable';
 import Badge from './Badge';
+import Button from './Button';
 import { Edit, Trash, Eye } from 'lucide-react';
 
 interface User {
@@ -430,5 +431,66 @@ export const FullWidthWithSecondaryRow: Story = {
         ),
       },
     ],
+  },
+};
+
+export const RowHighlighting: Story = {
+  render: () => {
+    const [highlightedRows, setHighlightedRows] = useState<string[]>([]);
+
+    const simulateSave = (rowId: string) => {
+      setHighlightedRows([rowId]);
+      // Clear after animation completes
+      setTimeout(() => setHighlightedRows([]), 2000);
+    };
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <Button variant="secondary" size="sm" onClick={() => simulateSave('1')}>
+            Flash Row 1
+          </Button>
+          <Button variant="secondary" size="sm" onClick={() => simulateSave('2')}>
+            Flash Row 2
+          </Button>
+          <Button variant="secondary" size="sm" onClick={() => simulateSave('3')}>
+            Flash Row 3
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => {
+              setHighlightedRows(['1', '3', '5']);
+              setTimeout(() => setHighlightedRows([]), 2000);
+            }}
+          >
+            Flash Multiple
+          </Button>
+        </div>
+        <DataTable
+          data={sampleUsers}
+          columns={[
+            { key: 'name', header: 'Name', sortable: true },
+            { key: 'email', header: 'Email', sortable: true },
+            { key: 'role', header: 'Role' },
+            {
+              key: 'status',
+              header: 'Status',
+              render: (user: User) => (
+                <Badge variant={user.status === 'active' ? 'success' : user.status === 'inactive' ? 'error' : 'warning'}>
+                  {user.status}
+                </Badge>
+              ),
+            },
+          ]}
+          highlightedRows={highlightedRows}
+          highlightDuration={2000}
+        />
+        <p style={{ fontSize: '0.875rem', color: '#64748b' }}>
+          Click a button to see the row flash green and fade back to normal.
+          This is useful for indicating successful saves or updates.
+        </p>
+      </div>
+    );
   },
 };

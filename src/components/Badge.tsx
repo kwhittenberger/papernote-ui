@@ -16,6 +16,8 @@ export interface BadgeProps {
   truncate?: boolean;
   /** Maximum width for the badge (useful with truncate), e.g. '150px' or '10rem' */
   maxWidth?: string;
+  /** Apply fade-in animation when badge appears */
+  animate?: boolean;
 }
 
 export default function Badge({
@@ -29,6 +31,7 @@ export default function Badge({
   pill = false,
   truncate = false,
   maxWidth,
+  animate = false,
 }: BadgeProps) {
   const variantStyles = {
     success: 'bg-success-50 text-success-700 border-success-200',
@@ -79,6 +82,7 @@ export default function Badge({
           inline-block rounded-full
           ${dotVariantStyles[variant]}
           ${dotSizeStyles[size]}
+          ${animate ? 'animate-fade-in' : ''}
           ${className}
         `}
         aria-label={`${variant} indicator`}
@@ -95,6 +99,7 @@ export default function Badge({
         ${variantStyles[variant]}
         ${pill ? pillSizeStyles[size] : sizeStyles[size]}
         ${truncate ? 'max-w-full overflow-hidden' : ''}
+        ${animate ? 'animate-fade-in' : ''}
         ${className}
       `}
       style={maxWidth ? { maxWidth } : undefined}

@@ -224,6 +224,8 @@ export default {
         'float': 'float 6s ease-in-out infinite',
         'scale-in': 'scaleIn 0.2s ease-out',
         'scale-out': 'scaleOut 0.2s ease-in',
+        'row-flash': 'rowFlash 2s ease-out',
+        'success-check': 'successCheck 0.6s ease-out',
       },
       keyframes: {
         fadeIn: {
@@ -289,6 +291,16 @@ export default {
         scaleOut: {
           '0%': { transform: 'scale(1)', opacity: '1' },
           '100%': { transform: 'scale(0.9)', opacity: '0' },
+        },
+        rowFlash: {
+          '0%': { backgroundColor: 'rgb(187 247 208)' }, // success-200
+          '25%': { backgroundColor: 'rgb(187 247 208)' },
+          '100%': { backgroundColor: 'transparent' },
+        },
+        successCheck: {
+          '0%': { transform: 'scale(0)', opacity: '0' },
+          '50%': { transform: 'scale(1.2)', opacity: '1' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
         },
       },
       backdropBlur: {

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { useState } from 'react';
 import Badge from './Badge';
 import { Check, X, AlertCircle, Info as InfoIcon } from 'lucide-react';
 
@@ -248,4 +249,59 @@ export const CountBadges: Story = {
       </div>
     </div>
   ),
+};
+
+export const Animated: Story = {
+  args: {
+    children: 'Animated Badge',
+    variant: 'success',
+    animate: true,
+  },
+};
+
+export const AnimatedBadges: Story = {
+  render: () => {
+    const [badges, setBadges] = useState<string[]>([]);
+    const [counter, setCounter] = useState(0);
+
+    const addBadge = () => {
+      const newBadge = `Badge ${counter + 1}`;
+      setBadges([...badges, newBadge]);
+      setCounter(counter + 1);
+    };
+
+    const removeBadge = (index: number) => {
+      setBadges(badges.filter((_, i) => i !== index));
+    };
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <button
+          onClick={addBadge}
+          style={{
+            padding: '0.5rem 1rem',
+            border: '1px solid #e5e5e5',
+            borderRadius: '0.375rem',
+            background: 'white',
+            cursor: 'pointer',
+            width: 'fit-content',
+          }}
+        >
+          Add Badge
+        </button>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', minHeight: '2rem' }}>
+          {badges.map((badge, index) => (
+            <Badge
+              key={badge}
+              variant="info"
+              animate
+              onRemove={() => removeBadge(index)}
+            >
+              {badge}
+            </Badge>
+          ))}
+        </div>
+      </div>
+    );
+  },
 };

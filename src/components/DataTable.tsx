@@ -207,6 +207,10 @@ interface DataTableProps<T extends BaseDataItem = BaseDataItem> {
   rowHighlight?: (item: T) => string | undefined;
   /** ID of a single row to highlight */
   highlightedRowId?: string | number;
+  /** Array of row IDs to temporarily highlight (flash animation) */
+  highlightedRows?: (string | number)[];
+  /** Duration in ms for temporary row highlight (default: 2000) */
+  highlightDuration?: number;
   /** Enable cell borders */
   bordered?: boolean;
   /** Custom border color (Tailwind class like 'border-paper-200') */
@@ -513,6 +517,8 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
   rowClassName,
   rowHighlight,
   highlightedRowId,
+  highlightedRows = [],
+  highlightDuration = 2000,
   bordered = false,
   borderColor = 'border-paper-200',
   disableHover = false,
@@ -561,6 +567,10 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
   // Row hover state (for coordinating primary + secondary row highlighting)
   const [hoveredRowKey, setHoveredRowKey] = useState<string | null>(null);
 
+  // Temporary row highlight state (for flash animation)
+  const [flashingRows, setFlashingRows] = useState<Set<string>>(new Set());
+  const flashTimeoutRef = useRef<number | null>(null);
+
   // Context menu state
   const [contextMenuState, setContextMenuState] = useState<{
     isOpen: boolean;
@@ -583,6 +593,31 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
       setColumnOrder(baseVisibleColumns.map(col => String(col.key)));
     }
   }, [baseVisibleColumns, columnOrder.length]);
+
+  // Handle temporary row highlighting (flash animation)
+  useEffect(() => {
+    if (highlightedRows.length > 0) {
+      // Add new highlighted rows to flashing set
+      const newFlashingRows = new Set(highlightedRows.map(id => String(id)));
+      setFlashingRows(newFlashingRows);
+
+      // Clear any existing timeout
+      if (flashTimeoutRef.current) {
+        window.clearTimeout(flashTimeoutRef.current);
+      }
+
+      // Set timeout to clear the flash
+      flashTimeoutRef.current = window.setTimeout(() => {
+        setFlashingRows(new Set());
+      }, highlightDuration);
+    }
+
+    return () => {
+      if (flashTimeoutRef.current) {
+        window.clearTimeout(flashTimeoutRef.current);
+      }
+    };
+  }, [highlightedRows, highlightDuration]);
 
   // Apply column order
   const visibleColumns = reorderable && columnOrder.length > 0
@@ -618,9 +653,14 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
   // Get row background class based on striping and highlighting
   const getRowBackgroundClass = (item: T, index: number): string => {
     const classes: string[] = [];
+    const rowKey = getRowKey(item);
 
+    // Check for temporary flash highlight (takes priority)
+    if (flashingRows.has(rowKey)) {
+      classes.push('animate-row-flash');
+    }
     // Check for highlighted row
-    if (highlightedRowId !== undefined && getRowKey(item) === String(highlightedRowId)) {
+    else if (highlightedRowId !== undefined && rowKey === String(highlightedRowId)) {
       classes.push('bg-accent-100');
     }
     // Check for custom row highlight

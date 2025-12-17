@@ -1,5 +1,5 @@
-import React, { forwardRef } from 'react';
-import { Loader2 } from 'lucide-react';
+import React, { forwardRef, useState, useEffect, useRef } from 'react';
+import { Loader2, Check } from 'lucide-react';
 
 /**
  * Button component props
@@ -23,6 +23,10 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   badge?: number | string;
   /** Badge color variant */
   badgeVariant?: 'primary' | 'success' | 'warning' | 'error';
+  /** Show success checkmark animation (briefly shows checkmark, then reverts) */
+  showSuccess?: boolean;
+  /** Duration in ms for success animation (default: 1500) */
+  successDuration?: number;
 }
 
 /**
@@ -76,11 +80,40 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
   iconOnly = false,
   badge,
   badgeVariant = 'error',
+  showSuccess = false,
+  successDuration = 1500,
   children,
   disabled,
   className = '',
   ...props
 }, ref) => {
+  // Track success animation state
+  const [isShowingSuccess, setIsShowingSuccess] = useState(false);
+  const successTimeoutRef = useRef<number | null>(null);
+
+  // Handle showSuccess prop changes
+  useEffect(() => {
+    if (showSuccess && !isShowingSuccess) {
+      setIsShowingSuccess(true);
+      
+      // Clear any existing timeout
+      if (successTimeoutRef.current) {
+        window.clearTimeout(successTimeoutRef.current);
+      }
+      
+      // Set timeout to revert back
+      successTimeoutRef.current = window.setTimeout(() => {
+        setIsShowingSuccess(false);
+      }, successDuration);
+    }
+    
+    return () => {
+      if (successTimeoutRef.current) {
+        window.clearTimeout(successTimeoutRef.current);
+      }
+    };
+  }, [showSuccess, successDuration, isShowingSuccess]);
+
   const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-400 disabled:opacity-40 disabled:cursor-not-allowed';
 
   const variantStyles = {
@@ -117,12 +150,15 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
     lg: 'min-w-[20px] h-5 text-xs px-1.5',
   };
 
+  // Determine what to show inside button
+  const showSuccessState = isShowingSuccess && !loading;
+
   const buttonElement = (
     <button
       ref={ref}
       className={`
         ${baseStyles}
-        ${variantStyles[variant]}
+        ${showSuccessState ? 'bg-success-500 border-success-500 text-white' : variantStyles[variant]}
         ${sizeStyles[size]}
         ${fullWidth && !iconOnly ? 'w-full' : ''}
         ${className}
@@ -134,11 +170,14 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
       {loading && (
         <Loader2 className={`${iconSize[size]} animate-spin`} />
       )}
-      {!loading && icon && iconPosition === 'left' && (
+      {showSuccessState && (
+        <Check className={`${iconSize[size]} animate-success-check`} />
+      )}
+      {!loading && !showSuccessState && icon && iconPosition === 'left' && (
         <span className={iconSize[size]}>{icon}</span>
       )}
-      {!iconOnly && children}
-      {!loading && icon && iconPosition === 'right' && !iconOnly && (
+      {!iconOnly && !showSuccessState && children}
+      {!loading && !showSuccessState && icon && iconPosition === 'right' && !iconOnly && (
         <span className={iconSize[size]}>{icon}</span>
       )}
     </button>

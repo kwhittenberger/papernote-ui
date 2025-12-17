@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { useState } from 'react';
 import Button from './Button';
 import { Save, Trash, Plus, Download } from 'lucide-react';
 
@@ -252,4 +253,101 @@ export const AllSizes: Story = {
       <Button variant="primary" size="lg">Large</Button>
     </div>
   ),
+};
+
+export const SuccessAnimation: Story = {
+  args: {
+    variant: 'primary',
+    showSuccess: true,
+    children: 'Saved!',
+  },
+};
+
+export const SaveWithSuccess: Story = {
+  render: () => {
+    const [saving, setSaving] = useState(false);
+    const [saved, setSaved] = useState(false);
+
+    const handleSave = async () => {
+      setSaving(true);
+      setSaved(false);
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setSaving(false);
+      setSaved(true);
+      
+      // Reset after animation completes
+      setTimeout(() => setSaved(false), 1500);
+    };
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'flex-start' }}>
+        <Button
+          variant="primary"
+          icon={<Save />}
+          loading={saving}
+          showSuccess={saved}
+          onClick={handleSave}
+        >
+          Save Changes
+        </Button>
+        <p style={{ fontSize: '0.875rem', color: '#64748b' }}>
+          Click to simulate save with success animation
+        </p>
+      </div>
+    );
+  },
+};
+
+export const SuccessAnimationVariants: Story = {
+  render: () => {
+    const [successStates, setSuccessStates] = useState<Record<string, boolean>>({});
+
+    const triggerSuccess = (key: string) => {
+      setSuccessStates(prev => ({ ...prev, [key]: true }));
+      setTimeout(() => {
+        setSuccessStates(prev => ({ ...prev, [key]: false }));
+      }, 1500);
+    };
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '0.5rem' }}>
+          Click any button to see the success animation
+        </p>
+        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+          <Button
+            variant="primary"
+            showSuccess={successStates['primary']}
+            onClick={() => triggerSuccess('primary')}
+          >
+            Primary
+          </Button>
+          <Button
+            variant="secondary"
+            showSuccess={successStates['secondary']}
+            onClick={() => triggerSuccess('secondary')}
+          >
+            Secondary
+          </Button>
+          <Button
+            variant="outline"
+            showSuccess={successStates['outline']}
+            onClick={() => triggerSuccess('outline')}
+          >
+            Outline
+          </Button>
+          <Button
+            variant="ghost"
+            showSuccess={successStates['ghost']}
+            onClick={() => triggerSuccess('ghost')}
+          >
+            Ghost
+          </Button>
+        </div>
+      </div>
+    );
+  },
 };
