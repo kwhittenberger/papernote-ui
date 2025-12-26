@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import { SuccessCheck } from './SuccessCheck';
-import { Button } from './Button';
-import { Stack } from './Stack';
-import { Text } from './Text';
+import Button from './Button';
+import Stack from './Stack';
+import Text from './Text';
 
 const meta: Meta<typeof SuccessCheck> = {
   title: 'Feedback/SuccessCheck',

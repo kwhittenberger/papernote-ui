@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { ActivityFeed, ActivityItem } from './ActivityFeed';
 import Stack from './Stack';
 import Text from './Text';
-import { Card, CardContent, CardHeader, CardTitle } from './Card';
+import Card, { CardContent, CardHeader, CardTitle } from './Card';
 import { FileEdit, Upload, MessageSquare, UserPlus, Trash2, Eye } from 'lucide-react';
 
 const meta: Meta<typeof ActivityFeed> = {

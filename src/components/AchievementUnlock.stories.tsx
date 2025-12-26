@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import { AchievementUnlock } from './AchievementUnlock';
-import { Button } from './Button';
-import { Stack } from './Stack';
-import { Text } from './Text';
+import Button from './Button';
+import Stack from './Stack';
+import Text from './Text';
 import { 
   Trophy, 
   Star, 

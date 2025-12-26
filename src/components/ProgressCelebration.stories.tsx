@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState, useEffect } from 'react';
 import { ProgressCelebration } from './ProgressCelebration';
-import { Progress } from './Progress';
-import { Stack } from './Stack';
-import { Text } from './Text';
-import { Button } from './Button';
-import { Card, CardContent, CardHeader, CardTitle } from './Card';
+import Progress from './Progress';
+import Stack from './Stack';
+import Text from './Text';
+import Button from './Button';
+import Card, { CardContent, CardHeader, CardTitle } from './Card';
 
 const meta: Meta<typeof ProgressCelebration> = {
   title: 'Feedback/ProgressCelebration',

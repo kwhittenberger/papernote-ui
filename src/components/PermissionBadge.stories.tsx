@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { PermissionBadge, PermissionLevel } from './PermissionBadge';
 import Stack from './Stack';
 import Text from './Text';
-import { Card, CardContent, CardHeader, CardTitle } from './Card';
+import Card, { CardContent, CardHeader, CardTitle } from './Card';
 import { CollaboratorAvatars } from './CollaboratorAvatars';
 
 const meta: Meta<typeof PermissionBadge> = {

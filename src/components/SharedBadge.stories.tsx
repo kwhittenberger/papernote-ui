@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { SharedBadge } from './SharedBadge';
 import Stack from './Stack';
 import Text from './Text';
-import { Card, CardContent, CardHeader, CardTitle } from './Card';
+import Card, { CardContent, CardHeader, CardTitle } from './Card';
 
 const meta: Meta<typeof SharedBadge> = {
   title: 'Collaboration/SharedBadge',

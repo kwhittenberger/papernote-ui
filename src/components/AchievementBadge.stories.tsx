@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { AchievementBadge } from './AchievementBadge';
-import { Stack } from './Stack';
-import { Text } from './Text';
-import { Card, CardContent, CardHeader, CardTitle } from './Card';
+import Stack from './Stack';
+import Text from './Text';
+import Card, { CardContent, CardHeader, CardTitle } from './Card';
 import { 
   Trophy, 
   Target, 

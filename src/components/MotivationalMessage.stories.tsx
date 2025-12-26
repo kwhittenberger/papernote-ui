@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import { MotivationalMessage } from './MotivationalMessage';
-import { Stack } from './Stack';
-import { Text } from './Text';
+import Stack from './Stack';
+import Text from './Text';
 import { Trophy, TrendingUp, Target, Heart } from 'lucide-react';
 
 const meta: Meta<typeof MotivationalMessage> = {

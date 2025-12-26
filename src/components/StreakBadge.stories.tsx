@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { StreakBadge } from './StreakBadge';
-import { Stack } from './Stack';
-import { Text } from './Text';
-import { Card, CardContent, CardHeader, CardTitle } from './Card';
+import Stack from './Stack';
+import Text from './Text';
+import Card, { CardContent, CardHeader, CardTitle } from './Card';
 
 const meta: Meta<typeof StreakBadge> = {
   title: 'Feedback/StreakBadge',

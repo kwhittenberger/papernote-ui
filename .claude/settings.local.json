@@ -46,7 +46,15 @@
       "Bash(npm uninstall:*)",
       "mcp__filesystem__read_text_file",
       "Bash(node:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(~/bin/linear transition:*)",
+      "Bash(~/bin/linear raw:*)",
+      "Bash(~/bin/linear get:*)",
+      "Bash(~/bin/linear comments:*)",
+      "mcp__filesystem__directory_tree",
+      "Bash(~/bin/linear list:*)",
+      "Bash(bash -c:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []
