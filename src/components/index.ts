@@ -69,6 +69,44 @@ export { Celebration, useCelebration } from './Celebration';
 export type { CelebrationProps } from './Celebration';
 export type { CardProps } from './Card';
 
+// Delighter Components (PAP-12)
+export { SuccessCheck } from './SuccessCheck';
+export type { SuccessCheckProps } from './SuccessCheck';
+
+export { MotivationalMessage } from './MotivationalMessage';
+export type { MotivationalMessageProps } from './MotivationalMessage';
+
+export { StreakBadge } from './StreakBadge';
+export type { StreakBadgeProps } from './StreakBadge';
+
+export { AchievementBadge } from './AchievementBadge';
+export type { AchievementBadgeProps, AchievementBadgeData } from './AchievementBadge';
+
+export { ProgressCelebration } from './ProgressCelebration';
+export type { ProgressCelebrationProps } from './ProgressCelebration';
+
+export { AchievementUnlock } from './AchievementUnlock';
+export type { AchievementUnlockProps } from './AchievementUnlock';
+
+export { useDelighters } from '../hooks/useDelighters';
+export type { UseDelightersReturn, CelebrationType, CelebrationOptions } from '../hooks/useDelighters';
+
+// Collaboration Components (PAP-11)
+export { CollaboratorAvatars } from './CollaboratorAvatars';
+export type { CollaboratorAvatarsProps, Collaborator } from './CollaboratorAvatars';
+
+export { PermissionBadge } from './PermissionBadge';
+export type { PermissionBadgeProps, PermissionLevel } from './PermissionBadge';
+
+export { SharedBadge } from './SharedBadge';
+export type { SharedBadgeProps } from './SharedBadge';
+
+export { ActivityFeed } from './ActivityFeed';
+export type { ActivityFeedProps, ActivityItem } from './ActivityFeed';
+
+export { InviteCard } from './InviteCard';
+export type { InviteCardProps, PendingInvite } from './InviteCard';
+
 export { default as Stack } from './Stack';
 export type { StackProps } from './Stack';
 
