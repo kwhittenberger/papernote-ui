@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import { Celebration, useCelebration } from './Celebration';
-import { Button } from './Button';
-import { Stack } from './Stack';
-import { Card, CardHeader, CardTitle, CardContent } from './Card';
+import Button from './Button';
+import Stack from './Stack';
+import Card, { CardHeader, CardTitle, CardContent } from './Card';
 
 const meta: Meta<typeof Celebration> = {
   title: 'Feedback/Celebration',
