@@ -292,6 +292,7 @@ const TimePicker = forwardRef<TimePickerHandle, TimePickerProps>(({
           aria-controls={dropdownId}
           aria-invalid={validationState === 'error' ? 'true' : undefined}
           aria-describedby={validationMessage ? descriptionId : undefined}
+          aria-required={required}
           role="combobox"
         />
 

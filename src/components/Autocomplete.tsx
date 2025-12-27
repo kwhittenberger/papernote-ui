@@ -320,6 +320,7 @@ const Autocomplete = forwardRef<AutocompleteHandle, AutocompleteProps>(({
           aria-activedescendant={highlightedIndex >= 0 ? `autocomplete-option-${highlightedIndex}` : undefined}
           aria-invalid={error ? 'true' : undefined}
           aria-describedby={error ? errorId : undefined}
+          aria-required={required}
           aria-busy={loading}
         />
 

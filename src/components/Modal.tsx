@@ -1,8 +1,11 @@
-import React, { useEffect, useRef, useId } from 'react';
+import React, { useEffect, useRef, useId, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { useIsMobile } from '../hooks/useResponsive';
 import BottomSheet from './BottomSheet';
+
+// Selector for all focusable elements
+const FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export interface ModalProps {
   isOpen: boolean;
@@ -118,34 +121,86 @@ export default function Modal({
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const mouseDownOnBackdrop = useRef(false);
+  const previousActiveElement = useRef<HTMLElement | null>(null);
   const titleId = useId();
   const isMobile = useIsMobile();
+
+  // Get all focusable elements within the modal
+  const getFocusableElements = useCallback(() => {
+    if (!modalRef.current) return [];
+    return Array.from(modalRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR))
+      .filter(el => el.offsetParent !== null); // Filter out hidden elements
+  }, []);
 
   // Determine if we should use BottomSheet
   const useBottomSheet = 
     mobileMode === 'sheet' || 
     (mobileMode === 'auto' && isMobile);
 
-  // Handle escape key (only for modal mode, BottomSheet handles its own)
+  // Handle escape key and focus trap (only for modal mode, BottomSheet handles its own)
   useEffect(() => {
-    if (useBottomSheet) return; // BottomSheet handles escape
-    
-    const handleEscape = (e: KeyboardEvent) => {
+    if (useBottomSheet) return; // BottomSheet handles its own focus
+
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
         onClose();
+        return;
+      }
+
+      // Focus trap: keep focus within modal
+      if (e.key === 'Tab' && isOpen) {
+        const focusableElements = getFocusableElements();
+        if (focusableElements.length === 0) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          // Shift+Tab: if on first element, wrap to last
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          // Tab: if on last element, wrap to first
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
       }
     };
 
     if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
+      // Store the currently focused element to restore later
+      previousActiveElement.current = document.activeElement as HTMLElement;
+
+      document.addEventListener('keydown', handleKeyDown);
       document.body.style.overflow = 'hidden';
+
+      // Set initial focus to first focusable element
+      // Use requestAnimationFrame to ensure the modal is rendered
+      requestAnimationFrame(() => {
+        const focusableElements = getFocusableElements();
+        if (focusableElements.length > 0) {
+          focusableElements[0].focus();
+        } else if (modalRef.current) {
+          // If no focusable elements, focus the modal container
+          modalRef.current.focus();
+        }
+      });
     }
 
     return () => {
-      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = 'unset';
+
+      // Restore focus to the previously focused element
+      if (previousActiveElement.current && typeof previousActiveElement.current.focus === 'function') {
+        previousActiveElement.current.focus();
+      }
     };
-  }, [isOpen, onClose, useBottomSheet]);
+  }, [isOpen, onClose, useBottomSheet, getFocusableElements]);
 
   // Track if mousedown originated on the backdrop
   const handleBackdropMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -214,6 +269,7 @@ export default function Modal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
+        tabIndex={-1}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-paper-200">

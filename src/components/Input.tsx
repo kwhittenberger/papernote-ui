@@ -1,4 +1,4 @@
-import React, { forwardRef, useState } from 'react';
+import React, { forwardRef, useState, useId } from 'react';
 import { AlertCircle, CheckCircle, AlertTriangle, Eye, EyeOff, X, Loader2 } from 'lucide-react';
 
 /**
@@ -166,7 +166,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     },
     ref
   ) => {
-    const inputId = id || `input-${Math.random().toString(36).substring(2, 9)}`;
+    const generatedId = useId();
+    const inputId = id || generatedId;
+    const helperId = `${inputId}-helper`;
     const [showPassword, setShowPassword] = useState(false);
 
     // Handle clear button click
@@ -299,6 +301,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             maxLength={maxLength}
             inputMode={effectiveInputMode}
             enterKeyHint={enterKeyHint}
+            aria-invalid={validationState === 'error'}
+            aria-describedby={helperText || validationMessage ? helperId : undefined}
+            aria-required={props.required}
             className={`
               input
               ${sizeClasses[size]}
@@ -382,7 +387,12 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {/* Helper Text, Validation Message, or Character Counter */}
         <div className="flex justify-between items-center mt-2">
           {(helperText || validationMessage) && (
-            <p className={`text-xs ${validationMessage ? getValidationMessageColor() : 'text-ink-600'}`}>
+            <p
+              id={helperId}
+              className={`text-xs ${validationMessage ? getValidationMessageColor() : 'text-ink-600'}`}
+              role={validationState === 'error' ? 'alert' : undefined}
+              aria-live={validationState === 'error' ? 'assertive' : undefined}
+            >
               {validationMessage || helperText}
             </p>
           )}

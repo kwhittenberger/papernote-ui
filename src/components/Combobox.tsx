@@ -312,6 +312,7 @@ const Combobox = forwardRef<ComboboxHandle, ComboboxProps>(({
             aria-activedescendant={isOpen && filteredOptions.length > 0 ? `option-${highlightedIndex}` : undefined}
             aria-invalid={validationState === 'error' ? 'true' : undefined}
             aria-describedby={validationMessage ? descriptionId : undefined}
+            aria-required={required}
             role="combobox"
           />
 

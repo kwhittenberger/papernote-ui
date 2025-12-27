@@ -342,6 +342,7 @@ const DateRangePicker = forwardRef<DateRangePickerHandle, DateRangePickerProps>(
           aria-controls={dialogId}
           aria-invalid={validationState === 'error' ? 'true' : undefined}
           aria-describedby={validationMessage ? descriptionId : (isOpen ? hintId : undefined)}
+          aria-required={required}
           role="combobox"
         />
 

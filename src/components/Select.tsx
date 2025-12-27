@@ -85,6 +85,8 @@ export interface SelectProps {
   mobileMode?: 'auto' | 'dropdown' | 'native';
   /** Render dropdown via portal (default: true). Set to false when overflow clipping is not an issue */
   usePortal?: boolean;
+  /** Whether this field is required */
+  required?: boolean;
 }
 
 // Size classes for trigger button
@@ -194,6 +196,7 @@ const Select = forwardRef<SelectHandle, SelectProps>(
     size = 'md',
     mobileMode = 'auto',
     usePortal = true,
+    required = false,
   } = props;
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -566,6 +569,7 @@ const Select = forwardRef<SelectHandle, SelectProps>(
         {label && (
           <label id={labelId} className="label">
             {label}
+            {required && <span className="text-error-500 ml-1">*</span>}
           </label>
         )}
 
@@ -584,6 +588,7 @@ const Select = forwardRef<SelectHandle, SelectProps>(
             aria-labelledby={label ? labelId : undefined}
             aria-invalid={error ? 'true' : undefined}
             aria-describedby={error ? errorId : (helperText ? helperTextId : undefined)}
+            aria-required={required}
           >
             <option value="" disabled>{placeholder}</option>
             {options.map((opt) => (
@@ -624,6 +629,7 @@ const Select = forwardRef<SelectHandle, SelectProps>(
       {label && (
         <label id={labelId} className="label">
           {label}
+          {required && <span className="text-error-500 ml-1">*</span>}
         </label>
       )}
 
@@ -651,6 +657,7 @@ const Select = forwardRef<SelectHandle, SelectProps>(
           aria-invalid={error ? 'true' : undefined}
           aria-describedby={error ? errorId : (helperText ? helperTextId : undefined)}
           aria-disabled={disabled}
+          aria-required={required}
         >
           <span className={`flex items-center gap-2 ${selectedOption ? 'text-ink-800' : 'text-ink-400'}`}>
             {loading && <Loader2 className="h-4 w-4 animate-spin text-ink-500" />}
