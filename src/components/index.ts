@@ -238,6 +238,15 @@ export type { BottomSheetProps, BottomSheetHeaderProps, BottomSheetContentProps,
 export { default as Collapsible } from './Collapsible';
 export type { CollapsibleProps } from './Collapsible';
 
+export { default as CollapsibleSection } from './CollapsibleSection';
+export type { CollapsibleSectionProps } from './CollapsibleSection';
+
+export { default as SummaryCard } from './SummaryCard';
+export type { SummaryCardProps, SummaryCardTrend, SummaryCardAction } from './SummaryCard';
+
+export { default as PriorityAlertBanner } from './PriorityAlertBanner';
+export type { PriorityAlertBannerProps, PriorityAlert } from './PriorityAlertBanner';
+
 export { default as ExpandablePanel, ExpandablePanelSpacer, ExpandablePanelContainer } from './ExpandablePanel';
 export type { ExpandablePanelProps } from './ExpandablePanel';
 
