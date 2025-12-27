@@ -141,6 +141,9 @@ export type { ConfirmDialogProps } from './ConfirmDialog';
 export { default as Tooltip } from './Tooltip';
 export type { TooltipProps } from './Tooltip';
 
+export { default as HelpTooltip } from './HelpTooltip';
+export type { HelpTooltipProps } from './HelpTooltip';
+
 export { default as Popover } from './Popover';
 export type { PopoverProps } from './Popover';
 
