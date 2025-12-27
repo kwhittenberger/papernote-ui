@@ -144,6 +144,9 @@ export type { TooltipProps } from './Tooltip';
 export { default as HelpTooltip } from './HelpTooltip';
 export type { HelpTooltipProps } from './HelpTooltip';
 
+export { default as SkipLink } from './SkipLink';
+export type { SkipLinkProps } from './SkipLink';
+
 export { default as Popover } from './Popover';
 export type { PopoverProps } from './Popover';
 

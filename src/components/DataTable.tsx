@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown, ChevronRight, MoreVertical, Edit, Trash } from 'lucide-react';
 import Menu, { MenuItem } from './Menu';
@@ -567,6 +567,11 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
   // Row hover state (for coordinating primary + secondary row highlighting)
   const [hoveredRowKey, setHoveredRowKey] = useState<string | null>(null);
 
+  // Keyboard navigation state
+  const [focusedCell, setFocusedCell] = useState<{ row: number; col: number } | null>(null);
+  const [announcement, setAnnouncement] = useState<string>('');
+  const tableBodyRef = useRef<HTMLTableSectionElement>(null);
+
   // Temporary row highlight state (for flash animation)
   const [flashingRows, setFlashingRows] = useState<Set<string>>(new Set());
   const flashTimeoutRef = useRef<number | null>(null);
@@ -649,6 +654,12 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
 
   // Key extractor function - defined early for use in other functions
   const getRowKey = keyExtractor || ((row: T) => String(row.id));
+
+  // Calculate if there are any actions (for keyboard navigation column calculation)
+  // This is computed early so it can be used in keyboard handlers
+  const hasAnyActions = !!(onEdit || onDelete || actions.length > 0 ||
+    expandedRowConfig?.edit || expandedRowConfig?.details ||
+    expandedRowConfig?.addRelated?.length || expandedRowConfig?.manageRelated?.length);
 
   // Get row background class based on striping and highlighting
   const getRowBackgroundClass = (item: T, index: number): string => {
@@ -773,6 +784,7 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
       document.removeEventListener('mouseup', handleMouseUp);
     };
   }, [resizingColumn, resizeStartX, resizeStartWidth, columnWidths, onColumnResize]);
+
   // Build combined actions: built-in edit/delete + custom actions + expansion mode actions
   const builtInActions: DataTableAction<T>[] = [];
   
@@ -982,6 +994,203 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
     setExpansionState(null);
   };
 
+  // Keyboard navigation handler
+  const handleKeyboardNavigation = useCallback((e: React.KeyboardEvent<HTMLTableSectionElement>) => {
+    if (!data.length) return;
+
+    const totalRows = data.length;
+    const totalCols = visibleColumns.length;
+
+    // If no cell is focused, focus first data cell on first arrow key
+    if (!focusedCell) {
+      if (['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+        e.preventDefault();
+        setFocusedCell({ row: 0, col: 0 });
+        const colHeader = visibleColumns[0]?.header || 'first column';
+        setAnnouncement(`Row 1, ${colHeader}`);
+        return;
+      }
+      return;
+    }
+
+    const { row, col } = focusedCell;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        if (row < totalRows - 1) {
+          const newRow = row + 1;
+          setFocusedCell({ row: newRow, col });
+          const rowItem = data[newRow];
+          const colHeader = visibleColumns[col]?.header || '';
+          const cellValue = rowItem[visibleColumns[col]?.key as keyof typeof rowItem];
+          setAnnouncement(`Row ${newRow + 1}, ${colHeader}: ${cellValue || 'empty'}`);
+        }
+        break;
+
+      case 'ArrowUp':
+        e.preventDefault();
+        if (row > 0) {
+          const newRow = row - 1;
+          setFocusedCell({ row: newRow, col });
+          const rowItem = data[newRow];
+          const colHeader = visibleColumns[col]?.header || '';
+          const cellValue = rowItem[visibleColumns[col]?.key as keyof typeof rowItem];
+          setAnnouncement(`Row ${newRow + 1}, ${colHeader}: ${cellValue || 'empty'}`);
+        }
+        break;
+
+      case 'ArrowRight':
+        e.preventDefault();
+        if (col < totalCols - 1) {
+          const newCol = col + 1;
+          setFocusedCell({ row, col: newCol });
+          const rowItem = data[row];
+          const colHeader = visibleColumns[newCol]?.header || '';
+          const cellValue = rowItem[visibleColumns[newCol]?.key as keyof typeof rowItem];
+          setAnnouncement(`${colHeader}: ${cellValue || 'empty'}`);
+        }
+        break;
+
+      case 'ArrowLeft':
+        e.preventDefault();
+        if (col > 0) {
+          const newCol = col - 1;
+          setFocusedCell({ row, col: newCol });
+          const rowItem = data[row];
+          const colHeader = visibleColumns[newCol]?.header || '';
+          const cellValue = rowItem[visibleColumns[newCol]?.key as keyof typeof rowItem];
+          setAnnouncement(`${colHeader}: ${cellValue || 'empty'}`);
+        }
+        break;
+
+      case 'Home':
+        e.preventDefault();
+        if (e.ctrlKey) {
+          // Ctrl+Home: Go to first cell
+          setFocusedCell({ row: 0, col: 0 });
+          setAnnouncement(`First cell, Row 1, ${visibleColumns[0]?.header || ''}`);
+        } else {
+          // Home: Go to first cell in current row
+          setFocusedCell({ row, col: 0 });
+          const rowItem = data[row];
+          const cellValue = rowItem[visibleColumns[0]?.key as keyof typeof rowItem];
+          setAnnouncement(`${visibleColumns[0]?.header || ''}: ${cellValue || 'empty'}`);
+        }
+        break;
+
+      case 'End':
+        e.preventDefault();
+        if (e.ctrlKey) {
+          // Ctrl+End: Go to last cell
+          const lastRow = totalRows - 1;
+          const lastCol = totalCols - 1;
+          setFocusedCell({ row: lastRow, col: lastCol });
+          setAnnouncement(`Last cell, Row ${lastRow + 1}, ${visibleColumns[lastCol]?.header || ''}`);
+        } else {
+          // End: Go to last cell in current row
+          const lastCol = totalCols - 1;
+          setFocusedCell({ row, col: lastCol });
+          const rowItem = data[row];
+          const cellValue = rowItem[visibleColumns[lastCol]?.key as keyof typeof rowItem];
+          setAnnouncement(`${visibleColumns[lastCol]?.header || ''}: ${cellValue || 'empty'}`);
+        }
+        break;
+
+      case 'Enter':
+        e.preventDefault();
+        {
+          const rowItem = data[row];
+          const rowKey = getRowKey(rowItem);
+
+          // Priority: Edit mode > Details mode > Row double-click handler
+          if (onEdit) {
+            onEdit(rowItem);
+            setAnnouncement('Opening edit mode');
+          } else if (expandedRowConfig?.edit) {
+            handleExpansionWithMode(rowKey, 'edit');
+            setAnnouncement('Opening inline edit');
+          } else if (expandedRowConfig?.details) {
+            handleExpansionWithMode(rowKey, 'details');
+            setAnnouncement('Opening details view');
+          } else if (onRowDoubleClick) {
+            onRowDoubleClick(rowItem);
+            setAnnouncement('Activating row');
+          } else if (onRowClick) {
+            onRowClick(rowItem);
+            setAnnouncement('Row selected');
+          }
+        }
+        break;
+
+      case ' ':
+        // Space: Toggle selection if selectable
+        if (selectable) {
+          e.preventDefault();
+          const rowItem = data[row];
+          const rowKey = getRowKey(rowItem);
+          handleRowSelect(rowKey);
+          const isNowSelected = !selectedRowsSet.has(rowKey);
+          setAnnouncement(isNowSelected ? 'Row selected' : 'Row deselected');
+        }
+        break;
+
+      case 'Escape':
+        e.preventDefault();
+        setFocusedCell(null);
+        setAnnouncement('Table navigation exited');
+        // Return focus to table container
+        tableBodyRef.current?.closest('table')?.focus();
+        break;
+
+      case 'PageDown':
+        e.preventDefault();
+        {
+          const jumpSize = 10;
+          const newRow = Math.min(row + jumpSize, totalRows - 1);
+          setFocusedCell({ row: newRow, col });
+          const colHeader = visibleColumns[col]?.header || '';
+          setAnnouncement(`Row ${newRow + 1} of ${totalRows}, ${colHeader}`);
+        }
+        break;
+
+      case 'PageUp':
+        e.preventDefault();
+        {
+          const jumpSize = 10;
+          const newRow = Math.max(row - jumpSize, 0);
+          setFocusedCell({ row: newRow, col });
+          const colHeader = visibleColumns[col]?.header || '';
+          setAnnouncement(`Row ${newRow + 1} of ${totalRows}, ${colHeader}`);
+        }
+        break;
+    }
+  }, [data, visibleColumns, focusedCell, selectable, expandedRowConfig, onEdit, onRowDoubleClick, onRowClick, getRowKey, handleExpansionWithMode, handleRowSelect, selectedRowsSet]);
+
+  // Focus the appropriate cell when focusedCell changes
+  useEffect(() => {
+    if (focusedCell && tableBodyRef.current) {
+      const { row, col } = focusedCell;
+      const rows = tableBodyRef.current.querySelectorAll('tr[data-row-index]');
+      const targetRow = rows[row] as HTMLTableRowElement | undefined;
+      if (targetRow) {
+        // Calculate actual column index including extra columns
+        const hasSelectionCol = selectable;
+        const hasExpandCol = (expandable || expandedRowConfig) && showExpandChevron;
+        const hasActionsCol = hasAnyActions;
+        const extraColsBefore = (hasSelectionCol ? 1 : 0) + (hasExpandCol ? 1 : 0) + (hasActionsCol ? 1 : 0);
+
+        const cells = targetRow.querySelectorAll('td');
+        const targetCell = cells[col + extraColsBefore] as HTMLTableCellElement | undefined;
+        if (targetCell) {
+          targetCell.focus();
+          // Scroll into view if needed
+          targetCell.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        }
+      }
+    }
+  }, [focusedCell, selectable, expandable, expandedRowConfig, showExpandChevron, hasAnyActions]);
+
   // Handle column header click for sorting
   const handleSort = (column: DataTableColumn<T>) => {
     if (!column.sortable || !onSortChange) return;
@@ -1135,10 +1344,14 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
       const isHovered = hoveredRowKey === rowKey;
       const hoverClass = disableHover ? '' : (isHovered ? 'bg-paper-100' : '');
 
+      // Check if this row is keyboard-focused
+      const isKeyboardFocused = focusedCell?.row === index;
+
       return (
       <React.Fragment key={rowKey}>
         <tr
-          className={`table-row-stable ${onRowDoubleClick || onRowClick || onEdit || expandedRowConfig?.edit || expandedRowConfig?.details || expandedRowConfig?.addRelated?.length || expandedRowConfig?.manageRelated?.length ? 'cursor-pointer' : ''} ${isSelected ? 'bg-accent-50 border-l-2 border-accent-500' : hoverClass || rowBgClass} ${borderClass}`}
+          data-row-index={index}
+          className={`table-row-stable ${onRowDoubleClick || onRowClick || onEdit || expandedRowConfig?.edit || expandedRowConfig?.details || expandedRowConfig?.addRelated?.length || expandedRowConfig?.manageRelated?.length ? 'cursor-pointer' : ''} ${isSelected ? 'bg-accent-50 border-l-2 border-accent-500' : hoverClass || rowBgClass} ${borderClass} ${isKeyboardFocused ? 'ring-2 ring-inset ring-accent-400' : ''}`}
           onMouseEnter={() => !disableHover && setHoveredRowKey(rowKey)}
           onMouseLeave={() => !disableHover && setHoveredRowKey(null)}
           onClick={() => onRowClick?.(item)}
@@ -1275,11 +1488,17 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
           const isFirstColumn = colIdx === 0;
           const paddingClass = isFirstColumn && allActions.length > 0 ? 'pl-3' : '';
 
+          // Check if this cell is keyboard-focused
+          const isCellFocused = focusedCell?.row === index && focusedCell?.col === colIdx;
+
           return (
             <td
               key={`${item.id}-${columnKey}`}
-              className={`${currentDensity.cell} ${paddingClass} ${column.className || ''} ${bordered ? `border ${borderColor}` : ''}`}
+              className={`${currentDensity.cell} ${paddingClass} ${column.className || ''} ${bordered ? `border ${borderColor}` : ''} ${isCellFocused ? 'outline outline-2 outline-accent-500 outline-offset-[-2px]' : ''}`}
               style={getColumnStyle(column, dynamicWidth)}
+              tabIndex={isCellFocused ? 0 : -1}
+              role="gridcell"
+              aria-colindex={colIdx + 1}
             >
               <div className={`${currentDensity.text} leading-tight`}>{primaryContent}</div>
             </td>
@@ -1437,7 +1656,13 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
         </div>
       )}
 
-      <table className={`table-stable w-full ${bordered ? 'border-collapse' : ''}`}>
+      <table
+        className={`table-stable w-full ${bordered ? 'border-collapse' : ''}`}
+        role="grid"
+        aria-label="Data table"
+        aria-rowcount={data.length}
+        aria-colcount={visibleColumns.length}
+      >
         <colgroup>
           {selectable && <col className="w-12" />}
           {((expandable || expandedRowConfig) && showExpandChevron) && <col className="w-10" />}
@@ -1531,7 +1756,12 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
           </tr>
         </thead>
         <tbody
+          ref={tableBodyRef}
           className="bg-white table-loading transition-opacity duration-200"
+          onKeyDown={handleKeyboardNavigation}
+          tabIndex={0}
+          role="rowgroup"
+          aria-label="Table data"
         >
           {loading && data.length === 0 ? (
             renderLoadingSkeleton()
@@ -1648,6 +1878,15 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
   // Render with context menu
   return (
     <>
+      {/* Screen reader announcement region */}
+      <div
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {announcement}
+      </div>
       {renderPaginationControls()}
       {shouldShowCardView ? cardViewContent : finalContent}
       {contextMenuState.isOpen && contextMenuState.item && (
