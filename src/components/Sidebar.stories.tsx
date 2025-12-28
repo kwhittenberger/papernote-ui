@@ -280,3 +280,86 @@ export const Complete: Story = {
     ),
   },
 };
+
+/**
+ * Demonstrates custom data attributes for E2E testing and product tours.
+ * Each item includes data-testid and data-tour attributes for reliable element targeting.
+ *
+ * Inspect the elements to see the data attributes:
+ * - `data-testid`: For E2E testing with Playwright/Cypress
+ * - `data-tour`: For product tours with Driver.js or similar libraries
+ */
+export const WithDataAttributes: Story = {
+  args: {
+    items: [
+      {
+        id: 'dashboard',
+        label: 'Dashboard',
+        icon: <Home className="h-5 w-5" />,
+        href: '/dashboard',
+        dataAttributes: {
+          'data-tour': 'nav-dashboard',
+          'data-testid': 'sidebar-dashboard',
+        },
+      },
+      {
+        id: 'users',
+        label: 'Users',
+        icon: <Users className="h-5 w-5" />,
+        dataAttributes: {
+          'data-tour': 'nav-users',
+          'data-testid': 'sidebar-users',
+        },
+        children: [
+          {
+            id: 'all-users',
+            label: 'All Users',
+            href: '/users/all',
+            dataAttributes: {
+              'data-tour': 'nav-users-all',
+              'data-testid': 'sidebar-users-all',
+            },
+          },
+          {
+            id: 'active-users',
+            label: 'Active Users',
+            href: '/users/active',
+            dataAttributes: {
+              'data-tour': 'nav-users-active',
+              'data-testid': 'sidebar-users-active',
+            },
+          },
+        ],
+      },
+      {
+        id: 'reports',
+        label: 'Reports',
+        icon: <BarChart className="h-5 w-5" />,
+        href: '/reports',
+        dataAttributes: {
+          'data-tour': 'nav-reports',
+          'data-testid': 'sidebar-reports',
+        },
+      },
+      {
+        id: 'sep-1',
+        label: '',
+        separator: true,
+        dataAttributes: {
+          'data-testid': 'sidebar-separator-main',
+        },
+      },
+      {
+        id: 'settings',
+        label: 'Settings',
+        icon: <Settings className="h-5 w-5" />,
+        href: '/settings',
+        dataAttributes: {
+          'data-tour': 'nav-settings',
+          'data-testid': 'sidebar-settings',
+        },
+      },
+    ],
+    currentPath: '/dashboard',
+  },
+};

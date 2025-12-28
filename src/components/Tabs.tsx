@@ -18,6 +18,12 @@ export interface Tab {
   badgeVariant?: 'success' | 'warning' | 'error' | 'info' | 'neutral';
   /** Whether this individual tab can be closed (overrides global closeable) */
   closeable?: boolean;
+  /**
+   * Custom data attributes to spread on the tab trigger element.
+   * Useful for product tours (e.g., Driver.js) and E2E testing (Playwright, Cypress).
+   * @example { 'data-tour': 'tab-settings', 'data-testid': 'settings-tab' }
+   */
+  dataAttributes?: Record<string, string>;
 }
 
 export interface TabsProps {
@@ -274,6 +280,12 @@ export interface TabsTriggerProps {
   badgeVariant?: 'success' | 'warning' | 'error' | 'info' | 'neutral';
   /** Additional class name */
   className?: string;
+  /**
+   * Custom data attributes to spread on the tab trigger element.
+   * Useful for product tours (e.g., Driver.js) and E2E testing (Playwright, Cypress).
+   * @example { 'data-tour': 'tab-settings', 'data-testid': 'settings-tab' }
+   */
+  dataAttributes?: Record<string, string>;
 }
 
 /**
@@ -287,6 +299,7 @@ export function TabsTrigger({
   badge,
   badgeVariant = 'info',
   className = '',
+  dataAttributes,
 }: TabsTriggerProps) {
   const { activeTab, setActiveTab, variant, orientation, size, registerTab, unregisterTab } = useTabsContext();
   const isActive = activeTab === value;
@@ -332,6 +345,8 @@ export function TabsTrigger({
         focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-1
         ${className}
       `}
+      data-testid={dataAttributes?.['data-testid'] || `tab-${value}`}
+      {...dataAttributes}
     >
       {icon && <span className={`flex-shrink-0 ${sizeClasses[size].icon}`}>{icon}</span>}
       <span>{children}</span>
@@ -660,6 +675,8 @@ export default function Tabs({
                 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-1
                 group
               `}
+              data-testid={tab.dataAttributes?.['data-testid'] || `tab-${tab.id}`}
+              {...tab.dataAttributes}
             >
               {tab.icon && <span className={`flex-shrink-0 ${sizeClasses[size].icon}`}>{tab.icon}</span>}
               <span className={isTabCloseable ? 'mr-1' : ''}>{tab.label}</span>

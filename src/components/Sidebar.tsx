@@ -14,6 +14,12 @@ export interface SidebarItem {
   badge?: string | number;
   separator?: boolean; // Render as a separator instead of a nav item
   external?: boolean; // Open as external link instead of SPA navigation
+  /**
+   * Custom data attributes to spread on the rendered element.
+   * Useful for product tours (e.g., Driver.js) and E2E testing (Playwright, Cypress).
+   * @example { 'data-tour': 'nav-dashboard', 'data-testid': 'sidebar-dashboard' }
+   */
+  dataAttributes?: Record<string, string>;
 }
 
 export interface SidebarProps {
@@ -87,8 +93,8 @@ function SidebarNavItem({
         className={`
           w-full flex items-center justify-between py-2 text-sm transition-colors
           ${showFullActive
-            ? level > 0 
-              ? 'bg-accent-100 text-accent-900 font-medium rounded-lg border-l-2 border-accent-500' 
+            ? level > 0
+              ? 'bg-accent-100 text-accent-900 font-medium rounded-lg border-l-2 border-accent-500'
               : 'bg-accent-50 text-accent-900 font-medium rounded-lg'
             : showParentActive
             ? 'text-ink-900 rounded-lg'
@@ -98,6 +104,8 @@ function SidebarNavItem({
           }
           ${paddingLeft} pr-3
         `}
+        data-testid={item.dataAttributes?.['data-testid'] || `sidebar-item-${item.id}`}
+        {...item.dataAttributes}
       >
         <div className="flex items-center gap-3 min-w-0 flex-1">
           {item.icon && (
@@ -325,7 +333,14 @@ export default function Sidebar({
         {items.map((item) => {
           // Render separator
           if (item.separator) {
-            return <div key={item.id} className="my-4 border-t border-paper-300" />;
+            return (
+              <div
+                key={item.id}
+                className="my-4 border-t border-paper-300"
+                data-testid={item.dataAttributes?.['data-testid'] || `sidebar-separator-${item.id}`}
+                {...item.dataAttributes}
+              />
+            );
           }
 
           // Render nav item

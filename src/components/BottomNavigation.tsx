@@ -18,6 +18,12 @@ export interface BottomNavItem {
   onClick?: () => void;
   /** Disabled state */
   disabled?: boolean;
+  /**
+   * Custom data attributes to spread on the rendered element.
+   * Useful for product tours (e.g., Driver.js) and E2E testing (Playwright, Cypress).
+   * @example { 'data-tour': 'nav-home', 'data-testid': 'bottom-nav-home' }
+   */
+  dataAttributes?: Record<string, string>;
 }
 
 /**
@@ -122,8 +128,8 @@ export default function BottomNavigation({
                 relative flex flex-col items-center justify-center
                 flex-1 h-full min-w-touch-sm
                 transition-colors duration-200
-                ${item.disabled 
-                  ? 'opacity-40 cursor-not-allowed' 
+                ${item.disabled
+                  ? 'opacity-40 cursor-not-allowed'
                   : 'active:bg-paper-100'
                 }
                 ${isActive
@@ -133,6 +139,8 @@ export default function BottomNavigation({
               `}
               aria-current={isActive ? 'page' : undefined}
               aria-label={item.label}
+              data-testid={item.dataAttributes?.['data-testid'] || `bottom-nav-${item.id}`}
+              {...item.dataAttributes}
             >
               {/* Icon container */}
               <div className="relative">

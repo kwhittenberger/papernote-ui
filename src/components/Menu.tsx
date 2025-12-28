@@ -10,6 +10,12 @@ export interface MenuItem {
   danger?: boolean;
   divider?: boolean;
   submenu?: MenuItem[];
+  /**
+   * Custom data attributes to spread on the rendered element.
+   * Useful for product tours (e.g., Driver.js) and E2E testing (Playwright, Cypress).
+   * @example { 'data-tour': 'menu-settings', 'data-testid': 'menu-settings' }
+   */
+  dataAttributes?: Record<string, string>;
 }
 
 export interface MenuProps {
@@ -161,6 +167,8 @@ export default function Menu({
               key={`divider-${index}`}
               className="h-px bg-ink-200 my-1"
               role="separator"
+              data-testid={item.dataAttributes?.['data-testid'] || `menu-divider-${index}`}
+              {...item.dataAttributes}
             />
           );
         }
@@ -193,6 +201,8 @@ export default function Menu({
               role="menuitem"
               aria-haspopup={hasSubmenu}
               aria-expanded={hasSubmenu && isSubmenuOpen}
+              data-testid={item.dataAttributes?.['data-testid'] || `menu-item-${item.id}`}
+              {...item.dataAttributes}
             >
               <div className="flex items-center gap-2 flex-1 min-w-0">
                 {item.icon && (

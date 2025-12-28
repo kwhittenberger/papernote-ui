@@ -140,3 +140,60 @@ export const SpacerExample: Story = {
     </div>
   ),
 };
+
+/**
+ * Demonstrates custom data attributes for E2E testing and product tours.
+ * Each item includes data-testid and data-tour attributes for reliable element targeting.
+ *
+ * Inspect the elements to see the data attributes:
+ * - `data-testid`: For E2E testing with Playwright/Cypress
+ * - `data-tour`: For product tours with Driver.js or similar libraries
+ */
+export const WithDataAttributes: Story = {
+  args: {
+    items: [
+      {
+        id: 'home',
+        label: 'Home',
+        icon: <Home className="w-6 h-6" />,
+        href: '/',
+        dataAttributes: {
+          'data-tour': 'bottom-nav-home',
+          'data-testid': 'bottom-nav-home',
+        },
+      },
+      {
+        id: 'search',
+        label: 'Search',
+        icon: <Search className="w-6 h-6" />,
+        href: '/search',
+        dataAttributes: {
+          'data-tour': 'bottom-nav-search',
+          'data-testid': 'bottom-nav-search',
+        },
+      },
+      {
+        id: 'notifications',
+        label: 'Alerts',
+        icon: <Bell className="w-6 h-6" />,
+        badge: 3,
+        dataAttributes: {
+          'data-tour': 'bottom-nav-notifications',
+          'data-testid': 'bottom-nav-notifications',
+        },
+      },
+      {
+        id: 'profile',
+        label: 'Profile',
+        icon: <User className="w-6 h-6" />,
+        href: '/profile',
+        dataAttributes: {
+          'data-tour': 'bottom-nav-profile',
+          'data-testid': 'bottom-nav-profile',
+        },
+      },
+    ],
+    activeId: 'home',
+    onNavigate: (id, href) => console.log('Navigate:', id, href),
+  },
+};

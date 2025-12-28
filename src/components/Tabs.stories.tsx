@@ -923,3 +923,129 @@ This example places the tabs in a header row separate from the content area.
     },
   },
 };
+
+/**
+ * Demonstrates custom data attributes for E2E testing and product tours.
+ * Each tab includes data-testid and data-tour attributes for reliable element targeting.
+ *
+ * Inspect the elements to see the data attributes:
+ * - `data-testid`: For E2E testing with Playwright/Cypress
+ * - `data-tour`: For product tours with Driver.js or similar libraries
+ */
+export const WithDataAttributes: Story = {
+  render: () => {
+    const [activeTab, setActiveTab] = useState('profile');
+    const tabs: Tab[] = [
+      {
+        id: 'profile',
+        label: 'Profile',
+        icon: <User className="h-4 w-4" />,
+        content: <div style={{ padding: '1rem' }}><h3>Profile</h3><p>Manage your profile information.</p></div>,
+        dataAttributes: {
+          'data-tour': 'tab-profile',
+          'data-testid': 'tab-profile',
+        },
+      },
+      {
+        id: 'settings',
+        label: 'Settings',
+        icon: <Settings className="h-4 w-4" />,
+        content: <div style={{ padding: '1rem' }}><h3>Settings</h3><p>Configure your preferences.</p></div>,
+        dataAttributes: {
+          'data-tour': 'tab-settings',
+          'data-testid': 'tab-settings',
+        },
+      },
+      {
+        id: 'notifications',
+        label: 'Notifications',
+        icon: <Bell className="h-4 w-4" />,
+        badge: 5,
+        content: <div style={{ padding: '1rem' }}><h3>Notifications</h3><p>View your notifications.</p></div>,
+        dataAttributes: {
+          'data-tour': 'tab-notifications',
+          'data-testid': 'tab-notifications',
+        },
+      },
+    ];
+
+    return (
+      <div>
+        <p style={{ marginBottom: '1rem', color: '#64748b', fontSize: '0.875rem' }}>
+          Inspect the tab buttons to see the <code>data-tour</code> and <code>data-testid</code> attributes.
+        </p>
+        <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
+      </div>
+    );
+  },
+};
+
+/**
+ * Compound component pattern with custom data attributes for testing and product tours.
+ */
+export const CompoundWithDataAttributes: Story = {
+  render: () => (
+    <TabsRoot defaultValue="account">
+      <TabsList>
+        <TabsTrigger
+          value="account"
+          icon={<User className="h-4 w-4" />}
+          dataAttributes={{
+            'data-tour': 'compound-tab-account',
+            'data-testid': 'compound-tab-account',
+          }}
+        >
+          Account
+        </TabsTrigger>
+        <TabsTrigger
+          value="password"
+          icon={<Lock className="h-4 w-4" />}
+          dataAttributes={{
+            'data-tour': 'compound-tab-password',
+            'data-testid': 'compound-tab-password',
+          }}
+        >
+          Password
+        </TabsTrigger>
+        <TabsTrigger
+          value="settings"
+          icon={<Settings className="h-4 w-4" />}
+          dataAttributes={{
+            'data-tour': 'compound-tab-settings',
+            'data-testid': 'compound-tab-settings',
+          }}
+        >
+          Settings
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value="account">
+        <div style={{ padding: '1rem' }}>
+          <h3>Account Settings</h3>
+          <p>Manage your account information and preferences.</p>
+        </div>
+      </TabsContent>
+      <TabsContent value="password">
+        <div style={{ padding: '1rem' }}>
+          <h3>Password Settings</h3>
+          <p>Change your password and security settings.</p>
+        </div>
+      </TabsContent>
+      <TabsContent value="settings">
+        <div style={{ padding: '1rem' }}>
+          <h3>Application Settings</h3>
+          <p>Configure application preferences.</p>
+        </div>
+      </TabsContent>
+    </TabsRoot>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `
+The compound component pattern also supports \`dataAttributes\` on the \`TabsTrigger\` component.
+This allows targeting individual tabs with selectors like \`[data-tour="compound-tab-account"]\`.
+        `,
+      },
+    },
+  },
+};
