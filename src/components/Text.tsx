@@ -23,7 +23,7 @@ export interface TextProps extends Omit<React.HTMLAttributes<HTMLElement>, 'colo
   /** Weight variant */
   weight?: 'normal' | 'medium' | 'semibold' | 'bold';
   /** Color variant */
-  color?: 'primary' | 'secondary' | 'muted' | 'accent' | 'error' | 'success' | 'warning';
+  color?: 'primary' | 'secondary' | 'muted' | 'accent' | 'error' | 'success' | 'warning' | 'caution';
   /** Text alignment */
   align?: 'left' | 'center' | 'right';
   /** Truncate text with ellipsis (single line) */
@@ -54,9 +54,10 @@ export interface TextProps extends Omit<React.HTMLAttributes<HTMLElement>, 'colo
  * <Text size="lg" weight="semibold" color="primary">
  *   Hello World
  * </Text>
- * 
+ *
  * <Text color="warning">Warning message</Text>
- * 
+ * <Text color="caution">Caution message (informational, not alarming)</Text>
+ *
  * // With ref
  * const textRef = useRef<HTMLParagraphElement>(null);
  * <Text ref={textRef}>Measurable text</Text>
@@ -130,6 +131,7 @@ export const Text = forwardRef<HTMLElement, TextProps>(({
     error: 'text-error-600',
     success: 'text-success-600',
     warning: 'text-warning-600',
+    caution: 'text-warning-700',
   };
 
   const alignClasses = {

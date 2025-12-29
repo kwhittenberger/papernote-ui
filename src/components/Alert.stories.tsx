@@ -13,7 +13,7 @@ const meta = {
 Alert banner for displaying important messages with contextual styling and actions.
 
 ## Features
-- **Variants**: info, success, warning, error with semantic colors
+- **Variants**: info, success, warning, caution, error with semantic colors
 - **Icons**: Automatic variant-specific icons
 - **Title & Message**: Optional title with message content
 - **Dismissible**: Optional close button
@@ -45,10 +45,10 @@ import { Alert } from 'notebook-ui';
   argTypes: {
     variant: {
       control: 'select',
-      options: ['info', 'success', 'warning', 'error'],
+      options: ['info', 'success', 'warning', 'caution', 'error'],
       description: 'Alert variant with semantic colors and icons',
       table: {
-        type: { summary: 'info | success | warning | error' },
+        type: { summary: 'info | success | warning | caution | error' },
         defaultValue: { summary: 'info' },
       },
     },
@@ -114,6 +114,18 @@ export const Warning: Story = {
   },
 };
 
+/**
+ * Caution variant for informational states that need context but aren't alarming.
+ * Use for demo/sandbox modes, wash sale notices, or exploratory features.
+ */
+export const Caution: Story = {
+  args: {
+    variant: 'caution',
+    title: 'Demo Mode',
+    children: 'You are in demo mode. Changes will not be saved to the database.',
+  },
+};
+
 export const Error: Story = {
   args: {
     variant: 'error',
@@ -170,10 +182,11 @@ export const LongMessage: Story = {
 export const AllVariants: Story = {
   render: () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-      <Alert variant="info" title="Information" message="This is an informational message." />
-      <Alert variant="success" title="Success" message="Operation completed successfully." />
-      <Alert variant="warning" title="Warning" message="Please review before proceeding." />
-      <Alert variant="error" title="Error" message="Something went wrong." />
+      <Alert variant="info" title="Information">This is an informational message.</Alert>
+      <Alert variant="success" title="Success">Operation completed successfully.</Alert>
+      <Alert variant="warning" title="Warning">Please review before proceeding.</Alert>
+      <Alert variant="caution" title="Demo Mode">You are exploring in sandbox mode.</Alert>
+      <Alert variant="error" title="Error">Something went wrong.</Alert>
     </div>
   ),
 };

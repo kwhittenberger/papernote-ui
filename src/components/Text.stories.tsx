@@ -16,7 +16,7 @@ Text component for consistent typography across the application.
 - **Semantic elements**: Render as p, span, div, h1-h6, or label
 - **Size scale**: xs, sm, base, lg, xl, 2xl
 - **Weight options**: normal, medium, semibold, bold
-- **Color variants**: primary, secondary, muted, accent, error, success, warning
+- **Color variants**: primary, secondary, muted, accent, error, success, warning, caution
 - **Text alignment**: left, center, right
 - **Truncation**: Single line truncate or multi-line clamp (1-6 lines)
 - **Transform**: uppercase, lowercase, capitalize
@@ -61,7 +61,7 @@ import { Text } from 'notebook-ui';
     },
     color: {
       control: 'select',
-      options: ['primary', 'secondary', 'muted', 'accent', 'error', 'success', 'warning'],
+      options: ['primary', 'secondary', 'muted', 'accent', 'error', 'success', 'warning', 'caution'],
       description: 'Text color',
     },
     align: {
@@ -120,7 +120,9 @@ export const Weights: Story = {
 };
 
 /**
- * All available color variants including the new `warning` color.
+ * All available color variants including `warning` and `caution` colors.
+ * - **warning**: Urgent attention needed (brighter amber)
+ * - **caution**: Informational, exploratory states like sandbox/demo mode (darker, subdued amber)
  */
 export const Colors: Story = {
   render: () => (
@@ -130,15 +132,16 @@ export const Colors: Story = {
       <Text color="muted">Muted - Subdued text</Text>
       <Text color="accent">Accent - Branded color</Text>
       <Text color="success">Success - Positive feedback</Text>
-      <Text color="warning">Warning - Caution messages</Text>
+      <Text color="warning">Warning - Urgent attention</Text>
+      <Text color="caution">Caution - Informational, exploratory</Text>
       <Text color="error">Error - Error messages</Text>
     </Stack>
   ),
 };
 
 /**
- * The warning color is useful for displaying caution messages,
- * threshold alerts, or status indicators that need attention.
+ * The warning color is useful for urgent alerts, threshold warnings,
+ * or status indicators that need immediate attention.
  */
 export const WarningColor: Story = {
   render: () => (
@@ -151,6 +154,27 @@ export const WarningColor: Story = {
       </Text>
       <Text color="warning" size="sm">
         This action cannot be undone
+      </Text>
+    </Stack>
+  ),
+};
+
+/**
+ * The caution color is for informational states that need context but aren't alarming.
+ * Use for demo/sandbox modes, wash sale notices, or exploratory features.
+ * It's calmer than warning - inviting users to explore safely.
+ */
+export const CautionColor: Story = {
+  render: () => (
+    <Stack spacing="md">
+      <Text color="caution" size="lg" weight="semibold">
+        Demo Mode: Changes will not be saved
+      </Text>
+      <Text color="caution">
+        This is a sandbox environment for testing
+      </Text>
+      <Text color="caution" size="sm">
+        Wash sale: Cost basis adjusted for tax purposes
       </Text>
     </Stack>
   ),

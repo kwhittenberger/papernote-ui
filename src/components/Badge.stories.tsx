@@ -14,7 +14,7 @@ const meta = {
 Badge component for status indicators, labels, and tags with optional icons and removal.
 
 ## Features
-- **Variants**: success, warning, error, info, neutral with semantic colors
+- **Variants**: success, warning, caution, error, info, neutral with semantic colors
 - **Sizes**: sm, md, lg
 - **Icons**: Display icons alongside text
 - **Removable**: Optional X button for dismissible badges
@@ -44,10 +44,10 @@ import { Check } from 'lucide-react';
   argTypes: {
     variant: {
       control: 'select',
-      options: ['success', 'warning', 'error', 'info', 'neutral'],
+      options: ['success', 'warning', 'caution', 'error', 'info', 'neutral'],
       description: 'Badge variant with semantic colors',
       table: {
-        type: { summary: 'success | warning | error | info | neutral' },
+        type: { summary: 'success | warning | caution | error | info | neutral' },
         defaultValue: { summary: 'neutral' },
       },
     },
@@ -110,6 +110,17 @@ export const Warning: Story = {
   args: {
     variant: 'warning',
     children: 'Warning',
+  },
+};
+
+/**
+ * Caution variant for informational states that need context but aren't alarming.
+ * Use for demo/sandbox modes, wash sale notices, or exploratory features.
+ */
+export const Caution: Story = {
+  args: {
+    variant: 'caution',
+    children: 'Demo Mode',
   },
 };
 
@@ -199,10 +210,10 @@ export const DotWithText: Story = {
 export const AllVariants: Story = {
   render: () => (
     <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-      <Badge variant="default">Default</Badge>
-      <Badge variant="primary">Primary</Badge>
+      <Badge variant="neutral">Neutral</Badge>
       <Badge variant="success">Success</Badge>
       <Badge variant="warning">Warning</Badge>
+      <Badge variant="caution">Caution</Badge>
       <Badge variant="error">Error</Badge>
       <Badge variant="info">Info</Badge>
     </div>
@@ -224,10 +235,10 @@ export const StatusBadges: Story = {
     <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
       <Badge variant="success">Active</Badge>
       <Badge variant="warning">Pending</Badge>
+      <Badge variant="caution">Demo</Badge>
       <Badge variant="error">Inactive</Badge>
       <Badge variant="info">Draft</Badge>
-      <Badge variant="primary">Published</Badge>
-      <Badge variant="default">Archived</Badge>
+      <Badge variant="neutral">Archived</Badge>
     </div>
   ),
 };

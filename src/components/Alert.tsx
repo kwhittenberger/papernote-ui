@@ -8,7 +8,7 @@ export interface AlertAction {
 }
 
 export interface AlertProps {
-  variant?: 'success' | 'error' | 'warning' | 'info';
+  variant?: 'success' | 'error' | 'warning' | 'caution' | 'info';
   title?: string;
   children: React.ReactNode;
   onClose?: () => void;
@@ -38,6 +38,10 @@ export default function Alert({
       container: 'bg-warning-50 border-warning-200 text-warning-900',
       icon: <AlertTriangle className="h-5 w-5 text-warning-600" />,
     },
+    caution: {
+      container: 'bg-warning-100 border-warning-200 text-warning-800',
+      icon: <Info className="h-5 w-5 text-warning-700" />,
+    },
     info: {
       container: 'bg-primary-50 border-primary-200 text-primary-900',
       icon: <Info className="h-5 w-5 text-primary-600" />,
@@ -54,6 +58,7 @@ export default function Alert({
         success: 'bg-success-600 text-white hover:bg-success-700',
         error: 'bg-error-600 text-white hover:bg-error-700',
         warning: 'bg-warning-600 text-white hover:bg-warning-700',
+        caution: 'bg-warning-700 text-white hover:bg-warning-800',
         info: 'bg-primary-600 text-white hover:bg-primary-700',
       };
       return `${base} ${variantClasses[variant]}`;
@@ -64,6 +69,7 @@ export default function Alert({
       success: 'bg-white border border-success-300 text-success-700 hover:bg-success-50',
       error: 'bg-white border border-error-300 text-error-700 hover:bg-error-50',
       warning: 'bg-white border border-warning-300 text-warning-700 hover:bg-warning-50',
+      caution: 'bg-white border border-warning-300 text-warning-800 hover:bg-warning-50',
       info: 'bg-white border border-primary-300 text-primary-700 hover:bg-primary-50',
     };
     return `${base} ${variantClasses[variant]}`;

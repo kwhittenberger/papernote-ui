@@ -1,8 +1,8 @@
 
-import { CheckCircle, Clock, AlertCircle, XCircle } from 'lucide-react';
+import { CheckCircle, Clock, AlertCircle, XCircle, Info } from 'lucide-react';
 
 export interface StatusBadgeProps {
-  status: 'paid' | 'pending' | 'overdue' | 'cancelled' | 'success' | 'warning' | 'error' | 'info';
+  status: 'paid' | 'pending' | 'overdue' | 'cancelled' | 'success' | 'warning' | 'caution' | 'error' | 'info';
   label?: string;
   size?: 'sm' | 'md' | 'lg';
   showIcon?: boolean;
@@ -28,6 +28,11 @@ const statusConfig = {
     icon: AlertCircle,
     defaultLabel: 'Warning',
     className: 'bg-warning-100 text-warning-800',
+  },
+  caution: {
+    icon: Info,
+    defaultLabel: 'Caution',
+    className: 'bg-warning-100 text-warning-700',
   },
   overdue: {
     icon: AlertCircle,
