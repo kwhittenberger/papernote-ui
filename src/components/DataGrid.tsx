@@ -747,19 +747,17 @@ export const DataGrid = forwardRef<DataGridHandle, DataGridProps>(
         if (column.type === 'currency' && !isNaN(numVal)) {
           const decimals = column.format?.decimals ?? 2;
           const prefix = column.format?.prefix ?? '$';
-          return `${prefix}${numVal.toFixed(decimals)}`;
+          return `${prefix}${numVal.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}`;
         }
 
         if (column.type === 'percent' && !isNaN(numVal)) {
-          const decimals = column.format?.decimals ?? 1;
-          return `${(numVal * 100).toFixed(decimals)}%`;
+          const decimals = column.format?.decimals ?? 2;
+          return `${(numVal * 100).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}%`;
         }
 
         if (column.type === 'number' && !isNaN(numVal)) {
-          const decimals = column.format?.decimals;
-          if (decimals !== undefined) {
-            return numVal.toFixed(decimals);
-          }
+          const decimals = column.format?.decimals ?? 0;
+          return numVal.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
         }
 
         return String(value);
