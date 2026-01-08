@@ -32,3 +32,4 @@ jobs:
           buildScriptName: 'build-storybook'
           autoAcceptChanges: 'main' # Auto-accept on main branch
           exitZeroOnChanges: true # Don't fail on visual changes
+          onlyChanged: true # Only snapshot stories affected by changes
