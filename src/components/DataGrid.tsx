@@ -76,6 +76,10 @@ export interface DataGridColumn {
     prefix?: string;
     suffix?: string;
   };
+  /** Column group identifier for visual banding (e.g., "SalesAmount" groups base column with comparison variants) */
+  group?: string;
+  /** Variant type within a group: "current", "prior", "variance", "variancePct" */
+  variant?: 'current' | 'prior' | 'variance' | 'variancePct';
 }
 
 /**
@@ -196,6 +200,34 @@ const colIndexToLetter = (index: number): string => {
 // const parseRef = (ref: string): { row: number; col: number } | null => { ... }
 
 /**
+ * Color banding for column groups (e.g., comparison columns)
+ * Alternates between color sets to visually distinguish groups
+ */
+const COLUMN_GROUP_COLORS = [
+  { header: 'bg-sky-100', cell: 'bg-sky-50', cellAlt: 'bg-sky-100/50' },
+  { header: 'bg-amber-100', cell: 'bg-amber-50', cellAlt: 'bg-amber-100/50' },
+  { header: 'bg-emerald-100', cell: 'bg-emerald-50', cellAlt: 'bg-emerald-100/50' },
+  { header: 'bg-pink-100', cell: 'bg-pink-50', cellAlt: 'bg-pink-100/50' },
+];
+
+/**
+ * Build a map of group names to color indices for column banding
+ */
+const buildGroupColorMap = (columns: DataGridColumn[]): Map<string, number> => {
+  const groupColorMap = new Map<string, number>();
+  let colorIndex = 0;
+
+  for (const col of columns) {
+    if (col.group && !groupColorMap.has(col.group)) {
+      groupColorMap.set(col.group, colorIndex % COLUMN_GROUP_COLORS.length);
+      colorIndex++;
+    }
+  }
+
+  return groupColorMap;
+};
+
+/**
  * DataGrid - Excel-like data grid component with formulas
  *
  * A grid-based spreadsheet component that provides:
@@ -290,6 +322,41 @@ export const DataGrid = forwardRef<DataGridHandle, DataGridProps>(
       if (typeof frozenRowsState === 'number') return frozenRowsState;
       return 0;
     }, [frozenRowsState, selectedCell]);
+
+    // Build group color map for column banding
+    const groupColorMap = useMemo(() => buildGroupColorMap(columns), [columns]);
+
+    // Get header background class for a column (considers group banding)
+    const getHeaderBgClass = useCallback(
+      (column: DataGridColumn): string => {
+        if (column.group) {
+          const colorIdx = groupColorMap.get(column.group);
+          if (colorIdx !== undefined) {
+            return COLUMN_GROUP_COLORS[colorIdx].header;
+          }
+        }
+        return 'bg-stone-100';
+      },
+      [groupColorMap]
+    );
+
+    // Get cell background class for a column (considers group banding and zebra)
+    const getCellBgClass = useCallback(
+      (column: DataGridColumn, isZebra: boolean, isFrozenCol: boolean): string => {
+        if (column.group) {
+          const colorIdx = groupColorMap.get(column.group);
+          if (colorIdx !== undefined) {
+            const colors = COLUMN_GROUP_COLORS[colorIdx];
+            return isZebra ? colors.cellAlt : colors.cell;
+          }
+        }
+        // Default behavior
+        if (isZebra && isFrozenCol) return 'bg-paper-50';
+        if (isFrozenCol) return 'bg-white';
+        return '';
+      },
+      [groupColorMap]
+    );
 
     // Check if a specific row is frozen
     const isRowFrozen = useCallback(
@@ -821,11 +888,12 @@ export const DataGrid = forwardRef<DataGridHandle, DataGridProps>(
                 {columns.map((column, colIndex) => {
                   const isFrozen = colIndex < frozenColumns;
                   const leftOffset = rowHeaders ? 50 + columns.slice(0, colIndex).reduce((sum, c) => sum + (c.width || 100), 0) : columns.slice(0, colIndex).reduce((sum, c) => sum + (c.width || 100), 0);
+                  const headerBgClass = getHeaderBgClass(column);
 
                   return (
                     <th
                       key={column.key}
-                      className={`${cellPadding} border-b border-r border-stone-200 bg-stone-100 font-semibold text-ink-600 text-${column.align || 'left'} ${
+                      className={`${cellPadding} border-b border-r border-stone-200 ${headerBgClass} font-semibold text-ink-600 text-${column.align || 'left'} ${
                         isFrozen ? 'sticky z-30' : ''
                       }`}
                       style={{
@@ -944,17 +1012,16 @@ export const DataGrid = forwardRef<DataGridHandle, DataGridProps>(
                       const leftOffset = rowHeaders
                         ? 50 + columns.slice(0, colIndex).reduce((sum, c) => sum + (c.width || 100), 0)
                         : columns.slice(0, colIndex).reduce((sum, c) => sum + (c.width || 100), 0);
+                      const cellBgClass = getCellBgClass(column, isZebra, isFrozenCol);
 
                       return (
                         <td
                           key={colIndex}
                           className={`${cellPadding} border-b border-r border-stone-200 text-${
                             column?.align || 'left'
-                          } ${isFrozenCol ? 'sticky z-10' : ''} ${
-                            isZebra && isFrozenCol ? 'bg-paper-50' : isFrozenCol ? 'bg-white' : ''
-                          } ${isSelected ? 'ring-2 ring-inset ring-primary-500' : ''} ${
-                            hasFormula ? 'bg-blue-50' : ''
-                          } ${cell?.className || ''}`}
+                          } ${isFrozenCol ? 'sticky z-10' : ''} ${cellBgClass} ${
+                            isSelected ? 'ring-2 ring-inset ring-primary-500' : ''
+                          } ${hasFormula ? 'bg-blue-50' : ''} ${cell?.className || ''}`}
                           style={{
                             left: isFrozenCol ? leftOffset : undefined,
                             minWidth: column?.minWidth || 80,
