@@ -111,5 +111,8 @@
     "canvas-confetti": "^1.9.4",
     "react-spreadsheet": "^0.10.1",
     "xlsx": "^0.18.5"
+  },
+  "overrides": {
+    "esbuild": "^0.25.0"
   }
 }
