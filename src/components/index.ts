@@ -404,6 +404,10 @@ export type {
   FrozenRowMode,
 } from './DataGrid';
 
+// PivotTable (cross-tabulation display)
+export { default as PivotTable } from './PivotTable';
+export type { PivotTableProps } from './PivotTable';
+
 export { default as SwipeActions } from './SwipeActions';
 export type { SwipeActionsProps, SwipeAction } from './SwipeActions';
 
