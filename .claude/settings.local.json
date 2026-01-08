@@ -59,7 +59,10 @@
       "Bash(ls:*)",
       "Bash(grep:*)",
       "Bash(~/bin/linear:*)",
-      "Bash(\"https://api.linear.app/graphql\" )"
+      "Bash(\"https://api.linear.app/graphql\" )",
+      "Bash(gh api:*)",
+      "Bash(npm audit:*)",
+      "Bash(npm run docs:build:*)"
     ],
     "deny": [],
     "ask": []

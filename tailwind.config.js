@@ -4,6 +4,15 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  // Safelist dynamic classes used in DataGrid column grouping
+  // These are applied programmatically and won't be detected by content scanning
+  safelist: [
+    // Column group color banding (used in DataGrid.tsx)
+    'bg-sky-100', 'bg-sky-50', 'bg-sky-100/50',
+    'bg-amber-100', 'bg-amber-50', 'bg-amber-100/50',
+    'bg-emerald-100', 'bg-emerald-50', 'bg-emerald-100/50',
+    'bg-pink-100', 'bg-pink-50', 'bg-pink-100/50',
+  ],
   theme: {
     extend: {
       colors: {
