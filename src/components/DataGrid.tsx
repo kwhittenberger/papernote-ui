@@ -159,6 +159,12 @@ export interface DataGridProps {
   className?: string;
   /** Density */
   density?: 'compact' | 'normal' | 'comfortable';
+  /** Enable virtual scrolling for large datasets (only renders visible rows) */
+  virtualized?: boolean;
+  /** Row height in pixels when virtualized (default: 40) */
+  virtualRowHeight?: number;
+  /** Number of rows to render above/below visible area (default: 5) */
+  virtualOverscan?: number;
 }
 
 /**
@@ -287,11 +293,15 @@ export const DataGrid = forwardRef<DataGridHandle, DataGridProps>(
       toolbarActions,
       className = '',
       density = 'normal',
+      virtualized = false,
+      virtualRowHeight = 40,
+      virtualOverscan = 5,
     },
     ref
   ) => {
     // State
     const [data, setData] = useState<DataGridCell[][]>(initialData);
+    const [scrollTop, setScrollTop] = useState(0);
     const [editingCell, setEditingCell] = useState<{ row: number; col: number } | null>(null);
     const [editValue, setEditValue] = useState<string>('');
     const [sortConfig, setSortConfig] = useState<SortConfig | null>(null);
@@ -358,24 +368,17 @@ export const DataGrid = forwardRef<DataGridHandle, DataGridProps>(
       [groupColorMap]
     );
 
-    // Check if a specific row is frozen
-    const isRowFrozen = useCallback(
-      (rowIndex: number) => {
-        if (frozenRowsState === 'none') return false;
-        if (frozenRowsState === 'first') return rowIndex === 0;
-        if (frozenRowsState === 'selected') {
-          return selectedCell ? rowIndex === selectedCell.row : false;
-        }
-        if (typeof frozenRowsState === 'number') return rowIndex < frozenRowsState;
-        return false;
-      },
-      [frozenRowsState, selectedCell]
-    );
-
     // Update data when initialData changes
     useEffect(() => {
       setData(initialData);
     }, [initialData]);
+
+    // Handle scroll for virtualization
+    const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+      if (virtualized) {
+        setScrollTop(e.currentTarget.scrollTop);
+      }
+    }, [virtualized]);
 
     // Get computed data with formulas evaluated
     // Uses a cache to handle formula dependencies (formulas referencing other formulas)
@@ -495,6 +498,36 @@ export const DataGrid = forwardRef<DataGridHandle, DataGridProps>(
 
       return [...frozenData, ...filtered];
     }, [sortedData, filters, columns, frozenRows]);
+
+    // Calculate visible rows for virtualization
+    const visibleRowRange = useMemo(() => {
+      if (!virtualized) {
+        return { startIndex: 0, endIndex: filteredData.length, paddingTop: 0, paddingBottom: 0, frozenRowCount: 0 };
+      }
+
+      const containerHeight = typeof height === 'number' ? height : 400;
+      const headerHeight = 40; // Approximate header height
+      const availableHeight = containerHeight - headerHeight;
+
+      // Account for frozen rows
+      const frozenRowCount = frozenRows;
+      const scrollableData = filteredData.slice(frozenRowCount);
+
+      const visibleCount = Math.ceil(availableHeight / virtualRowHeight);
+      const startIndex = Math.max(0, Math.floor(scrollTop / virtualRowHeight) - virtualOverscan);
+      const endIndex = Math.min(scrollableData.length, startIndex + visibleCount + (virtualOverscan * 2));
+
+      const paddingTop = startIndex * virtualRowHeight;
+      const paddingBottom = Math.max(0, (scrollableData.length - endIndex) * virtualRowHeight);
+
+      return {
+        startIndex: startIndex + frozenRowCount,
+        endIndex: endIndex + frozenRowCount,
+        paddingTop,
+        paddingBottom,
+        frozenRowCount
+      };
+    }, [virtualized, filteredData.length, scrollTop, height, virtualRowHeight, virtualOverscan, frozenRows]);
 
     // Handle cell edit start
     const handleCellDoubleClick = useCallback(
@@ -866,6 +899,7 @@ export const DataGrid = forwardRef<DataGridHandle, DataGridProps>(
           className="relative overflow-auto border border-stone-200 rounded-lg bg-white"
           style={{ height }}
           onKeyDown={handleKeyDown}
+          onScroll={handleScroll}
           tabIndex={0}
         >
           <table className="border-collapse" style={{ tableLayout: 'auto' }}>
@@ -974,18 +1008,23 @@ export const DataGrid = forwardRef<DataGridHandle, DataGridProps>(
 
             {/* Body */}
             <tbody>
-              {filteredData.map((row, rowIndex) => {
-                const isFrozen = isRowFrozen(rowIndex);
+              {/* Top spacer for virtualization */}
+              {virtualized && visibleRowRange.paddingTop > 0 && (
+                <tr style={{ height: visibleRowRange.paddingTop }}>
+                  <td colSpan={columns.length + (rowHeaders ? 1 : 0)} />
+                </tr>
+              )}
+
+              {/* Render frozen rows first (always visible) */}
+              {filteredData.slice(0, visibleRowRange.frozenRowCount).map((row, rowIndex) => {
                 const isZebra = zebraStripes && rowIndex % 2 === 1;
 
                 return (
                   <tr
-                    key={rowIndex}
-                    className={`${isZebra ? 'bg-paper-50' : 'bg-white'} ${
-                      isFrozen ? 'sticky z-10' : ''
-                    } ${isFrozen ? 'shadow-sm' : ''}`}
+                    key={`frozen-${rowIndex}`}
+                    className={`${isZebra ? 'bg-paper-50' : 'bg-white'} sticky z-10 shadow-sm`}
                     style={{
-                      top: isFrozen ? `${40 + rowIndex * 40}px` : undefined,
+                      top: `${40 + rowIndex * virtualRowHeight}px`,
                     }}
                   >
                     {/* Row header */}
@@ -1023,6 +1062,7 @@ export const DataGrid = forwardRef<DataGridHandle, DataGridProps>(
                           style={{
                             left: isFrozenCol ? leftOffset : undefined,
                             minWidth: column?.minWidth || 80,
+                            height: virtualized ? virtualRowHeight : undefined,
                           }}
                           onClick={() => handleCellClick(rowIndex, colIndex)}
                           onDoubleClick={(e) => handleCellDoubleClick(rowIndex, colIndex, e.currentTarget)}
@@ -1058,6 +1098,104 @@ export const DataGrid = forwardRef<DataGridHandle, DataGridProps>(
                   </tr>
                 );
               })}
+
+              {/* Render visible rows (virtualized or all) */}
+              {filteredData
+                .slice(
+                  virtualized ? Math.max(visibleRowRange.startIndex, visibleRowRange.frozenRowCount) : visibleRowRange.frozenRowCount,
+                  virtualized ? visibleRowRange.endIndex : filteredData.length
+                )
+                .map((row, idx) => {
+                  const rowIndex = virtualized
+                    ? Math.max(visibleRowRange.startIndex, visibleRowRange.frozenRowCount) + idx
+                    : visibleRowRange.frozenRowCount + idx;
+                  const isZebra = zebraStripes && rowIndex % 2 === 1;
+
+                  return (
+                    <tr
+                      key={rowIndex}
+                      className={`${isZebra ? 'bg-paper-50' : 'bg-white'}`}
+                      style={{
+                        height: virtualized ? virtualRowHeight : undefined,
+                      }}
+                    >
+                      {/* Row header */}
+                      {rowHeaders && (
+                        <td
+                          className={`${cellPadding} border-b border-r border-stone-200 bg-stone-50 text-ink-500 font-medium sticky left-0 z-10`}
+                          style={{ width: 50, minWidth: 50, maxWidth: 50 }}
+                        >
+                          {Array.isArray(rowHeaders) ? rowHeaders[rowIndex] : rowIndex + 1}
+                        </td>
+                      )}
+
+                      {/* Data cells */}
+                      {row.map((cell, colIndex) => {
+                        const column = columns[colIndex];
+                        const isFrozenCol = colIndex < frozenColumns;
+                        const isEditing =
+                          editingCell?.row === rowIndex && editingCell?.col === colIndex;
+                        const isSelected =
+                          selectedCell?.row === rowIndex && selectedCell?.col === colIndex;
+                        const hasFormula = !!cell?.formula;
+                        const leftOffset = rowHeaders
+                          ? 50 + columns.slice(0, colIndex).reduce((sum, c) => sum + (c.width || 100), 0)
+                          : columns.slice(0, colIndex).reduce((sum, c) => sum + (c.width || 100), 0);
+                        const cellBgClass = getCellBgClass(column, isZebra, isFrozenCol);
+
+                        return (
+                          <td
+                            key={colIndex}
+                            className={`${cellPadding} border-b border-r border-stone-200 text-${
+                              column?.align || 'left'
+                            } ${isFrozenCol ? 'sticky z-10' : ''} ${cellBgClass} ${
+                              isSelected ? 'ring-2 ring-inset ring-primary-500' : ''
+                            } ${hasFormula ? 'bg-blue-50' : ''} ${cell?.className || ''}`}
+                            style={{
+                              left: isFrozenCol ? leftOffset : undefined,
+                              minWidth: column?.minWidth || 80,
+                            }}
+                            onClick={() => handleCellClick(rowIndex, colIndex)}
+                            onDoubleClick={(e) => handleCellDoubleClick(rowIndex, colIndex, e.currentTarget)}
+                          >
+                            {isEditing ? (
+                              formulas ? (
+                                <FormulaAutocomplete
+                                  value={editValue}
+                                  onChange={setEditValue}
+                                  onComplete={handleEditComplete}
+                                  onCancel={handleEditCancel}
+                                  anchorRect={editingCellRect}
+                                  autoFocus
+                                />
+                              ) : (
+                                <input
+                                  ref={inputRef}
+                                  type="text"
+                                  value={editValue}
+                                  onChange={(e) => setEditValue(e.target.value)}
+                                  onBlur={handleEditComplete}
+                                  onKeyDown={handleEditKeyDown}
+                                  className="w-full h-full border-none outline-none bg-transparent"
+                                  style={{ margin: '-4px', padding: '4px' }}
+                                />
+                              )
+                            ) : (
+                              formatValue(cell?.value, column)
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  );
+                })}
+
+              {/* Bottom spacer for virtualization */}
+              {virtualized && visibleRowRange.paddingBottom > 0 && (
+                <tr style={{ height: visibleRowRange.paddingBottom }}>
+                  <td colSpan={columns.length + (rowHeaders ? 1 : 0)} />
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
