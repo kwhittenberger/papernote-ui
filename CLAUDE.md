@@ -1,39 +1,29 @@
-# CLAUDE.md
+# CLAUDE.md — papernote-ui (notebook-ui)
 
-This file provides guidance to Claude Code when working with notebook-ui.
+This file provides project-specific guidance for this codebase. For universal workflow rules, see the root `../CLAUDE.md`.
 
-## What is notebook-ui?
+---
 
-A React component library with a paper notebook aesthetic. **Single source of truth for all UI** across applications (CMMS, Conductor, epstein-files). Host apps use notebook-ui exclusively - no custom HTML/CSS/Tailwind.
+## Project Context
 
-## Commands
+- **Product:** React component library with a paper notebook aesthetic — single source of truth for all UI across consuming apps (prylance, epstein-files, etc.)
+- **Stack:** React 18/19, TypeScript, Tailwind CSS v3, Rollup
+- **Architecture:** Component library built to CommonJS + ESM + types + CSS
+- **Deploy:** Published as `@papernote/ui` npm package; consumers install and import
+- **Key integrations:** lucide-react (icons), Tailwind design tokens (paper, ink, primary, accent)
+
+## Build & Run
 
 ```bash
 npm run build      # Build library (dist/)
+npm run dev        # Watch mode
 npm run typecheck  # Type check
 npm run lint       # Lint
-npm run dev        # Watch mode
 ```
-
-## Critical Rules
-
-**NO raw HTML in host apps:**
-```tsx
-// WRONG
-<div className="flex gap-4"><h1>Title</h1></div>
-
-// CORRECT
-<Stack direction="horizontal" gap="md">
-  <Text as="h1" size="2xl" weight="bold">Title</Text>
-</Stack>
-```
-
-- No `<div>`, `<span>`, `<h1>`-`<h6>`, `<p>` - use `Stack`, `Grid`, `Box`, `Text`
-- No `className` with Tailwind utilities
-- No inline `style={{}}` 
-- All icons from `lucide-react`
 
 ## Architecture
+
+### Key Directories
 
 ```
 src/
@@ -43,10 +33,15 @@ src/
 └── utils/          # Helpers (excelExport, statisticsFormatter)
 ```
 
-**Build**: Rollup → CommonJS, ESM, types, CSS
-**Styling**: Tailwind CSS v3 with custom design tokens (paper, ink, primary, accent)
+### Key Design Decisions
 
-## Component Categories
+- **No raw HTML in consumers:** Host apps must use library components exclusively — no `<div>`, `<span>`, `<h1>`-`<h6>`, `<p>`, no `className` with Tailwind, no inline `style={{}}`
+- **Rollup build:** Outputs CommonJS, ESM, types, and CSS
+- **Custom design tokens:** paper, ink, primary, accent color families via Tailwind config
+
+## Code Conventions
+
+### Component Categories
 
 | Category | Components |
 |----------|------------|
@@ -59,60 +54,30 @@ src/
 | **Mobile** | BottomSheet, SwipeableCard, PullToRefresh, HorizontalScroll |
 | **Advanced** | CommandPalette, KanbanBoard, Calendar, Timeline, TreeView |
 
-## Quick Patterns
-
-**Layout:**
-```tsx
-<Stack gap="md">...</Stack>                    // Vertical
-<Stack direction="horizontal" gap="sm">...</Stack>  // Horizontal
-<Grid columns={3} gap="md">...</Grid>          // Grid
-<Text as="h1" size="2xl" weight="bold">...</Text>   // Typography
-```
-
-**Forms:**
-```tsx
-<Button loading={saving} onClick={save}>Save</Button>
-<Input label="Email" validationState="error" validationMessage="Invalid" clearable />
-<Select options={opts} value={val} onChange={setVal} searchable clearable />
-```
-
-**Data:**
-```tsx
-<DataTable
-  data={items}
-  columns={[{ key: 'name', header: 'Name', sortable: true }]}
-  paginated currentPage={page} totalItems={total}
-  onEdit={edit} onDelete={del}
-/>
-```
-
-**Feedback:**
-```tsx
-addSuccessMessage('Saved');
-addErrorMessage('Failed');
-<Modal isOpen={open} onClose={close} title="Edit" size="lg" scrollable>...</Modal>
-```
-
-## Adding Components
+### Adding Components
 
 1. Create in `src/components/`
 2. Export from `src/components/index.ts`
 3. `npm run build`
 4. Host app: `npm update notebook-ui`
 
-## Key Types (src/types/index.ts)
+### Key Types (`src/types/index.ts`)
 
-- `BaseDataItem` - All table data must have `id`
-- `PaginationResponse` - Standard paginated API shape
-- `DataFetchParams` - Fetch params for paginated data
+- `BaseDataItem` — All table data must have `id`
+- `PaginationResponse` — Standard paginated API shape
+- `DataFetchParams` — Fetch params for paginated data
 
-## Consumer Setup
+## Domain-Specific Rules
 
-```tsx
-import 'notebook-ui/styles';
-```
+- All icons must come from `lucide-react` — no other icon libraries
+- Consumer setup requires `import 'notebook-ui/styles'` and Tailwind config including notebook-ui paths
+- Peer dependencies: react, react-dom, react-router-dom, lucide-react
 
-Configure Tailwind to include notebook-ui paths. Install peers: react, react-dom, react-router-dom, lucide-react.
+## What NOT To Do (Project-Specific)
+
+- Do NOT use raw HTML elements in consuming apps — use Stack, Grid, Box, Text instead
+- Do NOT use `className` with Tailwind utilities in consuming apps
+- Do NOT use inline `style={{}}` in consuming apps
 
 ---
 
