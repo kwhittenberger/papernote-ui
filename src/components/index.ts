@@ -287,6 +287,15 @@ export type { PaginationProps } from './Pagination';
 export { default as StepIndicator } from './StepIndicator';
 export type { StepIndicatorProps, Step } from './StepIndicator';
 
+export { default as ProcessIndicator } from './ProcessIndicator';
+export type { ProcessIndicatorProps, ProcessStage } from './ProcessIndicator';
+
+export { default as EntityCard } from './EntityCard';
+export type { EntityCardProps } from './EntityCard';
+
+export { default as SplitPane } from './SplitPane';
+export type { SplitPaneProps } from './SplitPane';
+
 // Data Display Components
 export { default as Badge } from './Badge';
 export type { BadgeProps } from './Badge';
