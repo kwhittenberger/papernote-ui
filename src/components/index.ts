@@ -296,6 +296,45 @@ export type { EntityCardProps } from './EntityCard';
 export { default as SplitPane } from './SplitPane';
 export type { SplitPaneProps } from './SplitPane';
 
+export { default as CaseQueueItem } from './CaseQueueItem';
+export type { CaseQueueItemProps } from './CaseQueueItem';
+
+export { default as SLAIndicator } from './SLAIndicator';
+export type { SLAIndicatorProps } from './SLAIndicator';
+
+export { default as MatchIndicator } from './MatchIndicator';
+export type { MatchIndicatorProps } from './MatchIndicator';
+
+export { default as VarianceDisplay } from './VarianceDisplay';
+export type { VarianceDisplayProps } from './VarianceDisplay';
+
+export { default as ActionCard } from './ActionCard';
+export type { ActionCardProps, ActionCardAction } from './ActionCard';
+
+export { default as SystemActionEntry } from './SystemActionEntry';
+export type { SystemActionEntryProps } from './SystemActionEntry';
+
+export { default as ProcessHealthBar } from './ProcessHealthBar';
+export type { ProcessHealthBarProps, ProcessHealthMetric } from './ProcessHealthBar';
+
+export { default as FunnelChart } from './FunnelChart';
+export type { FunnelChartProps, FunnelStage } from './FunnelChart';
+
+export { default as PersonaDashboard } from './PersonaDashboard';
+export type { PersonaDashboardProps, DashboardWidget } from './PersonaDashboard';
+
+export { default as ConfidenceIndicator } from './ConfidenceIndicator';
+export type { ConfidenceIndicatorProps } from './ConfidenceIndicator';
+
+export { default as ConfidenceBadge } from './ConfidenceBadge';
+export type { ConfidenceBadgeProps } from './ConfidenceBadge';
+
+export { default as ReviewDecisionCard } from './ReviewDecisionCard';
+export type { ReviewDecisionCardProps, ConfidenceBreakdown, ReviewAction } from './ReviewDecisionCard';
+
+export { default as AnomalyBanner } from './AnomalyBanner';
+export type { AnomalyBannerProps } from './AnomalyBanner';
+
 // Data Display Components
 export { default as Badge } from './Badge';
 export type { BadgeProps } from './Badge';
