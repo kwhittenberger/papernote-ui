@@ -20,6 +20,8 @@ export interface FunnelChartProps {
   height?: number;
   /** Whether to show conversion rates between stages */
   showConversion?: boolean;
+  /** Label size preset — controls stage name, value, count, and conversion text */
+  labelSize?: 'sm' | 'md' | 'lg';
   /** Click handler for a stage */
   onStageClick?: (stageName: string) => void;
   /** Additional className */
@@ -41,6 +43,16 @@ const defaultColors = [
 ];
 
 // =============================================================================
+// Label Size Presets
+// =============================================================================
+
+const labelSizes = {
+  sm: { name: '9px', value: '8px', count: '10px', conversion: '8px' },
+  md: { name: '11px', value: '10px', count: '12px', conversion: '10px' },
+  lg: { name: '13px', value: '12px', count: '14px', conversion: '12px' },
+} as const;
+
+// =============================================================================
 // Component
 // =============================================================================
 
@@ -55,11 +67,13 @@ export default function FunnelChart({
   stages,
   height = 300,
   showConversion = true,
+  labelSize = 'md',
   onStageClick,
   className = '',
 }: FunnelChartProps) {
   if (stages.length === 0) return null;
 
+  const sizes = labelSizes[labelSize];
   const maxCount = Math.max(...stages.map(s => s.count), 1);
   const stageHeight = height / stages.length;
   const svgWidth = 450;
@@ -115,8 +129,8 @@ export default function FunnelChart({
                 y={y + stageHeight / 2 + 1}
                 textAnchor="middle"
                 dominantBaseline="middle"
-                className="fill-white text-xs font-bold"
-                style={{ fontSize: '12px' }}
+                className="fill-white font-bold"
+                style={{ fontSize: sizes.count }}
               >
                 {stage.count.toLocaleString()}
               </text>
@@ -126,7 +140,7 @@ export default function FunnelChart({
                 x={centerX + funnelWidth / 2 + 12}
                 y={y + stageHeight / 2 - 4}
                 className="fill-ink-700 dark:fill-ink-300"
-                style={{ fontSize: '9px', fontWeight: 500 }}
+                style={{ fontSize: sizes.name, fontWeight: 500 }}
               >
                 {stage.name}
               </text>
@@ -135,7 +149,7 @@ export default function FunnelChart({
                   x={centerX + funnelWidth / 2 + 12}
                   y={y + stageHeight / 2 + 7}
                   className="fill-ink-400"
-                  style={{ fontSize: '8px' }}
+                  style={{ fontSize: sizes.value }}
                 >
                   {stage.value}
                 </text>
@@ -143,17 +157,15 @@ export default function FunnelChart({
 
               {/* Conversion rate on left — shows stage-to-stage conversion */}
               {showConversion && conversionRate !== null && (
-                <g>
-                  <text
-                    x={centerX - funnelWidth / 2 - 16}
-                    y={y + 4}
-                    textAnchor="end"
-                    className="fill-ink-500"
-                    style={{ fontSize: '10px', fontWeight: 500 }}
-                  >
-                    ↓ {conversionRate}%
-                  </text>
-                </g>
+                <text
+                  x={centerX - funnelWidth / 2 - 16}
+                  y={y + 4}
+                  textAnchor="end"
+                  className="fill-ink-500"
+                  style={{ fontSize: sizes.conversion, fontWeight: 500 }}
+                >
+                  ↓ {conversionRate}%
+                </text>
               )}
             </g>
           );
