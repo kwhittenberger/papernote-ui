@@ -49,7 +49,7 @@ export interface PageProps {
  */
 export const Page: React.FC<PageProps> = ({
   children,
-  maxWidth = '7xl',
+  maxWidth = 'full',
   className = '',
   padding = 'normal',
   fixed = false
@@ -74,7 +74,7 @@ export const Page: React.FC<PageProps> = ({
   // Margin classes - responsive (fixed left/top, responsive right/bottom) vs all fixed
   const marginClasses = fixed
     ? 'mt-4 ml-4 mr-4 mb-4'
-    : 'mt-4 ml-4 mr-4 mb-4 sm:mr-6 md:mr-8 lg:mr-auto sm:mb-6 md:mb-8';
+    : 'mt-4 ml-4 mr-4 mb-4 sm:mb-6 md:mb-8';
 
   return (
     <div className="min-h-screen bg-paper-100">

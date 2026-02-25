@@ -84,7 +84,7 @@ export function PageLayout({
   children,
   className = '',
   headerContent,
-  maxWidth = '7xl',
+  maxWidth = 'full',
   fixed = false,
   actions,
   rightContent,
