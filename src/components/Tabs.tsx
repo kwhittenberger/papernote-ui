@@ -348,7 +348,7 @@ export function TabsTrigger({
       data-testid={dataAttributes?.['data-testid'] || `tab-${value}`}
       {...dataAttributes}
     >
-      {icon && <span className={`flex-shrink-0 ${sizeClasses[size].icon}`}>{icon}</span>}
+      {icon && <span className={`flex-shrink-0 [&>svg]:h-full [&>svg]:w-full ${sizeClasses[size].icon}`}>{icon}</span>}
       <span>{children}</span>
       {badge !== undefined && (
         <Badge variant={badgeVariant} size={sizeClasses[size].badgeSize}>
@@ -678,7 +678,7 @@ export default function Tabs({
               data-testid={tab.dataAttributes?.['data-testid'] || `tab-${tab.id}`}
               {...tab.dataAttributes}
             >
-              {tab.icon && <span className={`flex-shrink-0 ${sizeClasses[size].icon}`}>{tab.icon}</span>}
+              {tab.icon && <span className={`flex-shrink-0 [&>svg]:h-full [&>svg]:w-full ${sizeClasses[size].icon}`}>{tab.icon}</span>}
               <span className={isTabCloseable ? 'mr-1' : ''}>{tab.label}</span>
               {tab.badge !== undefined && (
                 <Badge
