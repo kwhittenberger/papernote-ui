@@ -62,9 +62,9 @@ export default function FunnelChart({
 
   const maxCount = Math.max(...stages.map(s => s.count), 1);
   const stageHeight = height / stages.length;
-  const svgWidth = 440;
+  const svgWidth = 450;
   const padding = 20;
-  const leftLabelSpace = 40; // Space for conversion rate labels on left
+  const leftLabelSpace = 50; // Space for conversion rate labels on left
   const rightLabelSpace = 160; // Space for stage name + value labels on right
   const funnelWidth = svgWidth - padding * 2 - leftLabelSpace - rightLabelSpace;
 
@@ -141,17 +141,19 @@ export default function FunnelChart({
                 </text>
               )}
 
-              {/* Conversion rate on left */}
+              {/* Conversion rate on left — shows stage-to-stage conversion */}
               {showConversion && conversionRate !== null && (
-                <text
-                  x={centerX - funnelWidth / 2 - 8}
-                  y={y + 4}
-                  textAnchor="end"
-                  className="fill-ink-400"
-                  style={{ fontSize: '10px' }}
-                >
-                  {conversionRate}%
-                </text>
+                <g>
+                  <text
+                    x={centerX - funnelWidth / 2 - 16}
+                    y={y + 4}
+                    textAnchor="end"
+                    className="fill-ink-500"
+                    style={{ fontSize: '10px', fontWeight: 500 }}
+                  >
+                    ↓ {conversionRate}%
+                  </text>
+                </g>
               )}
             </g>
           );
