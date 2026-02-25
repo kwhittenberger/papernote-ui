@@ -124,18 +124,18 @@ export default function FunnelChart({
               {/* Labels on right side */}
               <text
                 x={centerX + funnelWidth / 2 + 12}
-                y={y + stageHeight / 2 - 6}
+                y={y + stageHeight / 2 - 4}
                 className="fill-ink-700 dark:fill-ink-300"
-                style={{ fontSize: '11px', fontWeight: 500 }}
+                style={{ fontSize: '9px', fontWeight: 500 }}
               >
                 {stage.name}
               </text>
               {stage.value && (
                 <text
                   x={centerX + funnelWidth / 2 + 12}
-                  y={y + stageHeight / 2 + 8}
+                  y={y + stageHeight / 2 + 7}
                   className="fill-ink-400"
-                  style={{ fontSize: '10px' }}
+                  style={{ fontSize: '8px' }}
                 >
                   {stage.value}
                 </text>
