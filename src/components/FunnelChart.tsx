@@ -62,9 +62,11 @@ export default function FunnelChart({
 
   const maxCount = Math.max(...stages.map(s => s.count), 1);
   const stageHeight = height / stages.length;
-  const svgWidth = 400;
+  const svgWidth = 440;
   const padding = 20;
-  const funnelWidth = svgWidth - padding * 2 - 160; // Leave room for labels
+  const leftLabelSpace = 40; // Space for conversion rate labels on left
+  const rightLabelSpace = 160; // Space for stage name + value labels on right
+  const funnelWidth = svgWidth - padding * 2 - leftLabelSpace - rightLabelSpace;
 
   return (
     <div className={className}>
@@ -75,7 +77,7 @@ export default function FunnelChart({
           const y = idx * stageHeight;
           const topWidth = funnelWidth * ratio;
           const bottomWidth = funnelWidth * nextRatio;
-          const centerX = padding + funnelWidth / 2;
+          const centerX = padding + leftLabelSpace + funnelWidth / 2;
           const color = stage.color || defaultColors[idx % defaultColors.length];
 
           // Conversion rate
