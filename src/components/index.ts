@@ -640,3 +640,9 @@ export {
   Responsive,
 } from '../context/MobileContext';
 export type { MobileContextValue, MobileProviderProps } from '../context/MobileContext';
+
+// Chat & AI Components
+export { default as ChatUI } from './ChatUI';
+export type { ChatUIProps, ChatMessage } from './ChatUI';
+export { default as InsightsPanelUI } from './InsightsPanelUI';
+export type { InsightsPanelUIProps, AnalyticsInsight } from './InsightsPanelUI';
