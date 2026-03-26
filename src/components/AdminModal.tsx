@@ -109,6 +109,7 @@ export function AdminModal({
             className="flex-1 overflow-y-auto min-h-0 h-0 px-6 py-6 admin-modal-form"
             onSubmit={handleFormSubmit}
             id={formId}
+            noValidate
           >
             {activeTab?.content || children}
           </form>
