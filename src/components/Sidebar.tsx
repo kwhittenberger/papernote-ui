@@ -331,8 +331,26 @@ export default function Sidebar({
       {/* Navigation */}
       <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto">
         {items.map((item) => {
-          // Render separator
+          // Render separator or section header
           if (item.separator) {
+            // Section header: separator with a label
+            if (item.label) {
+              return (
+                <div
+                  key={item.id}
+                  className="mt-6 mb-2 px-3"
+                  data-testid={item.dataAttributes?.['data-testid'] || `sidebar-section-${item.id}`}
+                  {...item.dataAttributes}
+                >
+                  <div className="border-t border-paper-300 pt-3">
+                    <span className="text-[10px] font-semibold uppercase tracking-widest text-ink-400">
+                      {item.label}
+                    </span>
+                  </div>
+                </div>
+              );
+            }
+            // Plain separator: just a line
             return (
               <div
                 key={item.id}
