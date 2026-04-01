@@ -10,6 +10,16 @@ export interface PaginationProps {
   maxPageNumbers?: number;
   /** Show page jump input field */
   showPageJump?: boolean;
+  /** Total number of items across all pages */
+  totalItems?: number;
+  /** Current page size */
+  pageSize?: number;
+  /** Available page size options */
+  pageSizeOptions?: number[];
+  /** Callback when page size changes */
+  onPageSizeChange?: (size: number) => void;
+  /** Show "Showing X-Y of Z records" text */
+  showRecordCount?: boolean;
 }
 
 export default function Pagination({
@@ -19,6 +29,11 @@ export default function Pagination({
   showPageNumbers = true,
   maxPageNumbers = 5,
   showPageJump = false,
+  totalItems,
+  pageSize,
+  pageSizeOptions,
+  onPageSizeChange,
+  showRecordCount = false,
 }: PaginationProps) {
   const [jumpValue, setJumpValue] = useState('');
   const getPageNumbers = () => {
@@ -67,8 +82,23 @@ export default function Pagination({
     }
   };
 
+  const showLeftSection = showRecordCount && totalItems !== undefined && pageSize;
+  const showRightSection = onPageSizeChange && pageSizeOptions && pageSizeOptions.length > 0;
+
+  const rangeStart = totalItems ? (currentPage - 1) * (pageSize || 0) + 1 : 0;
+  const rangeEnd = totalItems ? Math.min(currentPage * (pageSize || 0), totalItems) : 0;
+
   return (
-    <nav className="flex items-center justify-center gap-2" aria-label="Pagination">
+    <nav className={`flex items-center gap-2 ${showLeftSection || showRightSection ? 'justify-between' : 'justify-center'}`} aria-label="Pagination">
+      {/* Record Count (left) */}
+      {showLeftSection ? (
+        <span className="text-sm text-ink-500 tabular-nums shrink-0">
+          Showing {rangeStart.toLocaleString()}–{rangeEnd.toLocaleString()} of {totalItems!.toLocaleString()}
+        </span>
+      ) : showRightSection ? <div /> : null}
+
+      {/* Center: nav buttons */}
+      <div className="flex items-center gap-2">
       {/* Previous Button */}
       <button
         onClick={() => onPageChange(currentPage - 1)}
@@ -148,6 +178,24 @@ export default function Pagination({
           </button>
         </form>
       )}
+      </div>
+
+      {/* Page Size Selector (right) */}
+      {showRightSection ? (
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-sm text-ink-500 hidden sm:inline">Per page:</span>
+          <select
+            value={pageSize || pageSizeOptions![0]}
+            onChange={(e) => onPageSizeChange!(Number(e.target.value))}
+            className="px-2 py-1.5 text-sm border border-paper-300 rounded-lg bg-white text-ink-700 focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-accent-400 cursor-pointer"
+            aria-label="Items per page"
+          >
+            {pageSizeOptions!.map((size) => (
+              <option key={size} value={size}>{size}</option>
+            ))}
+          </select>
+        </div>
+      ) : showLeftSection ? <div /> : null}
     </nav>
   );
 }

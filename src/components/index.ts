@@ -54,6 +54,12 @@ export type { FormControlProps } from './FormControl';
 export { default as FilterBar } from './FilterBar';
 export type { FilterBarProps, FilterConfig } from './FilterBar';
 
+export { default as FilterPills } from './FilterPills';
+export type { FilterPillsProps, FilterPill } from './FilterPills';
+
+export { default as LetterNav } from './LetterNav';
+export type { LetterNavProps } from './LetterNav';
+
 export { default as StatCard } from './StatCard';
 export type { StatCardProps } from './StatCard';
 export { default as StatsGrid, StatItem } from './StatsGrid';

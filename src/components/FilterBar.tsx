@@ -1,4 +1,4 @@
-import { X } from 'lucide-react';
+import { X, Search } from 'lucide-react';
 import Input from './Input';
 import Select, { type SelectOption } from './Select';
 import Button from './Button';
@@ -6,7 +6,7 @@ import Button from './Button';
 export interface FilterConfig {
   key: string;
   label: string;
-  type: 'text' | 'select' | 'date' | 'number' | 'boolean';
+  type: 'text' | 'search' | 'select' | 'date' | 'number' | 'boolean' | 'dateRange' | 'toggle' | 'multiSelect';
   placeholder?: string;
   options?: Array<{ label: string; value: unknown }>;
 }
@@ -42,7 +42,15 @@ export default function FilterBar({
       // Default clear: set all values to null/empty
       const clearedValues: Record<string, unknown> = {};
       filters.forEach(filter => {
-        clearedValues[filter.key] = filter.type === 'text' ? '' : null;
+        if (filter.type === 'text' || filter.type === 'search') {
+          clearedValues[filter.key] = '';
+        } else if (filter.type === 'dateRange') {
+          clearedValues[filter.key] = { from: undefined, to: undefined };
+        } else if (filter.type === 'multiSelect') {
+          clearedValues[filter.key] = [];
+        } else {
+          clearedValues[filter.key] = null;
+        }
       });
       onChange(clearedValues);
     }
@@ -124,6 +132,111 @@ export default function FilterBar({
               )
             }
           />
+        );
+      }
+
+      case 'search':
+        return (
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="h-4 w-4 text-ink-400" />
+            </div>
+            <input
+              type="text"
+              placeholder={filter.placeholder || `Search ${filter.label}...`}
+              value={(value as string) || ''}
+              onChange={(e) => handleFilterChange(filter.key, e.target.value)}
+              className="input pl-9"
+            />
+          </div>
+        );
+
+      case 'dateRange': {
+        const rangeValue = (value as { from?: string; to?: string }) || {};
+        return (
+          <div className="flex items-center gap-2">
+            <input
+              type="date"
+              value={rangeValue.from || ''}
+              onChange={(e) =>
+                handleFilterChange(filter.key, { ...rangeValue, from: e.target.value || undefined })
+              }
+              className="input text-sm"
+              aria-label={`${filter.label} from`}
+            />
+            <span className="text-ink-400 text-xs">to</span>
+            <input
+              type="date"
+              value={rangeValue.to || ''}
+              onChange={(e) =>
+                handleFilterChange(filter.key, { ...rangeValue, to: e.target.value || undefined })
+              }
+              className="input text-sm"
+              aria-label={`${filter.label} to`}
+            />
+          </div>
+        );
+      }
+
+      case 'toggle': {
+        const toggleOptions: SelectOption[] = [
+          { value: '', label: 'All' },
+          { value: 'true', label: 'Yes' },
+          { value: 'false', label: 'No' },
+        ];
+        const currentVal = value === null || value === undefined ? '' : String(value);
+        return (
+          <div className="flex rounded-lg border border-paper-300 overflow-hidden" role="group">
+            {toggleOptions.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => handleFilterChange(filter.key, opt.value === '' ? null : opt.value === 'true')}
+                className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+                  currentVal === opt.value
+                    ? 'bg-accent-500 text-white'
+                    : 'bg-white text-ink-600 hover:bg-paper-50'
+                } ${opt.value !== '' ? 'border-l border-paper-300' : ''}`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        );
+      }
+
+      case 'multiSelect': {
+        const selectedValues = Array.isArray(value) ? (value as string[]) : [];
+        const msOptions = filter.options || [];
+        return (
+          <div className="relative">
+            <Select
+              options={[{ value: '', label: `All ${filter.label}` }, ...msOptions.map(o => ({ value: String(o.value), label: o.label }))]}
+              value=""
+              onChange={(newValue) => {
+                if (!newValue) {
+                  handleFilterChange(filter.key, []);
+                } else if (!selectedValues.includes(newValue)) {
+                  handleFilterChange(filter.key, [...selectedValues, newValue]);
+                }
+              }}
+            />
+            {selectedValues.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-1">
+                {selectedValues.map((sv) => {
+                  const opt = msOptions.find(o => String(o.value) === sv);
+                  return (
+                    <span key={sv} className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-accent-100 text-accent-700 rounded-full">
+                      {opt?.label || sv}
+                      <button type="button" onClick={() => handleFilterChange(filter.key, selectedValues.filter(v => v !== sv))} className="hover:text-accent-900">
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         );
       }
 
