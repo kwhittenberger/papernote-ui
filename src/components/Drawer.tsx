@@ -131,7 +131,7 @@ export default function Drawer({
       {/* Overlay */}
       {showOverlay && (
         <div
-          className="fixed inset-0 bg-ink-900 bg-opacity-50 backdrop-blur-sm animate-fade-in"
+          className="fixed inset-0 bg-ink-900/50 backdrop-blur-sm animate-fade-in"
           onClick={handleOverlayClick}
           aria-hidden="true"
         />

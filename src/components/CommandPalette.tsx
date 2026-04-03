@@ -167,7 +167,7 @@ export default function CommandPalette({
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh] animate-fade-in">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-ink-900 bg-opacity-50 backdrop-blur-sm"
+        className="absolute inset-0 bg-ink-900/50 backdrop-blur-sm"
         onClick={() => onOpenChange(false)}
       />
 
@@ -185,7 +185,7 @@ export default function CommandPalette({
               setSelectedIndex(0);
             }}
             placeholder={placeholder}
-            className="flex-1 text-base text-ink-900 placeholder-ink-400 bg-transparent border-none outline-none"
+            className="flex-1 text-base text-ink-900 placeholder:text-ink-400 bg-transparent border-none outline-none"
           />
           {trigger && (
             <kbd className="hidden sm:inline-block px-2 py-1 text-xs font-mono text-ink-500 bg-paper-100 border border-paper-300 rounded">

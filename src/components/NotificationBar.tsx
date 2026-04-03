@@ -54,7 +54,7 @@ export default function NotificationBar({ notifications, onDismiss }: Notificati
             className={`border-2 rounded-xl p-4 backdrop-blur-sm transform transition-all duration-300 ease-in-out animate-slide-in ${notificationStyles[notification.type]}`}
           >
             <div className="flex items-start space-x-3">
-              <div className={`flex-shrink-0 p-1 rounded-full bg-white bg-opacity-50 ${iconStyles[notification.type]}`}>
+              <div className={`flex-shrink-0 p-1 rounded-full bg-white/50 ${iconStyles[notification.type]}`}>
                 <IconComponent className="h-5 w-5" />
               </div>
               <div className="flex-1 min-w-0">
@@ -68,7 +68,7 @@ export default function NotificationBar({ notifications, onDismiss }: Notificati
               {notification.dismissible && onDismiss && (
                 <button
                   onClick={() => onDismiss(notification.id)}
-                  className={`flex-shrink-0 p-1.5 hover:bg-white hover:bg-opacity-60 rounded-full transition-all duration-200 ${iconStyles[notification.type]} hover:scale-110`}
+                  className={`flex-shrink-0 p-1.5 hover:bg-white/60 rounded-full transition-all duration-200 ${iconStyles[notification.type]} hover:scale-110`}
                   title="Dismiss notification"
                 >
                   <X className="h-4 w-4" />

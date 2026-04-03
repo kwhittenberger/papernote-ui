@@ -1646,7 +1646,7 @@ export default function DataTable<T extends BaseDataItem = BaseDataItem>({
       {/* Loading overlay for when data is being refreshed */}
       {loading && data.length > 0 && (
         <div
-          className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-20"
+          className="absolute inset-0 bg-white/75 flex items-center justify-center z-20"
           style={{ backdropFilter: 'blur(2px)' }}
         >
           <div className="flex flex-col items-center gap-3">

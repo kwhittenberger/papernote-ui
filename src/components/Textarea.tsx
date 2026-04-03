@@ -177,7 +177,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             rows={autoExpand ? minRows : rows}
             enterKeyHint={enterKeyHint}
             className={`
-              block w-full border rounded-lg text-ink-800 placeholder-ink-400
+              block w-full border rounded-lg text-ink-800 placeholder:text-ink-400
               bg-white bg-subtle-grain transition-all duration-200
               focus:outline-none focus:ring-2 ${getResizeClass()}
               disabled:bg-paper-100 disabled:text-ink-400 disabled:cursor-not-allowed disabled:opacity-60
