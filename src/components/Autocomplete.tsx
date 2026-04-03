@@ -301,7 +301,7 @@ const Autocomplete = forwardRef<AutocompleteHandle, AutocompleteProps>(({
           disabled={disabled}
           className={`
             w-full pl-9 pr-9 py-2
-            text-sm text-ink-900 placeholder-ink-400
+            text-sm text-ink-900 placeholder:text-ink-400
             bg-white border rounded-lg
             focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-accent-400
             disabled:bg-paper-100 disabled:cursor-not-allowed

@@ -187,7 +187,7 @@ export default function MarkdownEditor({
               disabled={disabled}
               className={`
                 w-full p-3 outline-none resize-none
-                text-sm text-ink-900 font-mono placeholder-ink-400
+                text-sm text-ink-900 font-mono placeholder:text-ink-400
                 ${disabled ? 'bg-paper-100 cursor-not-allowed' : 'bg-white'}
               `}
               style={{ minHeight, maxHeight }}

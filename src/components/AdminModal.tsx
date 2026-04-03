@@ -63,7 +63,7 @@ export function AdminModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 admin-modal-overlay">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 admin-modal-overlay">
       <div 
         className={`bg-white rounded-lg w-full ${sizeClasses[size]} flex flex-col overflow-hidden shadow-2xl admin-modal-content`}
         style={{ height: height }}

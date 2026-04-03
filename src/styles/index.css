@@ -3,9 +3,12 @@
 /* Component styles */
 @import '../components/Spreadsheet.css';
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import "./theme.css";
+
+/* Content sources for class detection */
+@source "../components/**/*.{tsx,ts}";
+@source inline("bg-sky-100 bg-sky-50 bg-sky-100/50 bg-amber-100 bg-amber-50 bg-amber-100/50 bg-emerald-100 bg-emerald-50 bg-emerald-100/50 bg-pink-100 bg-pink-50 bg-pink-100/50");
 
 @layer base {
   body {
@@ -47,7 +50,7 @@
 
   /* Input Styles - Comfortable & Clear */
   .input {
-    @apply block w-full px-4 py-2.5 border border-paper-300 rounded-lg text-sm text-ink-800 placeholder-ink-400 bg-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-accent-400 hover:border-paper-400;
+    @apply block w-full px-4 py-2.5 border border-paper-300 rounded-lg text-sm text-ink-800 placeholder:text-ink-400 bg-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-accent-400 hover:border-paper-400;
   }
 
   .label {
@@ -82,27 +85,6 @@
 
   .badge-info {
     @apply bg-primary-50 text-primary-700 border border-primary-200;
-  }
-
-  /* Table Styles - Clean & Minimal */
-  .table {
-    @apply min-w-full divide-y divide-paper-200;
-  }
-
-  .table-header {
-    @apply bg-paper-50;
-  }
-
-  .table-header-cell {
-    @apply px-6 py-3 text-left text-xs font-medium text-ink-500 uppercase tracking-wider;
-  }
-
-  .table-cell {
-    @apply px-6 py-4 whitespace-nowrap text-sm text-ink-700;
-  }
-
-  .table-row {
-    @apply hover:bg-paper-50 transition-colors duration-150;
   }
 
   /* Navigation Styles - Notebook-like */
@@ -140,7 +122,7 @@
   }
 
   input:checked + .slider:before {
-    @apply transform translate-x-5;
+    @apply translate-x-5;
   }
 
   /* Stat Card Styles - Paper-like */
@@ -316,56 +298,33 @@
   }
 }
 
-@layer utilities {
-  .line-clamp-1 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 1;
-  }
-  
-  .line-clamp-2 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-  }
-  
-  .line-clamp-3 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-  }
-
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  
-  .scrollbar-hide::-webkit-scrollbar {
+/* Custom utilities */
+@utility scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
     display: none;
   }
+}
 
-  .text-shadow {
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
+@utility text-shadow {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
 
-  .bg-gradient-primary {
-    background: linear-gradient(135deg, #64748b, #475569);
-  }
+@utility bg-gradient-primary {
+  background: linear-gradient(135deg, #64748b, #475569);
+}
 
-  .bg-gradient-success {
-    background: linear-gradient(135deg, #10b981, #059669);
-  }
+@utility bg-gradient-success {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
 
-  .bg-gradient-warning {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
-  }
+@utility bg-gradient-warning {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
 
-  .bg-gradient-accent {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
-  }
+@utility bg-gradient-accent {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
 }
 
 /* Custom scrollbar - Subtle paper aesthetic */
@@ -388,21 +347,7 @@
   background: #a8a29e;
 }
 
-/* Loading animations */
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: .5;
-  }
-}
-
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Table styles - Clean & minimal */
+/* Table styles - Clean & minimal (un-layered for higher specificity) */
 .table {
   @apply min-w-full divide-y divide-paper-200;
 }
@@ -429,35 +374,33 @@
 }
 
 .table-stable {
-  @apply table-fixed;
-  /* Removed min-height to allow content-based sizing for two-row layout */
+  table-layout: fixed !important;
 }
 
-  .table-stable thead {
-    height: auto !important;
-  }
+.table-stable thead {
+  height: auto !important;
+}
 
-  .table-stable thead th {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background-color: #fafaf9;
-    backdrop-filter: blur(8px);
-    /* padding controlled by component density classes (currentDensity.header) */
-    height: 28px !important;
-    min-height: 28px !important;
-    max-height: 28px !important;
-    line-height: 1 !important;
-    vertical-align: middle !important;
-    overflow: hidden !important;
-    box-sizing: border-box !important;
-    font-size: 0.75rem !important;
-    border-bottom: 1px solid #e7e5e4;
-  }
+.table-stable thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: #fafaf9;
+  backdrop-filter: blur(8px);
+  height: 28px !important;
+  min-height: 28px !important;
+  max-height: 28px !important;
+  line-height: 1 !important;
+  vertical-align: middle !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  font-size: 0.75rem !important;
+  border-bottom: 1px solid #e7e5e4;
+}
 
 /* Primary rows with normal content */
 .table-stable tbody tr {
-  height: auto; /* Allow content-based sizing for two-row layout */
+  height: auto;
 }
 
 /* Secondary rows should be compact */
@@ -532,59 +475,6 @@
 .animate-expand {
   animation: expandRow 0.3s ease-out forwards;
   overflow: hidden;
-}
-
-/* Drawer Slide Animations */
-@keyframes slideInLeft {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideInRight {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideInTop {
-  from {
-    transform: translateY(-100%);
-  }
-  to {
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideInBottom {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0);
-  }
-}
-
-.animate-slide-in-left {
-  animation: slideInLeft 0.3s ease-out;
-}
-
-.animate-slide-in-right {
-  animation: slideInRight 0.3s ease-out;
-}
-
-.animate-slide-in-top {
-  animation: slideInTop 0.3s ease-out;
-}
-
-.animate-slide-in-bottom {
-  animation: slideInBottom 0.3s ease-out;
 }
 
 /* Touch-friendly sizing for coarse pointer devices (touch screens) */

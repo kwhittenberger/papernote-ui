@@ -1,6 +1,6 @@
 {
   "name": "@papernote/ui",
-  "version": "1.14.0",
+  "version": "2.0.0",
   "type": "module",
   "description": "A modern React component library with a paper notebook aesthetic - minimal, professional, and expressive",
   "main": "dist/index.js",
@@ -20,6 +20,8 @@
     },
     "./styles": "./dist/styles.css",
     "./styles.css": "./dist/styles.css",
+    "./theme": "./src/styles/theme.css",
+    "./theme.css": "./src/styles/theme.css",
     "./tailwind-config": "./tailwind.config.js"
   },
   "scripts": {
@@ -60,7 +62,8 @@
     "@types/react-dom": "^19.2.2",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
-    "autoprefixer": "^10.4.0",
+    "@tailwindcss/postcss": "^4.0.0",
+    "@tailwindcss/vite": "^4.0.0",
     "eslint": "^8.0.0",
     "eslint-plugin-react": "^7.0.0",
     "eslint-plugin-react-hooks": "^4.0.0",
@@ -69,7 +72,6 @@
     "jest-environment-jsdom": "^30.2.0",
     "lucide-react": "^0.554.0",
     "postcss": "^8.4.0",
-    "postcss-import": "^16.1.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.9.6",
@@ -78,7 +80,7 @@
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-postcss": "^4.0.0",
     "storybook": "^10.1.11",
-    "tailwindcss": "^3.4.0",
+    "tailwindcss": "^4.0.0",
     "ts-jest": "^29.4.5",
     "tslib": "^2.6.0",
     "typescript": "^5.0.0",
